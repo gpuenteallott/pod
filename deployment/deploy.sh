@@ -74,7 +74,8 @@ aws ec2 run-instances --image-id $AMI --count 1 --instance-type $INSTANCE_TYPE -
 
 while read line
 do
-printf "EC2: " && aws ec2 create-tags --resources $line --tags Key=Name,Value=$NAME-Core
+	printf "EC2: " && aws ec2 create-tags --resources $line --tags Key=Name,Value=$NAME-Core
+	aws ec2 describe-instance-attribute --instance-id $line --attribute publicDnsName
     line=
 done < instance_ids.tmp
 
@@ -82,3 +83,4 @@ done < instance_ids.tmp
 #rm instance_ids.tmp
 rm $INSTANCE_SETUP.tmp
 rm instance_ids.tmp
+
