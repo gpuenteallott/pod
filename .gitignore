@@ -4,3 +4,7 @@
 .settings
 .classpath
 .project
+*.priv
+AwsCredentials.properties
+application/build
+application/bin
