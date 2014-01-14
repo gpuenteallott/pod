@@ -32,8 +32,8 @@ sudo apt-get -y install tomcat7 unzip
 echo `date` " - Installing MySQL" >> $LOG
 
 # Install mysql avoiding the password prompt message
-sudo debconf-set-selections <<< 'mysql-server-5.1 mysql-server/root_password password iit_123'
-sudo debconf-set-selections <<< 'mysql-server-5.1 mysql-server/root_password_again password iit_123'
+sudo debconf-set-selections <<< 'mysql-server-5.1 mysql-server/root_password password kaerus_123'
+sudo debconf-set-selections <<< 'mysql-server-5.1 mysql-server/root_password_again password kaerus_123'
 sudo apt-get -y install mysql-server
 
 echo `date` " - Configuring Tomcat" >> $LOG
