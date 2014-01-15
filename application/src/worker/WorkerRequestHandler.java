@@ -1,5 +1,7 @@
 package worker;
 
+import model.Activity;
+
 import com.eclipsesource.json.JsonObject;
 
 public class WorkerRequestHandler {
@@ -23,28 +25,30 @@ public class WorkerRequestHandler {
 		// Request to install a new activity, retrieving its code
 		if ( action.equals("installActivity") ) {
 			
+			System.out.println("worker processing install activity");
+			
 			// Get message information
 			JsonObject activityJson = json.get("activity").asObject();
-			String activityName = activityJson.get("activityName").asString();
+			String name = activityJson.get("name").asString();
 			String codeLocation = activityJson.get("codeLocation").asString();
 			String executeCommand = activityJson.get("executeCommand").asString();
 			
 			// Set up installer
-			ActivityInstaller ai = new ActivityInstaller();
-			ai.setActivityName(activityName);
-			ai.setCodeLocation(codeLocation);
-			ai.setExecuteCommand(executeCommand);
+			Activity activity = new Activity();
+			activity.setName(name);
+			activity.setCodeLocation(codeLocation);
+			activity.setExecuteCommand(executeCommand);
 			
 			// Start installer execution in a new thread
-			new Thread ( ai ).start();
+			new Thread ( new ActivityInstaller(activity) ).start();
 			
 			// Compose response
 			JsonObject jsonResponse = new JsonObject();
-			jsonResponse.add("activityName", activityName);
+			jsonResponse.add("name", name);
 			jsonResponse.add("status", "installing");
 			return jsonResponse;
 		}
 		
-		return null;
+		return new JsonObject().add("error", "this worker doesn't recognize that request");
 	}
 }

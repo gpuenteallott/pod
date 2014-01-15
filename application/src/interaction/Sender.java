@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import servlet.ServerProperties;
 import worker.WorkerRequestHandler;
 
 import com.eclipsesource.json.JsonObject;
@@ -18,6 +19,10 @@ public class Sender {
 	private String origin;
 	private JsonObject message;
 	
+	public Sender() {
+		this.origin = ServerProperties.getDns();
+	}
+	
 	/**
 	 * Send the message to the specified destination, which could be remote or local
 	 * @return String response
@@ -25,6 +30,9 @@ public class Sender {
 	 * @throws IOException
 	 */
 	public String send() throws MalformedURLException, IOException {
+		
+		// Set origin
+		this.message.add("origin", origin);
 		
 		// If there is no destination, send to this same machine
 		if ( destination.equals("") )
@@ -44,7 +52,8 @@ public class Sender {
 	 */
 	private String sendToMyself() {
 		
-		if ( message.get("workerId") == null ) 
+		// Who is this message for?
+		if ( message.get("for") != null && message.get("for").asString().equals("master") ) 
 			return sendToMyMasterSelf();
 		
 		else

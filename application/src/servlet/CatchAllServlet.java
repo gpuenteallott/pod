@@ -35,8 +35,9 @@ public class CatchAllServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		// Verify that we have the info of the public DNS
-		if ( ServerProperties.getPublicDNS() == null )
-			ServerProperties.setPublicDNS( request.getServerName() );
+		if ( ServerProperties.getDns() == null ) {
+			ServerProperties.setDns( request.getServerName() );
+		}
 		
 		
 		if ( servlet.ServerProperties.getRole().equals("master") ) {
@@ -118,6 +119,7 @@ public class CatchAllServlet extends HttpServlet {
 			String activityName = request.getParameter("activityName");
 			String input = request.getParameter("input");
 			
+			return;
 		}
 		
 		// The status of a previous started execution is requested
@@ -125,17 +127,20 @@ public class CatchAllServlet extends HttpServlet {
 			
 			String executionId = request.getParameter("executionId");
 			
+			return;
 		}
 		
 		// A new activity with new code to process is given
 		else if ( action.equals("newActivity") ) {
 			
-			String activityName = request.getParameter("activityName");
+			System.out.println("servlet started");
+			
+			String name = request.getParameter("name");
 			String codeLocation = request.getParameter("codeLocation");
 			String executeCommand = request.getParameter("executeCommand");
 			
 			ActivityHandler ah = new ActivityHandler();
-			int activityId = ah.newActivity(activityName, codeLocation, executeCommand);
+			int activityId = ah.newActivity(name, codeLocation, executeCommand);
 			
 			// Set up response object
 			JsonObject jsonResponse = new JsonObject();
@@ -150,7 +155,9 @@ public class CatchAllServlet extends HttpServlet {
 			PrintWriter out = response.getWriter();
 			out.print( jsonResponse.toString() );
 			out.close();	
-					
+
+			System.out.println("servlet done");
+			return;
 		}
 		
 		// The status of the activity is requested with the purpose to know if it's ready for executions
@@ -174,6 +181,7 @@ public class CatchAllServlet extends HttpServlet {
 			PrintWriter out = response.getWriter();
 			out.print( jsonResponse.toString() );
 			out.close();
+			return;
 		}
 		
 		// Requesting to delete an activity from the system
@@ -194,7 +202,7 @@ public class CatchAllServlet extends HttpServlet {
 			PrintWriter out = response.getWriter();
 			out.print( jsonResponse.toString() );
 			out.close();	
-			
+			return;
 		}
 
 	}

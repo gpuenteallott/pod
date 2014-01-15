@@ -510,5 +510,62 @@ public class ActivityDAO {
 		}
 		return activities.toArray( new Activity [activities.size()] );
 	}
+	
+	
+	/**
+	 * Deletes all activities in the database, as well as the information about their installations
+	 */
+	public void deleteAll (){
+		
+		Connection con = null;
+		PreparedStatement statement = null;
+		PreparedStatement statement2 = null;
+		
+		try {
+			
+			con = ConnectionManager.getConnection();
+			
+			String searchQuery = "DELETE FROM installations WHERE id > 0";
+			
+			statement = con.prepareStatement(searchQuery);
+			
+			statement.executeUpdate();
+			
+			searchQuery = "DELETE FROM activities WHERE id > 0";
+			
+			statement2 = con.prepareStatement(searchQuery);
+			
+			statement2.executeUpdate();
+			
+		} catch (SQLException e) {
+			error = e.toString();
+			e.printStackTrace();
+		}
+		
+		finally {
+		     
+		     if (statement != null) {
+		        try {
+		        	statement.close();
+		        } catch (Exception e) { System.err.println(e); }
+		        	statement = null;
+		        }
+		     
+		     if (statement2 != null) {
+		        try {
+		        	statement2.close();
+		        } catch (Exception e) { System.err.println(e); }
+		        statement2 = null;
+		        }
+		
+		     if (con != null) {
+		        try {
+		        	con.close();
+		        } catch (Exception e) { System.err.println(e); }
+		
+		        con = null;
+		     }
+		}
+	}
 
 }

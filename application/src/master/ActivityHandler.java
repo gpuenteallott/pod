@@ -39,6 +39,8 @@ public class ActivityHandler {
 		ActivityDAO adao = new ActivityDAO();
 		int activityId = adao.insert(activity);
 		
+		System.out.println("activity inserted with id "+activityId);
+		
 		// Some error happened
 		if ( activityId < 0 ) {
 			
@@ -48,9 +50,8 @@ public class ActivityHandler {
 			return activityId;
 		}
 		
-		
 		// Launch a thread that for every worker, sends a request to perform the installation
-		
+		new Thread ( new ActivityInstallationNotifier(activity) ).start();
 		
 		// No error happened
 		return activityId;

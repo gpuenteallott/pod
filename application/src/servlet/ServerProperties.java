@@ -7,6 +7,10 @@ import java.util.logging.Logger;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import dao.ActivityDAO;
+import dao.WorkerDAO;
+import model.Worker;
+
 
 /**
  * To make the listener work correctly, this line had to be commented in the server.xml file:
@@ -22,7 +26,9 @@ public class ServerProperties implements ServletContextListener {
 	
 	private static String role;
 	private static String name;
-	private static String publicDNS;
+	private static String dns;
+	private static String workerId;
+	private static String masterDns;
 
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
@@ -36,16 +42,38 @@ public class ServerProperties implements ServletContextListener {
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
+
+		// Reset the database
+		new WorkerDAO().deleteAll();
+		new ActivityDAO().deleteAll();
 		
+		// Load properties
 		try {
 			Properties properties = new Properties();
 			properties.load( getClass().getResourceAsStream("/Server.properties"));
 			role = properties.getProperty("role");
 			name = properties.getProperty("name");
+			
+			if ( role.equals("master") ) {
+				
+				// If this is the master, we put ourself in the workers list
+				Worker worker = new Worker();
+				worker.setDns("");
+				worker.setStatus("ready");
+				
+				WorkerDAO wdao = new WorkerDAO();
+				wdao.insert(worker);
+				
+				// Also, if this is the master, put the masterDns value to "", so the Sender class detects it
+				masterDns = "";
+			}
+			// If this is a worker, read the property from the properties file
+			else
+				masterDns = properties.getProperty("masterDns");
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 
 		logger.info("Context initialized. Name="+name +" Role="+role);
 		
@@ -67,12 +95,28 @@ public class ServerProperties implements ServletContextListener {
 		ServerProperties.name = name;
 	}
 
-	public static String getPublicDNS() {
-		return publicDNS;
+	public static String getDns() {
+		return dns;
 	}
 
-	public static void setPublicDNS(String publicDNS) {
-		ServerProperties.publicDNS = publicDNS;
+	public static void setDns(String dns) {
+		ServerProperties.dns = dns;
+	}
+
+	public static String getWorkerId() {
+		return workerId;
+	}
+
+	public static void setWorkerId(String workerId) {
+		ServerProperties.workerId = workerId;
+	}
+
+	public static String getMasterDns() {
+		return masterDns;
+	}
+
+	public static void setMasterDns(String masterDns) {
+		ServerProperties.masterDns = masterDns;
 	}
 
 }

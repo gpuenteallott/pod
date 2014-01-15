@@ -44,10 +44,11 @@ public class WorkerDAO {
 		try {
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "INSERT INTO workers ( status ) VALUES ( ? )";
+			String searchQuery = "INSERT INTO workers ( status , dns ) VALUES ( ? , ? )";
 			
 			statement = con.prepareStatement(searchQuery, Statement.RETURN_GENERATED_KEYS);
 			statement.setString(1, worker.getStatus() );
+			statement.setString(2, worker.getDns() );
 			
 			statement.executeUpdate();
 			
@@ -99,11 +100,12 @@ public class WorkerDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "UPDATE workers SET status=? WHERE id = ?";
+			String searchQuery = "UPDATE workers SET status=?, dns=? WHERE id = ?";
 			
 			statement = con.prepareStatement(searchQuery);
 			statement.setString(1, worker.getStatus() );
-			statement.setInt(2, worker.getId() );
+			statement.setString(2, worker.getDns() );
+			statement.setInt(3, worker.getId() );
 
 			int rows = statement.executeUpdate();
 			
@@ -162,6 +164,7 @@ public class WorkerDAO {
 				worker = new Worker();
 				worker.setId( id );
 				worker.setStatus( rs.getString("status") );
+				worker.setDns( rs.getString("dns") );
 				break;
 				
 			}
@@ -225,6 +228,7 @@ public class WorkerDAO {
 				worker = new Worker();
 				worker.setId( rs.getInt("id") );
 				worker.setStatus( rs.getString("status") );
+				worker.setDns( rs.getString("dns") );
 				break;
 				
 			}
@@ -275,7 +279,7 @@ public class WorkerDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "SELECT * FROM activities";
+			String searchQuery = "SELECT * FROM workers";
 			
 			statement = con.prepareStatement(searchQuery);
 			
@@ -286,7 +290,7 @@ public class WorkerDAO {
 				Worker worker = new Worker();
 				worker.setId( rs.getInt("id") );
 				worker.setStatus( rs.getString("status") );
-				
+				worker.setDns( rs.getString("dns") );
 				workers.add(worker);
 			}
 			
@@ -407,7 +411,7 @@ public class WorkerDAO {
 				Worker worker = new Worker();
 				worker.setId( rs.getInt("id") );
 				worker.setStatus( rs.getString("status") );
-				
+				worker.setDns( rs.getString("dns") );
 				workers.add(worker);
 			}
 			
@@ -471,7 +475,7 @@ public class WorkerDAO {
 				Worker worker = new Worker();
 				worker.setId( rs.getInt("id") );
 				worker.setStatus( rs.getString("status") );
-				
+				worker.setDns( rs.getString("dns") );
 				workers.add(worker);
 			}
 			
@@ -504,5 +508,61 @@ public class WorkerDAO {
 		     }
 		}
 		return workers.toArray( new Worker [workers.size()] );
+	}
+	
+	/**
+	 * Deletes all workers in the database, as well as the information about their installations
+	 */
+	public void deleteAll (){
+		
+		Connection con = null;
+		PreparedStatement statement = null;
+		PreparedStatement statement2 = null;
+		
+		try {
+			
+			con = ConnectionManager.getConnection();
+			
+			String searchQuery = "DELETE FROM installations WHERE id > 0";
+			
+			statement = con.prepareStatement(searchQuery);
+			
+			statement.executeUpdate();
+			
+			searchQuery = "DELETE FROM workers WHERE id > 0";
+			
+			statement2 = con.prepareStatement(searchQuery);
+			
+			statement2.executeUpdate();
+			
+		} catch (SQLException e) {
+			error = e.toString();
+			e.printStackTrace();
+		}
+		
+		finally {
+		     
+		     if (statement != null) {
+		        try {
+		        	statement.close();
+		        } catch (Exception e) { System.err.println(e); }
+		        	statement = null;
+		        }
+		     
+		     if (statement2 != null) {
+		        try {
+		        	statement2.close();
+		        } catch (Exception e) { System.err.println(e); }
+		        statement2 = null;
+		        }
+		
+		     if (con != null) {
+		        try {
+		        	con.close();
+		        } catch (Exception e) { System.err.println(e); }
+		
+		        con = null;
+		     }
+		}
 	}
 }
