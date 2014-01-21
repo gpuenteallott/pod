@@ -45,22 +45,22 @@ public class ActivityHandler {
 		if ( activityId < 0 ) {
 			
 			if( adao.getError().contains("Duplicate entry") ){
-				return json.add("error", "The activity name "+name+" already exists").add("activity", activity.toJsonObject());
+				return json.add("error", "The activity name "+name+" already exists");
 			}
-			return json.add("error", "Error creating the activity "+name+", retrieved id is "+activityId).add("activity", activity.toJsonObject());
+			return json.add("error", "Error creating the activity "+name+", retrieved id is "+activityId);
 		}
 		
 		// Launch a thread that for every worker, sends a request to perform the installation
 		new Thread ( new ActivityInstallationNotifier(activity, "installActivity") ).start();
 		
 		// No error happened
-		return json.add("activity", activity.toJsonObject());
+		return json.add("activity", activity.toJsonObject()).add("status", "installing");
 	}
 	
 	/**
 	 * Deletes the activity. If the activity can't be deleted, the result message should be checked using getResult()
 	 * @param activityName
-	 * @return true if success, false otherwise
+	 * @return a JsonObject representing the activity and a status parameter that indicates if the activity is being uninstalled
 	 */
 	public JsonObject deleteActivity( String name ) {
 		
@@ -81,7 +81,7 @@ public class ActivityHandler {
 		new Thread ( new ActivityInstallationNotifier(activity, "uninstallActivity") ).start();
 		
 		// No error happened
-		return new JsonObject().add("success", true);
+		return new JsonObject().add("activity", activity.toJsonObject()).add("status", "uninstalling");
 	}
 	
 	/**

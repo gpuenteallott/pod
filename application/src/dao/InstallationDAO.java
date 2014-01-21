@@ -223,6 +223,56 @@ public class InstallationDAO {
 
 		return deleted;
 	}
+	
+	/**
+	 * Deletes all installation records that match the given activityId
+	 * @param activityId
+	 * @return true if success, false if some error happened
+	 */
+	public boolean deleteAll ( int activityId ){
+		
+		Connection con = null;
+		PreparedStatement statement = null;
+		boolean deleted = true;
+		
+		try {
+			
+			con = ConnectionManager.getConnection();
+			
+			String searchQuery = "DELETE FROM installations WHERE activityId = ?";
+			
+			statement = con.prepareStatement(searchQuery);
+			statement.setInt(1, activityId );
+			
+			statement.executeUpdate();
+			
+		} catch (SQLException e) {
+			error = e.toString();
+			e.printStackTrace();
+			deleted = false;
+		}
+		
+		finally {
+		     
+		     if (statement != null) {
+		        try {
+		        	statement.close();
+		        } catch (Exception e) { System.err.println(e); }
+		        	statement = null;
+		        }
+		
+		     if (con != null) {
+		        try {
+		        	con.close();
+		        } catch (Exception e) { System.err.println(e); }
+		
+		        con = null;
+		     }
+		}
+
+		return deleted;
+	}
+
 
 	/**
 	 * Allows to get the worker ids that have anything to do with the given activity by its id

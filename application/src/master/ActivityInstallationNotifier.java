@@ -5,9 +5,11 @@ import java.io.IOException;
 import com.eclipsesource.json.JsonObject;
 
 import interaction.Sender;
+import dao.ActivityDAO;
 import dao.InstallationDAO;
 import dao.WorkerDAO;
 import model.Activity;
+import model.Installation;
 import model.Worker;
 
 /**
@@ -48,9 +50,11 @@ public class ActivityInstallationNotifier implements Runnable {
 		// For each one of these
 		for ( Worker worker : workers ) {
 			
-			// Create an installation record with status notifyingInstallation
-			InstallationDAO idao = new InstallationDAO();
-			idao.insert(activity.getId(), worker.getId(), "notifyingInstallation");
+			// Create an installation record with status notifyingInstallation (in case this is an installation process)
+			if ( action.equals("installActivity") ) {
+				InstallationDAO idao = new InstallationDAO();
+				idao.insert(activity.getId(), worker.getId(), "notifyingInstallation");
+			}
 			
 			// Set the public DNS of the worker. If empty, it will mean this same machine
 			Sender sender = new Sender();
@@ -64,7 +68,44 @@ public class ActivityInstallationNotifier implements Runnable {
 				e.printStackTrace();
 			}
 		}
+		
+		/* If this is an uninstallation, we schedule an activity removal operation
+		 * We will check if there are still workers uninstalling
+		 * If there aren't, we will remove the activity from the database
+		 * If there are, we will wait and try later
+		*/
+		if ( this.action.equals("uninstallActivity") ) {
+			
+			int attempts = 1;
+			int max_attempts = 10;
+			int interval_in_ms = 10*1000;
+			while (attempts <= max_attempts) {
+				
+				// Sleep thread. In case of looping, we make the interval longer
+				try { Thread.sleep(interval_in_ms*attempts);
+				} catch (Exception e) { e.printStackTrace(); }
+				
+				InstallationDAO idao = new InstallationDAO();
+				Installation[] installations = idao.selectByActivity(activity.getId());
+				
+				boolean allUninstalled = true;
+				for ( Installation installation : installations )
+					if ( !installation.getStatus().equals("uninstalled") ) {
+						allUninstalled = false; attempts++; break;
+					}
+				
+				// If there all records have status uninstalled
+				if ( allUninstalled ) {
+					idao.deleteAll( activity.getId() ); // First we delete installation records
+					new ActivityDAO().delete( activity.getId() ); // Then the activity, so we don't vulnerate foreign constraint
+				}
+			}
+		}
+		
+		// Finish thread
 	}
+	
+	
 	public String getAction() {
 		return action;
 	}

@@ -45,8 +45,6 @@ public class MasterRequestHandler {
 				idao.update(activity.getId(), workerId, status);
 			else
 				idao.update(activity.getId(), workerId, status, json.get("errorDescription").asString());
-
-			System.out.println("New installation registered: activity "+activity.getId()+", worker "+workerId+", status "+status);
 			
 			// Send response
 			JsonObject jsonResponse = new JsonObject();
