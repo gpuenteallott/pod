@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * Represents a worker object
+ */
 public class Worker implements java.io.Serializable {
 	
 	private static final long serialVersionUID = -5174950454384771612L;

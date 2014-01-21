@@ -1,5 +1,6 @@
 package servlet;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -13,12 +14,13 @@ import model.Worker;
 
 
 /**
+ * This class has the server attributes that are required by the app in general
+ * Also, it implements a listener so it can load these attributes and set everything up when the context is initialized
+ * 
+ * In case the app is located in /ROOT
  * To make the listener work correctly, this line had to be commented in the server.xml file:
- * 
  * <Context docBase="ROOT" path="/ROOT" reloadable="true" source="org.eclipse.jst.jee.server:ROOT"/>
- * 
  * The reason is that otherwise the context was initialized twice.
- *
  */
 public class ServerProperties implements ServletContextListener {
 	
@@ -27,7 +29,7 @@ public class ServerProperties implements ServletContextListener {
 	private static String role;
 	private static String name;
 	private static String dns;
-	private static String workerId;
+	private static int workerId;
 	private static String masterDns;
 
 	@Override
@@ -46,6 +48,9 @@ public class ServerProperties implements ServletContextListener {
 		// Reset the database
 		new WorkerDAO().deleteAll();
 		new ActivityDAO().deleteAll();
+		// Reset the app directory
+		File appDirectory = new File ("/home/user/app");
+		deleteContents(appDirectory);
 		
 		// Load properties
 		try {
@@ -62,10 +67,12 @@ public class ServerProperties implements ServletContextListener {
 				worker.setStatus("ready");
 				
 				WorkerDAO wdao = new WorkerDAO();
-				wdao.insert(worker);
+				workerId = wdao.insert(worker);
 				
 				// Also, if this is the master, put the masterDns value to "", so the Sender class detects it
 				masterDns = "";
+				
+				
 			}
 			// If this is a worker, read the property from the properties file
 			else
@@ -103,11 +110,11 @@ public class ServerProperties implements ServletContextListener {
 		ServerProperties.dns = dns;
 	}
 
-	public static String getWorkerId() {
+	public static int getWorkerId() {
 		return workerId;
 	}
 
-	public static void setWorkerId(String workerId) {
+	public static void setWorkerId(int workerId) {
 		ServerProperties.workerId = workerId;
 	}
 
@@ -117,6 +124,22 @@ public class ServerProperties implements ServletContextListener {
 
 	public static void setMasterDns(String masterDns) {
 		ServerProperties.masterDns = masterDns;
+	}
+	
+	
+
+	private boolean delete(File f) {
+	  if (f.isDirectory()) {
+	    for (File c : f.listFiles())
+	      delete(c);
+	  }
+	  return f.delete();
+	}
+	private void deleteContents(File f) {
+	  if (f.isDirectory()) {
+	    for (File c : f.listFiles())
+	      delete(c);
+	  }
 	}
 
 }

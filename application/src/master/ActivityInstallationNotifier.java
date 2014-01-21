@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.eclipsesource.json.JsonObject;
 
 import interaction.Sender;
+import dao.InstallationDAO;
 import dao.WorkerDAO;
 import model.Activity;
 import model.Worker;
@@ -12,13 +13,16 @@ import model.Worker;
 /**
  * This class implements runnable. 
  * When executed, it retrieves all workers information and sends them a message informing them about the new activity they have to install
+ * In the database, an installation record will be added with the status 'notifyingInstallation'
  */
 public class ActivityInstallationNotifier implements Runnable {
 
 	private Activity activity;
+	private String action;   //installActivity or uninstallActivity
 	
-	public ActivityInstallationNotifier ( Activity activity ) {
-		this.setActivity(activity);
+	public ActivityInstallationNotifier ( Activity activity , String action ) {
+		this.activity = activity;
+		this.action = action;
 	}
 	public Activity getActivity() {
 		return activity;
@@ -38,11 +42,15 @@ public class ActivityInstallationNotifier implements Runnable {
 		
 		// Prepare message
 		JsonObject message = new JsonObject();
-		message.add("action", "installActivity");
+		message.add("action", this.action);
 		message.add("activity", activity.toJsonObject());
 		
 		// For each one of these
 		for ( Worker worker : workers ) {
+			
+			// Create an installation record with status notifyingInstallation
+			InstallationDAO idao = new InstallationDAO();
+			idao.insert(activity.getId(), worker.getId(), "notifyingInstallation");
 			
 			// Set the public DNS of the worker. If empty, it will mean this same machine
 			Sender sender = new Sender();
@@ -56,5 +64,11 @@ public class ActivityInstallationNotifier implements Runnable {
 				e.printStackTrace();
 			}
 		}
+	}
+	public String getAction() {
+		return action;
+	}
+	public void setAction(String action) {
+		this.action = action;
 	}
 }

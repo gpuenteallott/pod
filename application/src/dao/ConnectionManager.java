@@ -7,6 +7,9 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 
+/**
+ * This class provides a getConnection method to allow efficient use of connections to the database, using a pool of connections
+ */
 public class ConnectionManager {
 	
 	public static DataSource dataSource;

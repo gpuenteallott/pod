@@ -44,13 +44,11 @@ public class ActivityDAO {
 		try {
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "INSERT INTO activities ( name , codeLocation , executeCommand , status ) VALUES ( ? , ? , ? , ? )";
+			String searchQuery = "INSERT INTO activities ( name , installationScriptLocation ) VALUES ( ? , ? )";
 			
 			statement = con.prepareStatement(searchQuery, Statement.RETURN_GENERATED_KEYS);
 			statement.setString(1, activity.getName() );
-			statement.setString(2, activity.getCodeLocation() );
-			statement.setString(3, activity.getExecuteCommand() );
-			statement.setString(4, activity.getStatus() );
+			statement.setString(2, activity.getInstallationScriptLocation() );
 			
 			statement.executeUpdate();
 			
@@ -104,14 +102,12 @@ public class ActivityDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "UPDATE activities SET name=?, codeLocation=?, executeCommand=?, status=? WHERE id = ?";
+			String searchQuery = "UPDATE activities SET name=?, installationScriptLocation=? WHERE id = ?";
 			
 			statement = con.prepareStatement(searchQuery);
 			statement.setString(1, activity.getName() );
-			statement.setString(2, activity.getCodeLocation() );
-			statement.setString(3, activity.getExecuteCommand() );
-			statement.setString(4, activity.getStatus() );
-			statement.setInt(5, activity.getId() );
+			statement.setString(2, activity.getInstallationScriptLocation() );
+			statement.setInt(3, activity.getId() );
 
 			int rows = statement.executeUpdate();
 			
@@ -119,6 +115,7 @@ public class ActivityDAO {
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
+			error = e.toString();
 		}
 		
 		finally {
@@ -169,15 +166,14 @@ public class ActivityDAO {
 				activity = new Activity();
 				activity.setId( id );
 				activity.setName( rs.getString("name") );
-				activity.setCodeLocation( rs.getString("codeLocation") );
-				activity.setExecuteCommand( rs.getString("executeCommand") );
-				activity.setStatus( rs.getString("status") );
+				activity.setInstallationScriptLocation( rs.getString("installationScriptLocation") );
 				break;
 				
 			}
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
+			error = e.toString();
 		}
 		
 		finally {
@@ -234,9 +230,7 @@ public class ActivityDAO {
 				activity = new Activity();
 				activity.setId( rs.getInt("id") );
 				activity.setName( name );
-				activity.setCodeLocation( rs.getString("codeLocation") );
-				activity.setExecuteCommand( rs.getString("executeCommand") );
-				activity.setStatus( rs.getString("status") );
+				activity.setInstallationScriptLocation( rs.getString("installationScriptLocation") );
 				break;
 				
 			}
@@ -298,14 +292,13 @@ public class ActivityDAO {
 				Activity activity = new Activity();
 				activity.setId( rs.getInt("id") );
 				activity.setName( rs.getString("name") );
-				activity.setCodeLocation( rs.getString("codeLocation") );
-				activity.setExecuteCommand( rs.getString("executeCommand") );
-				activity.setStatus( rs.getString("status") );
+				activity.setInstallationScriptLocation( rs.getString("installationScriptLocation") );
 				
 				activities.add(activity);
 			}
 			
 		} catch (SQLException e) {
+			error = e.toString();
 			e.printStackTrace();
 		}
 		
@@ -361,6 +354,7 @@ public class ActivityDAO {
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
+			error = e.toString();
 		}
 		
 		finally {
@@ -460,7 +454,7 @@ public class ActivityDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "SELECT activities.id, activities.name, activities.codeLocation, activities.executeCommand, activities.status "
+			String searchQuery = "SELECT activities.id, activities.name, activities.installationScriptLocation "
 					+ "FROM activities, installations WHERE activities.id = installations.activityId AND installations.workerId = ?";
 			
 			statement = con.prepareStatement(searchQuery);
@@ -473,9 +467,7 @@ public class ActivityDAO {
 				Activity activity = new Activity();
 				activity.setId( rs.getInt("id") );
 				activity.setName( rs.getString("name") );
-				activity.setCodeLocation( rs.getString("codeLocation") );
-				activity.setExecuteCommand( rs.getString("executeCommand") );
-				activity.setStatus( rs.getString("status") );
+				activity.setInstallationScriptLocation( rs.getString("installationScriptLocation") );
 				
 				activities.add(activity);
 			}

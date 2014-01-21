@@ -1,60 +1,60 @@
 package master;
 
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
+
 import model.Activity;
+import model.Installation;
 import dao.ActivityDAO;
+import dao.InstallationDAO;
 
 /**
  * This class provides the necessary functions to make operations on activities, such us add or delete
  */
 public class ActivityHandler {
-
-	private String result;
 	
 	/**
 	 * Creates a new activity and puts it in the information database
 	 * If there is an error, the result accessible by 
 	 * @param activityName unique name of the activity
-	 * @param codeLocation URL with the file containing the code, that will be unzipped
-	 * @param executeCommand command to execute the program
-	 * @return the id of the new activity, or -1 in case of error getResult();
+	 * @param installationScriptLocation URL to the installation script
+	 * @param executionScriptLocation URL to the script to execute when there are execution requests
+	 * @return a JsonObject representing the just created activity, including its unique id
 	 */
-	public int newActivity( String activityName, String codeLocation, String executeCommand ) {
+	public JsonObject newActivity( String name, String installationScriptLocation ) {
 		
 		// Validate parameters
-		if( activityName == null ) { result = "Parameter activityName is null"; return -1; }
-		if( codeLocation == null ) { result = "Parameter codeLocation is null"; return -1; }
-		if( executeCommand == null ) { result = "Parameter executeCommand is null"; return -1; }
-		if ( activityName.equals("") ) { result = "Parameter activityName is empty"; return -1; }
-		if ( codeLocation.equals("") ) { result = "Parameter codeLocation is empty"; return -1; }
-		if ( executeCommand.equals("") ) { result = "Parameter executeCommand is empty"; return -1; }
+		if( name == null ) { return new JsonObject().add("error", "Parameter name is null"); }
+		if( installationScriptLocation == null ) { return new JsonObject().add("error", "Parameter installationScriptLocation is null"); }
+		if ( name.equals("") ) { return new JsonObject().add("error", "Parameter name is empty"); }
+		if ( installationScriptLocation.equals("") ) { return new JsonObject().add("error", "Parameter installationScriptLocation is empty"); }
 		
 		// Create activity object
 		Activity activity = new Activity();
-		activity.setName(activityName);
-		activity.setCodeLocation(codeLocation);
-		activity.setExecuteCommand(executeCommand);
-		activity.setStatus("installing");
+		activity.setName(name);
+		activity.setInstallationScriptLocation(installationScriptLocation);
 		
 		// Insert object in persistent information storage (database)
 		ActivityDAO adao = new ActivityDAO();
 		int activityId = adao.insert(activity);
 		
-		System.out.println("activity inserted with id "+activityId);
+		// Prepare response object
+		JsonObject json = new JsonObject();
 		
 		// Some error happened
 		if ( activityId < 0 ) {
 			
 			if( adao.getError().contains("Duplicate entry") ){
-				result = "The activity name "+activityName+" already exists";
+				return json.add("error", "The activity name "+name+" already exists").add("activity", activity.toJsonObject());
 			}
-			return activityId;
+			return json.add("error", "Error creating the activity "+name+", retrieved id is "+activityId).add("activity", activity.toJsonObject());
 		}
 		
 		// Launch a thread that for every worker, sends a request to perform the installation
-		new Thread ( new ActivityInstallationNotifier(activity) ).start();
+		new Thread ( new ActivityInstallationNotifier(activity, "installActivity") ).start();
 		
 		// No error happened
-		return activityId;
+		return json.add("activity", activity.toJsonObject());
 	}
 	
 	/**
@@ -62,62 +62,75 @@ public class ActivityHandler {
 	 * @param activityName
 	 * @return true if success, false otherwise
 	 */
-	public boolean deleteActivity( String activityName ) {
+	public JsonObject deleteActivity( String name ) {
 		
 		// Validate parameters
-		if( activityName == null ) { result = "Parameter activityName is null"; return false; }
-		if ( activityName.equals("") ) { result = "Parameter activityName is empty"; return false; }
+		if( name == null ) { return new JsonObject().add("error", "Parameter name is null"); }
+		if ( name.equals("") ) { return new JsonObject().add("error", "Parameter name is empty"); }
 		
 		// Delete the activity from the database
 		ActivityDAO adao = new ActivityDAO();
-		boolean deleted = adao.delete(activityName);
+		Activity activity = adao.select(name);
 		
 		// Some error might have happened
-		if ( !deleted && !adao.getError().equals("")) {
-			return false;
-		}
-		// In case it wasn't deleted but there was no error, it's because it didn't exist
-		else if ( !deleted && adao.getError().equals("")) {
-			result = "The activity "+activityName+" didn't exist previously.";
-			return true;
+		if ( activity == null ) {
+			return new JsonObject().add("error", adao.getError());
 		}
 		
+		// Launch a thread that for every worker, sends a request to perform the installation
+		new Thread ( new ActivityInstallationNotifier(activity, "uninstallActivity") ).start();
+		
 		// No error happened
-		result = "Activity "+activityName+" deleted, in uninstalling process";
-		return true;
+		return new JsonObject().add("success", true);
 	}
 	
 	/**
 	 * Retrieves the status and saves it in the object. It can be later accessed using getResult()
 	 * @param activityName
-	 * @return true if success, false otherwise
+	 * @return JsonObject representing the status of the activity and its information
 	 */
-	public boolean retrieveActivityStatus( String activityName ) {
+	public JsonObject retrieveActivityStatus( String name ) {
+		
+		// Prepare response object
+		JsonObject json = new JsonObject();
 		
 		// Validate parameters
-		if( activityName == null ) { result = "Parameter activityName is null"; return false; }
-		if ( activityName.equals("") ) { result = "Parameter activityName is empty"; return false; }
+		if( name == null ) { return json.add("error", "Parameter name is null"); }
+		if ( name.equals("") ) { return json.add("error", "Parameter name is empty"); }
 		
-		// Delete the activity from the database
+		// Select the activity from the database
 		ActivityDAO adao = new ActivityDAO();
-		Activity activity = adao.select(activityName);
+		Activity activity = adao.select(name);
 		
 		// Some error might have happened
 		if ( activity == null ) {
-			result = adao.getError();
-			return false;
+			return json.add("error", "The requested activity doesn't exist");
 		}
 		
-		// No error happened
-		result = activity.getStatus();
-		return true;
+		// Prepare json objects
+		JsonObject jsonActivity = activity.toJsonObject();
+		JsonArray installationsJson = new JsonArray();
+		
+		// Select the worker ids that have anything to do with this activity
+		InstallationDAO idao = new InstallationDAO();
+		Installation[] installations = idao.selectByActivity(activity.getId());
+		
+		// Iterate through array
+		for ( Installation installation : installations ) {
+			
+			JsonObject installationJson = new JsonObject();
+			installationJson.add("workerId", installation.getWorkerId()).add("status", installation.getStatus());
+			
+			if ( installation.getErrorDescription() != null && !installation.getErrorDescription().equals("") )
+				installationJson.add("errorDescription", installation.getErrorDescription());
+			
+			installationsJson.add(installationJson);
+		}
+	    
+	    jsonActivity.add("installations", installationsJson);
+	    json.add("activity", jsonActivity);
+		
+		return json;
 	}
 	
-	/**
-	 * This method allows access to result description. If no result happened, it returns null
-	 * @return
-	 */
-	public String getResult(){
-		return this.result;
-	}
 }

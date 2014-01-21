@@ -19,7 +19,7 @@ import master.ActivityHandler;
  * Servlet implementation class CatchAllServlet
  */
 @WebServlet("/CatchAllServlet")
-public class CatchAllServlet extends HttpServlet {
+public class FrontServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -136,19 +136,11 @@ public class CatchAllServlet extends HttpServlet {
 			System.out.println("servlet started");
 			
 			String name = request.getParameter("name");
-			String codeLocation = request.getParameter("codeLocation");
-			String executeCommand = request.getParameter("executeCommand");
+			String installationScriptLocation = request.getParameter("installationScriptLocation");
 			
+			// Create activity and set up response object
 			ActivityHandler ah = new ActivityHandler();
-			int activityId = ah.newActivity(name, codeLocation, executeCommand);
-			
-			// Set up response object
-			JsonObject jsonResponse = new JsonObject();
-			jsonResponse.add("created", activityId >= 0);
-			if ( activityId < 0 )
-				jsonResponse.add("message", ah.getResult());
-			else
-				jsonResponse.add("activityId", activityId);
+			JsonObject jsonResponse = ah.newActivity(name, installationScriptLocation);
 			
 			// Send response
 			response.setContentType("text/plain");
@@ -163,18 +155,12 @@ public class CatchAllServlet extends HttpServlet {
 		// The status of the activity is requested with the purpose to know if it's ready for executions
 		else if ( action.equals("getActivityStatus") ) {
 			
-			String activityName = request.getParameter("activityName");
+			String activityName = request.getParameter("name");
 			
 			ActivityHandler ah = new ActivityHandler();
-			boolean retrieved = ah.retrieveActivityStatus(activityName);
 			
 			// Set up response object
-			JsonObject jsonResponse = new JsonObject();
-			jsonResponse.add("retrieved", retrieved);
-			if ( !retrieved )
-				jsonResponse.add("message", ah.getResult());
-			else
-				jsonResponse.add("status", ah.getResult());
+			JsonObject jsonResponse = ah.retrieveActivityStatus(activityName);
 			
 			// Send response
 			response.setContentType("text/plain");
@@ -187,15 +173,10 @@ public class CatchAllServlet extends HttpServlet {
 		// Requesting to delete an activity from the system
 		else if ( action.equals("deleteActivity") ) {
 			
-			String activityName = request.getParameter("activityName");
+			String name = request.getParameter("name");
 			
 			ActivityHandler ah = new ActivityHandler();
-			boolean deleted = ah.deleteActivity(activityName);
-			
-			// Set up response object
-			JsonObject jsonResponse = new JsonObject();
-			jsonResponse.add("deleted", deleted);
-			jsonResponse.add("message", ah.getResult());
+			JsonObject jsonResponse = ah.deleteActivity(name);
 		
 			// Send response
 			response.setContentType("text/plain");

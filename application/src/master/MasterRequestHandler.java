@@ -4,6 +4,13 @@ import model.Activity;
 
 import com.eclipsesource.json.JsonObject;
 
+import dao.InstallationDAO;
+
+/**
+ * This class handles the requests directed to a master from inside the cloud
+ * The reason to make this class is allow master request handling either if the master is a separate server or the same server than the worker that sends the message
+ */
+
 public class MasterRequestHandler {
 	
 	
@@ -29,11 +36,21 @@ public class MasterRequestHandler {
 			// Get the activity that it's referring to and the status of the installation
 			Activity activity = new Activity(json.get("activity").asObject());
 			String status = json.get("status").asString();
+			int workerId = json.get("workerId").asInt();
 			
-			// If the status is installed, then add am installation record with this info
+			InstallationDAO idao = new InstallationDAO();
 			
+			// In case that there was an error, we add the error description information
+			if ( !status.equals("error") )
+				idao.update(activity.getId(), workerId, status);
+			else
+				idao.update(activity.getId(), workerId, status, json.get("errorDescription").asString());
+
+			System.out.println("New installation registered: activity "+activity.getId()+", worker "+workerId+", status "+status);
+			
+			// Send response
 			JsonObject jsonResponse = new JsonObject();
-			jsonResponse.add("ok", "ok");
+			jsonResponse.add("action", "ack");
 			return jsonResponse;
 			
 		}

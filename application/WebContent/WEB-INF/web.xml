@@ -8,11 +8,11 @@
     <listener-class>servlet.ServerProperties</listener-class>
   </listener>
   <servlet>
-    <servlet-name>CatchAllServlet</servlet-name>
-    <servlet-class>servlet.CatchAllServlet</servlet-class>
+    <servlet-name>FrontServlet</servlet-name>
+    <servlet-class>servlet.FrontServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>CatchAllServlet</servlet-name>
+    <servlet-name>FrontServlet</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>
 </web-app>

@@ -8,11 +8,16 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import master.MasterRequestHandler;
 import servlet.ServerProperties;
 import worker.WorkerRequestHandler;
 
 import com.eclipsesource.json.JsonObject;
 
+/**
+ * This class abstracts the communication details between servers inside the cloud
+ * It also abstracts the complexity of communicating with the same machine (but another role) or another one
+ */
 public class Sender {
 	
 	private String destination;
@@ -33,6 +38,9 @@ public class Sender {
 		
 		// Set origin
 		this.message.add("origin", origin);
+		
+		if ( this.message.get("for") != null && this.message.get("for").asString().equals("master") )
+			this.message.add("workerId", ServerProperties.getWorkerId());
 		
 		// If there is no destination, send to this same machine
 		if ( destination.equals("") )
@@ -63,7 +71,7 @@ public class Sender {
 
 	/**
 	 * Execute directly the code that receives the messages at a worker
-	 * @return String response
+	 * @return String response from the worker
 	 */
 	private String sendToMyWorkerSelf() {
 		
@@ -71,9 +79,15 @@ public class Sender {
 		return worker.doWorkerRequest(message).toString();
 	}
 
+	/**
+	 * Execute directly the code that receives the messages at the master
+	 * @return String response from the master
+	 */
 	private String sendToMyMasterSelf() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		MasterRequestHandler master = new MasterRequestHandler();
+		return master.doMasterRequest(message).toString();
+		
 	}
 
 	/**
