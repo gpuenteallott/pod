@@ -1,5 +1,6 @@
 package worker;
 
+import interaction.Action;
 import model.Activity;
 
 import com.eclipsesource.json.JsonObject;
@@ -24,12 +25,11 @@ public class WorkerRequestHandler {
 			return jsonResponse;
 		}
 		
-		String action = json.get("action").asString();
+		int actionId = json.get("action").asInt();
+		Action action = Action.get(actionId);
 		
 		// Request to install a new activity, retrieving its code
-		if ( action.equals("installActivity") ) {
-			
-			System.out.println("worker processing install activity");
+		if ( action == Action.INSTALL_ACTIVITY ) {
 			
 			// Get message information
 			JsonObject activityJson = json.get("activity").asObject();
@@ -54,9 +54,7 @@ public class WorkerRequestHandler {
 		}
 		
 		// Request to uninstall an activity
-		else if ( action.equals("uninstallActivity") ) {
-				
-			System.out.println("worker processing uninstall activity");
+		else if ( action == Action.UNINSTALL_ACTIVITY ) {
 			
 			// Get message information
 			JsonObject activityJson = json.get("activity").asObject();

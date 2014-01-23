@@ -15,4 +15,22 @@
     <servlet-name>FrontServlet</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>ManagerServlet</servlet-name>
+    <servlet-class>servlet.ManagerServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ManagerServlet</servlet-name>
+    <url-pattern>/manager</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>WorkerServlet</servlet-name>
+    <servlet-class>servlet.WorkerServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>WorkerServlet</servlet-name>
+    <url-pattern>/worker</url-pattern>
+  </servlet-mapping>
 </web-app>

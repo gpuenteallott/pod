@@ -1,5 +1,6 @@
 package master;
 
+import interaction.Action;
 import model.Activity;
 
 import com.eclipsesource.json.JsonObject;
@@ -28,10 +29,11 @@ public class MasterRequestHandler {
 			return jsonResponse;
 		}
 		
-		String action = json.get("action").asString();
+		int actionId = json.get("action").asInt();
+		Action action = Action.get(actionId);
 		
 		// A message from a worker informing about the status of the installation of a new activity
-		if ( action.equals("installActivityReport") ) {
+		if ( action == Action.INSTALL_ACTIVITY_REPORT ) {
 			
 			// Get the activity that it's referring to and the status of the installation
 			Activity activity = new Activity(json.get("activity").asObject());

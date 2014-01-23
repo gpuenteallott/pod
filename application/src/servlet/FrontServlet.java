@@ -9,14 +9,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import worker.WorkerRequestHandler;
-
 import com.eclipsesource.json.JsonObject;
 
 import master.ActivityHandler;
+import master.ExecutionHandler;
 
 /**
- * Servlet implementation class CatchAllServlet
+ * Servlet implementation class FrontServlet
+ * This servlet receives all requests that are directed to the root path of the application
  */
 @WebServlet("/CatchAllServlet")
 public class FrontServlet extends HttpServlet {
@@ -39,69 +39,17 @@ public class FrontServlet extends HttpServlet {
 			ServerProperties.setDns( request.getServerName() );
 		}
 		
-		
-		if ( servlet.ServerProperties.getRole().equals("master") ) {
-			
-			String workerId = request.getParameter("workerId");
-			
-			if ( workerId == null )
-				doMasterFromOutside(request,response);
-			else
-				doMasterFromWorker(request, response);
-		}
-		
-		else if ( servlet.ServerProperties.getRole().equals("worker") ) {
-			doWorkerRequest(request,response);
-		}
+		// Do request processing as manager receiving request from outside the cloud
+		doManagerFromOutside(request,response);
 	}
 
-	/**
-	 * This method checks the message that was sent from the outside to this server from a worker, which is working in MASTER mode
-	 * @param request
-	 * @param response
-	 */
-	private void doMasterFromWorker(HttpServletRequest request, HttpServletResponse response) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * This method checks what message was sent to this server, which is working in WORKER mode
-	 * @param request
-	 * @param response
-	 */
-	private void doWorkerRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		String jsonRaw = request.getParameter("json");
-		
-		// In case no action parameter was provided
-		if ( jsonRaw == null ) {
-			JsonObject jsonResponse = new JsonObject();
-			jsonResponse.add("error", "no message");
-			PrintWriter out = response.getWriter();
-			out.print(jsonResponse.toString());
-			out.close();
-			return;
-		}
-		
-		// Create worker instance and attend request internally
-		WorkerRequestHandler worker = new WorkerRequestHandler();
-		JsonObject jsonResponse = worker.doWorkerRequest(JsonObject.readFrom( jsonRaw ));
-		
-		// Send response
-		PrintWriter out = response.getWriter();
-		out.print(jsonResponse.toString());
-		out.close();
-		return;
-		
-	}
 
 	/**
 	 * This method checks the message that was sent from the outside to this server, which is working in MASTER mode
 	 * @param request
 	 * @param response
 	 */
-	private void doMasterFromOutside(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void doManagerFromOutside(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		String action = request.getParameter("action");
 		
@@ -119,6 +67,19 @@ public class FrontServlet extends HttpServlet {
 			String activityName = request.getParameter("activityName");
 			String input = request.getParameter("input");
 			
+			// Logging
+				System.out.println("Message log. From outside. action:"+action+", activityName:"+activityName+", input:"+input); System.out.println();
+			// End logging
+			
+			ExecutionHandler eh = new ExecutionHandler();
+			JsonObject jsonResponse = eh.newExecution (activityName, input);
+			
+			// Send response
+			response.setContentType("text/plain");
+			PrintWriter out = response.getWriter();
+			out.print( jsonResponse.toString() );
+			out.close();	
+
 			return;
 		}
 		
@@ -127,16 +88,22 @@ public class FrontServlet extends HttpServlet {
 			
 			String executionId = request.getParameter("executionId");
 			
+			// Logging
+				System.out.println("Message log. From outside. action:"+action+", executionId:"+executionId); System.out.println();
+			// End logging
+			
 			return;
 		}
 		
 		// A new activity with new code to process is given
 		else if ( action.equals("newActivity") ) {
 			
-			System.out.println("servlet started");
-			
 			String name = request.getParameter("name");
 			String installationScriptLocation = request.getParameter("installationScriptLocation");
+			
+			// Logging
+				System.out.println("Message log. From outside. action:"+action+", name:"+name+", installationScriptLocation:"+installationScriptLocation); System.out.println();
+			// End logging
 			
 			// Create activity and set up response object
 			ActivityHandler ah = new ActivityHandler();
@@ -148,19 +115,22 @@ public class FrontServlet extends HttpServlet {
 			out.print( jsonResponse.toString() );
 			out.close();	
 
-			System.out.println("servlet done");
 			return;
 		}
 		
 		// The status of the activity is requested with the purpose to know if it's ready for executions
 		else if ( action.equals("getActivityStatus") ) {
 			
-			String activityName = request.getParameter("name");
+			String name = request.getParameter("name");
+			
+			// Logging
+				System.out.println("Message log. From outside. action:"+action+", name:"+name); System.out.println();
+			// End logging
 			
 			ActivityHandler ah = new ActivityHandler();
 			
 			// Set up response object
-			JsonObject jsonResponse = ah.retrieveActivityStatus(activityName);
+			JsonObject jsonResponse = ah.retrieveActivityStatus(name);
 			
 			// Send response
 			response.setContentType("text/plain");
@@ -174,6 +144,10 @@ public class FrontServlet extends HttpServlet {
 		else if ( action.equals("deleteActivity") ) {
 			
 			String name = request.getParameter("name");
+			
+			// Logging
+				System.out.println("Message log. From outside. action:"+action+", name:"+name); System.out.println();
+			// End logging
 			
 			ActivityHandler ah = new ActivityHandler();
 			JsonObject jsonResponse = ah.deleteActivity(name);

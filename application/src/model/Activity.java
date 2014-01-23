@@ -40,12 +40,29 @@ public class Activity implements java.io.Serializable {
 		this.installationScriptLocation = installationScriptLocation;
 	}
 
+	/**
+	 * Transforms the Activity into a JsonObject with all its attributes and values
+	 * @return
+	 */
 	public JsonObject toJsonObject() {
 		
 		JsonObject json = new JsonObject();
 		json.add("id", id);
 		json.add("name", name);
 		json.add("installationScriptLocation", installationScriptLocation);
+		return json;
+	}
+	
+	/**
+	 * Transforms the Activity into a JsonObject just like toJsonObject() but only including fundamental attributes
+	 * Better for a shorter representation
+	 * @return 
+	 */
+	public JsonObject toSmallJsonObject() {
+		
+		JsonObject json = new JsonObject();
+		json.add("id", id);
+		json.add("name", name);
 		return json;
 	}
 }

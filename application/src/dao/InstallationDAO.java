@@ -39,8 +39,6 @@ public class InstallationDAO {
 	 */
 	public int insert ( int activityId, int workerId, String status , String errorDescription ) {
 		
-		System.out.println("insert "+activityId+" , "+workerId+" , "+status+" , "+errorDescription+".");
-		
 		Connection con = null;
 		PreparedStatement statement = null;
 		ResultSet resultSet = null;

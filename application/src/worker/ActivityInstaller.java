@@ -14,6 +14,7 @@ import servlet.ServerProperties;
 
 import com.eclipsesource.json.JsonObject;
 
+import interaction.Action;
 import interaction.Sender;
 import model.Activity;
 
@@ -48,8 +49,6 @@ public class ActivityInstaller implements Runnable {
 	@Override
 	public void run() {
 		
-		System.out.println("worker performing activity at installer thread: uninstall? "+uninstall);
-		
 		// Install or uninstall activity
 		boolean success = false;
 		if ( !uninstall )
@@ -57,8 +56,6 @@ public class ActivityInstaller implements Runnable {
 		else 
 			success = uninstall();
 			
-		
-		System.out.println("worker performed activity at installer thread: uninstall? "+uninstall+"  success? "+success);
 		
 		// If the installation was unsuccessful, we delete every files that were possibly downloaded in order be as if it didn't happen
 		if ( !success && !uninstall ) {
@@ -69,9 +66,8 @@ public class ActivityInstaller implements Runnable {
 		Sender sender = new Sender();
 		
 		JsonObject message = new JsonObject();
-		message.add("for", "master");
-		message.add("action", "installActivityReport");
-		message.add("activity", activity.toJsonObject());
+		message.add("action", Action.INSTALL_ACTIVITY_REPORT.getId() );
+		message.add("activity", activity.toSmallJsonObject());
 		
 		// Add status depending on flags
 		if ( !success ) {
@@ -85,11 +81,10 @@ public class ActivityInstaller implements Runnable {
 		
 		
 		sender.setMessage(message);
-		sender.setDestination( ServerProperties.getMasterDns() );
+		sender.setDestinationIP( ServerProperties.getMasterDns() );
+		sender.setDestinationRole("master");
 		try {
-			System.out.println("a message is going to be sent from worker to "+ServerProperties.getMasterDns());
-			String response = sender.send();
-			System.out.println("worker sent installation report: "+response);
+			sender.send();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -160,10 +155,11 @@ public class ActivityInstaller implements Runnable {
 		isr = new InputStreamReader(is);
 		br = new BufferedReader(isr);
 		
-		// try catch for IO errors in the process
+		// try catch for IO output in the process
 		try {
 			while ((line = br.readLine()) != null) {
-				System.out.println(line);
+				// Every line of standard output
+				//System.out.println(line);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -179,7 +175,8 @@ public class ActivityInstaller implements Runnable {
 		// try catch for IO errors in the process
 		try {
 			while ((line = br.readLine()) != null) {
-				System.err.println(line);
+				// Every line of standard error
+				//System.err.println(line);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

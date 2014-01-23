@@ -20,12 +20,12 @@ import com.eclipsesource.json.JsonObject;
  */
 public class Sender {
 	
-	private String destination;
+	private String destinationIP;
+	private String destinationRole; // can be "worker" or "manager"
 	private String origin;
 	private JsonObject message;
 	
 	public Sender() {
-		this.origin = ServerProperties.getDns();
 	}
 	
 	/**
@@ -36,20 +36,31 @@ public class Sender {
 	 */
 	public String send() throws MalformedURLException, IOException {
 		
-		// Set origin
-		this.message.add("origin", origin);
-		
-		if ( this.message.get("for") != null && this.message.get("for").asString().equals("master") )
+		if ( "master".equals(destinationRole) )
 			this.message.add("workerId", ServerProperties.getWorkerId());
 		
+		// Logging
+			int i = (int)(Math.random() * 1000);
+			System.out.println("Message log. Id "+i+". To "+destinationRole+" ("+destinationIP+")");
+			System.out.println("Req ("+i+"): "+message);
+		// End logging
+		
+		String response = null;
+		
 		// If there is no destination, send to this same machine
-		if ( destination.equals("") )
-			return sendToMyself();
+		if ( destinationIP.equals("") )
+			response = sendToMyself();
 		
 		// Or send to a remote worker
 		else
-			return sendToRemote();
+			response = sendToRemote();
 		
+		// Logging
+			System.out.println("Res ("+i+"): "+response);
+			System.out.println();
+		// End logging
+			
+		return response;
 	}
 	
 	/**
@@ -61,7 +72,7 @@ public class Sender {
 	private String sendToMyself() {
 		
 		// Who is this message for?
-		if ( message.get("for") != null && message.get("for").asString().equals("master") ) 
+		if ( "master".equals(destinationRole) ) 
 			return sendToMyMasterSelf();
 		
 		else
@@ -102,6 +113,10 @@ public class Sender {
 		if ( message != null )
 		    urlParameters = "json="+message.toString();
 		
+		// Prepare destination. eg: http://123-45-67-89/worker
+		String destination = destinationIP;
+		if ( destinationRole != null ) destination += destinationIP;
+		
 		// Open connection
 		URL obj = new URL(destination);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -130,11 +145,11 @@ public class Sender {
 		return response.toString();
 	}
 	
-	public String getDestination() {
-		return destination;
+	public String getDestinationIP() {
+		return destinationIP;
 	}
-	public void setDestination(String destination) {
-		this.destination = destination;
+	public void setDestinationIP(String destinationIP) {
+		this.destinationIP = destinationIP;
 	}
 	public String getOrigin() {
 		return origin;
@@ -147,5 +162,13 @@ public class Sender {
 	}
 	public void setMessage(JsonObject message) {
 		this.message = message;
+	}
+
+	public String getDestinationRole() {
+		return destinationRole;
+	}
+
+	public void setDestinationRole(String destinationRole) {
+		this.destinationRole = destinationRole;
 	}
 }

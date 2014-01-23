@@ -1,5 +1,7 @@
 package master;
 
+import interaction.Action;
+
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
@@ -51,9 +53,9 @@ public class ActivityHandler {
 		}
 		
 		// Launch a thread that for every worker, sends a request to perform the installation
-		new Thread ( new ActivityInstallationNotifier(activity, "installActivity") ).start();
+		new Thread ( new ActivityInstallationNotifier(activity, Action.INSTALL_ACTIVITY ) ).start();
 		
-		// No error happened
+		// No error happened"uninstallActivity
 		return json.add("activity", activity.toJsonObject()).add("status", "installing");
 	}
 	
@@ -74,11 +76,15 @@ public class ActivityHandler {
 		
 		// Some error might have happened
 		if ( activity == null ) {
-			return new JsonObject().add("error", adao.getError());
+			
+			if ( adao.getError() == null || adao.getError().equals("") )
+				return new JsonObject().add("error", "The requested activity doesn't exist");
+			else
+				return new JsonObject().add("error", adao.getError());
 		}
 		
 		// Launch a thread that for every worker, sends a request to perform the installation
-		new Thread ( new ActivityInstallationNotifier(activity, "uninstallActivity") ).start();
+		new Thread ( new ActivityInstallationNotifier(activity, Action.UNINSTALL_ACTIVITY ) ).start();
 		
 		// No error happened
 		return new JsonObject().add("activity", activity.toJsonObject()).add("status", "uninstalling");

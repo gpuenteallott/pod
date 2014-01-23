@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.eclipsesource.json.JsonObject;
 
+import interaction.Action;
 import interaction.Sender;
 import dao.ActivityDAO;
 import dao.InstallationDAO;
@@ -20,9 +21,9 @@ import model.Worker;
 public class ActivityInstallationNotifier implements Runnable {
 
 	private Activity activity;
-	private String action;   //installActivity or uninstallActivity
+	private Action action;   //installActivity or uninstallActivity
 	
-	public ActivityInstallationNotifier ( Activity activity , String action ) {
+	public ActivityInstallationNotifier ( Activity activity , Action action ) {
 		this.activity = activity;
 		this.action = action;
 	}
@@ -36,34 +37,32 @@ public class ActivityInstallationNotifier implements Runnable {
 	@Override
 	public void run() {
 		
-		System.out.println("thread notifying workers");
-		
 		// Retrieve all workers
 		WorkerDAO wdao = new WorkerDAO();
 		Worker[] workers = wdao.list();
 		
 		// Prepare message
 		JsonObject message = new JsonObject();
-		message.add("action", this.action);
+		message.add("action", this.action.getId() );
 		message.add("activity", activity.toJsonObject());
 		
 		// For each one of these
 		for ( Worker worker : workers ) {
 			
 			// Create an installation record with status notifyingInstallation (in case this is an installation process)
-			if ( action.equals("installActivity") ) {
+			if ( this.action == Action.INSTALL_ACTIVITY ) {
 				InstallationDAO idao = new InstallationDAO();
 				idao.insert(activity.getId(), worker.getId(), "notifyingInstallation");
 			}
 			
 			// Set the public DNS of the worker. If empty, it will mean this same machine
 			Sender sender = new Sender();
-			sender.setDestination( worker.getDns() );
+			sender.setDestinationIP( worker.getDns() );
+			sender.setDestinationRole("worker");
 			sender.setMessage(message);
-			System.out.println("a message is going to be sent from master to "+worker.getDns());
+			
 			try {
-				String response = sender.send();
-				System.out.println("thread notifying workers response "+response);
+				sender.send();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -74,7 +73,7 @@ public class ActivityInstallationNotifier implements Runnable {
 		 * If there aren't, we will remove the activity from the database
 		 * If there are, we will wait and try later
 		*/
-		if ( this.action.equals("uninstallActivity") ) {
+		if ( this.action == Action.UNINSTALL_ACTIVITY ) {
 			
 			int attempts = 1;
 			int max_attempts = 10;
@@ -106,10 +105,10 @@ public class ActivityInstallationNotifier implements Runnable {
 	}
 	
 	
-	public String getAction() {
+	public Action getAction() {
 		return action;
 	}
-	public void setAction(String action) {
+	public void setAction(Action action) {
 		this.action = action;
 	}
 }
