@@ -14,6 +14,13 @@ import servlet.ServerProperties;
 
 import com.eclipsesource.json.JsonObject;
 
+/**
+ * This class is a runnable that performs the executions
+ * The execution to handle is given in the constructor
+ *
+ * After starting the process, a message will be sent to the manager of this worker informing about it
+ * When the execution is done, the worker will send a message to the manager with both standard output and standard error
+ */
 public class ExecutionPerformer implements Runnable {
 	
 	private Execution execution;

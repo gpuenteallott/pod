@@ -140,6 +140,7 @@ public class ActivityInstaller implements Runnable {
 		InputStream is = null;
 		InputStreamReader isr = null;
 		BufferedReader br = null;
+		@SuppressWarnings("unused")
 		String line = null;
 		
 		// try catch for IO errors in the process

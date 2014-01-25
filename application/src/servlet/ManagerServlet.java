@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import manager.ManagerRequestHandler;
-import worker.WorkerRequestHandler;
 
 import com.eclipsesource.json.JsonObject;
 

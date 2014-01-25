@@ -23,7 +23,7 @@ public class ExecutionMap {
 	private static Map<Integer, String> errors;
 	
 	/**
-	 * Create an execution bag object and initialize internal static variables
+	 * Create an execution map object and initialize internal static variables
 	 * This method has the initialization synchronized, so no concurrent threads start the structures at the same time
 	 */
 	public ExecutionMap () {
