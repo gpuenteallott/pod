@@ -87,6 +87,10 @@ public class ActivityHandler {
 		// Update the activity status to uninstalling so we don't accept more execution requests
 		adao.updateStatus( activity.getId() , "uninstalling");
 		
+		// Delete pending executions of this activity from queue
+		ExecutionWaitingQueue queue = new ExecutionWaitingQueue();
+		queue.deleteAll( activity.getId() );
+		
 		// Launch a thread that for every worker, sends a request to perform the installation
 		new Thread ( new ActivityInstallationNotifier(activity, Action.UNINSTALL_ACTIVITY ) ).start();
 		

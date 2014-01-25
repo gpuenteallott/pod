@@ -403,4 +403,69 @@ public class InstallationDAO {
 		return installations.toArray( new Installation [installations.size()] );
 	}
 
+	/**
+	 * Retrieves the ids of the activities that are installed in the given worker by its id
+	 * @param workerId
+	 * @return activity ids array
+	 */
+	public int[] selectInstalledActivityIdsByWorker ( int workerId ) {
+		
+		Connection con = null;
+		PreparedStatement statement = null;
+		ResultSet rs = null;
+		List<Integer> ids = new ArrayList<Integer>();
+		
+		try {
+			
+			con = ConnectionManager.getConnection();
+			
+			String searchQuery = "SELECT activities.id "
+					+ "FROM activities, installations WHERE activities.id = installations.activityId AND installations.workerId = ? "
+					+ "AND installations.status = 'installed'";
+			
+			statement = con.prepareStatement(searchQuery);
+			statement.setInt(1, workerId );
+			
+			rs = statement.executeQuery();
+			
+			while (rs.next()) {
+				ids.add(rs.getInt("activities.id"));
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			error = e.toString();
+		}
+		
+		finally {
+			if (rs != null)	{
+			    try {
+			     	rs.close();
+			    } catch (Exception e) { System.err.println(e); }
+			        rs = null;
+			    }
+		     
+		     if (statement != null) {
+		        try {
+		        	statement.close();
+		        } catch (Exception e) { System.err.println(e); }
+		        	statement = null;
+		        }
+		
+		     if (con != null) {
+		        try {
+		        	con.close();
+		        } catch (Exception e) { System.err.println(e); }
+		
+		        con = null;
+		     }
+		}
+		int [] result = new int [ids.size()];
+		for ( int i = 0; i<ids.size(); i++) {
+			result[i] = ids.get(i);
+		}
+		
+		return result;
+	}
+	
 }

@@ -9,6 +9,11 @@ import model.Execution;
  * This class represents a map containing all executions that are currently in the cloud
  * An execution is added when the new execution command from the client is accepted
  * An execution is removed when the client requests its status and the execution was already finished, so all the info is sent to the client and removed from here
+ * 
+ * TO DO ################################################################
+ * 
+ * An algorithm must be implemented in order to delete automatically the executions that are not removed externally before the expiration time
+ * This is necessary to avoid a memory problem due to executions not retrieved by the client
  */
 public class ExecutionMap {
 	
@@ -40,8 +45,8 @@ public class ExecutionMap {
 	 * @param status
 	 */
 	public void put ( Execution execution, String status ) {
-		executions.put(execution.getId(), execution.clone());
-		statuses.put(execution.getId(), new String(status));
+		executions.put(execution.getId(), execution);
+		statuses.put(execution.getId(), status);
 	}
 	
 	/**

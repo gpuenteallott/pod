@@ -561,6 +561,9 @@ public class ActivityDAO {
 		return activities.toArray( new Activity [activities.size()] );
 	}
 	
+
+
+	
 	
 	/**
 	 * Deletes all activities in the database, as well as the information about their installations

@@ -137,6 +137,58 @@ public class WorkerDAO {
 	}
 	
 	/**
+	 * Updates the worker's status
+	 * @param workerId
+	 * @param status
+	 * @return true if success, false otherwise
+	 */
+	public boolean updateStatus ( int workerId , String status ) {
+		
+		Connection con = null;
+		PreparedStatement statement = null;
+		boolean updated = false;
+		
+		try {
+			
+			con = ConnectionManager.getConnection();
+			
+			String searchQuery = "UPDATE workers SET status=? WHERE id = ?";
+			
+			statement = con.prepareStatement(searchQuery);
+			statement.setString(1, status );
+			statement.setInt(2, workerId );
+
+			int rows = statement.executeUpdate();
+			
+			updated = rows > 0 ? true : false;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			error = e.toString();
+		}
+		
+		finally {
+		     
+		     if (statement != null) {
+		        try {
+		        	statement.close();
+		        } catch (Exception e) { System.err.println(e); }
+		        	statement = null;
+		        }
+		
+		     if (con != null) {
+		        try {
+		        	con.close();
+		        } catch (Exception e) { System.err.println(e); }
+		
+		        con = null;
+		     }
+		}
+		return updated;
+	}
+	
+	
+	/**
 	 * Looks in the database for a worker with the given id
 	 * @param id
 	 * @return the worker object or null if it didn't exist

@@ -71,11 +71,9 @@ public class ExecutionHandler {
 			
 			worker = wdao.getAvailableByActivityAndStatus( activity.getId() , "ready");
 			
-			// In case there is no worker available, the execution request must go to the waiting queue
-			if ( worker == null ) {}
-			
 			// If we got a worker, set it as 'working'
-			else {
+			if ( worker != null ) {
+				
 				worker.setStatus("working");
 				wdao.update(worker);
 			}
@@ -122,6 +120,13 @@ public class ExecutionHandler {
 				// For now, we send an error message
 				json.add("error", "Couldn't contact with a worker to start this execution with id "+executionId);
 			}
+		}
+		
+		// In case there is no worker available, the execution request must go to the waiting queue
+		else {
+			ExecutionWaitingQueue queue = new ExecutionWaitingQueue();
+			queue.put(execution);
+			json.add("execution", execution.toJsonObject()).add("status", "in progress");
 		}
 		
 		return json;

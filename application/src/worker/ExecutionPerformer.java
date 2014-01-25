@@ -58,10 +58,23 @@ public class ExecutionPerformer implements Runnable {
 		sender.setDestinationRole("manager");
 		sender.setMessage(message);
 		
+		String response = null;
 		try {
-			sender.send();
+			response = sender.send();
 		} catch (IOException e) {
 			e.printStackTrace();
+			return;
+		}
+		
+		JsonObject jsonResponse = JsonObject.readFrom(response);
+		
+		// In case there is a new execution to perform
+		if ( jsonResponse.get("action").asInt() == Action.NEW_EXECUTION.getId() ) {
+			
+			Execution newExecution = new Execution (jsonResponse.get("execution").asObject());
+			
+			// Launch new thread to perform the execution, so this current thread will end
+			new Thread ( new ExecutionPerformer(newExecution) ).start();
 		}
 	}
 	

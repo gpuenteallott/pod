@@ -8,6 +8,7 @@ import com.eclipsesource.json.JsonObject;
 
 import dao.ActivityDAO;
 import dao.InstallationDAO;
+import dao.WorkerDAO;
 
 /**
  * This class handles the requests directed to a manager from inside the cloud
@@ -55,8 +56,33 @@ public class ManagerRequestHandler {
 			ExecutionMap bag = new ExecutionMap();
 			bag.put(execution, status);
 			
+			// Check if there is a pending execution in the queue that this worker could handle
+			InstallationDAO idao = new InstallationDAO();
+			int[] activityIds = idao.selectInstalledActivityIdsByWorker( json.get("workerId").asInt() );
+			
+			ExecutionWaitingQueue queue = new ExecutionWaitingQueue();
+			Execution newExecution = queue.pull(activityIds);
+			System.out.println(newExecution != null);
+			
+			// Prepare response object
 			JsonObject jsonResponse = new JsonObject();
-			jsonResponse.add("action", Action.ACK.getId());
+			
+			// If no pending executions in the queue are found
+			// we set the worker status to "ready" because it's available
+			if ( newExecution == null ) {
+				WorkerDAO wdao = new WorkerDAO();
+				wdao.updateStatus( json.get("workerId").asInt() , "ready");
+
+				jsonResponse.add("action", Action.ACK.getId());
+			}
+			
+			// If there is a pending execution we don't change the status of the worker (keep it "working")
+			else {
+				jsonResponse.add("action", Action.NEW_EXECUTION.getId());
+				jsonResponse.add("execution", newExecution.toJsonObject());
+			}
+			
+			
 			return jsonResponse;
 		}
 		
