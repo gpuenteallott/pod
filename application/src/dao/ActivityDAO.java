@@ -44,11 +44,12 @@ public class ActivityDAO {
 		try {
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "INSERT INTO activities ( name , installationScriptLocation ) VALUES ( ? , ? )";
+			String searchQuery = "INSERT INTO activities ( name , installationScriptLocation, status ) VALUES ( ? , ? , ? )";
 			
 			statement = con.prepareStatement(searchQuery, Statement.RETURN_GENERATED_KEYS);
 			statement.setString(1, activity.getName() );
 			statement.setString(2, activity.getInstallationScriptLocation() );
+			statement.setString(3, activity.getStatus() );
 			
 			statement.executeUpdate();
 			
@@ -102,12 +103,13 @@ public class ActivityDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "UPDATE activities SET name=?, installationScriptLocation=? WHERE id = ?";
+			String searchQuery = "UPDATE activities SET name=?, installationScriptLocation=?, status=? WHERE id = ?";
 			
 			statement = con.prepareStatement(searchQuery);
 			statement.setString(1, activity.getName() );
 			statement.setString(2, activity.getInstallationScriptLocation() );
-			statement.setInt(3, activity.getId() );
+			statement.setString(3, activity.getStatus() );
+			statement.setInt(4, activity.getId() );
 
 			int rows = statement.executeUpdate();
 			
@@ -139,6 +141,58 @@ public class ActivityDAO {
 	}
 	
 	/**
+	 * Updates only the status field of the given activity by its id
+	 * @param id of the activity to update
+	 * @param status
+	 * @return true if updated, false otherwise
+	 */
+	public boolean updateStatus ( int activityId , String status ) {
+		
+		Connection con = null;
+		PreparedStatement statement = null;
+		boolean updated = false;
+		
+		try {
+			
+			con = ConnectionManager.getConnection();
+			
+			String searchQuery = "UPDATE activities SET status=? WHERE id = ?";
+			
+			statement = con.prepareStatement(searchQuery);
+			statement.setString(1, status );
+			statement.setInt(2, activityId );
+
+			int rows = statement.executeUpdate();
+			
+			updated = rows > 0 ? true : false;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			error = e.toString();
+		}
+		
+		finally {
+		     
+		     if (statement != null) {
+		        try {
+		        	statement.close();
+		        } catch (Exception e) { System.err.println(e); }
+		        	statement = null;
+		        }
+		
+		     if (con != null) {
+		        try {
+		        	con.close();
+		        } catch (Exception e) { System.err.println(e); }
+		
+		        con = null;
+		     }
+		}
+		return updated;
+	}
+	
+	
+	/**
 	 * Looks in the database for a activity with the given id
 	 * @param id
 	 * @return the activity object or null if it didn't exist
@@ -167,6 +221,7 @@ public class ActivityDAO {
 				activity.setId( id );
 				activity.setName( rs.getString("name") );
 				activity.setInstallationScriptLocation( rs.getString("installationScriptLocation") );
+				activity.setStatus( rs.getString("status") );
 				break;
 				
 			}
@@ -231,6 +286,7 @@ public class ActivityDAO {
 				activity.setId( rs.getInt("id") );
 				activity.setName( name );
 				activity.setInstallationScriptLocation( rs.getString("installationScriptLocation") );
+				activity.setStatus( rs.getString("status") );
 				break;
 				
 			}
@@ -293,6 +349,7 @@ public class ActivityDAO {
 				activity.setId( rs.getInt("id") );
 				activity.setName( rs.getString("name") );
 				activity.setInstallationScriptLocation( rs.getString("installationScriptLocation") );
+				activity.setStatus( rs.getString("status") );
 				
 				activities.add(activity);
 			}
@@ -468,6 +525,7 @@ public class ActivityDAO {
 				activity.setId( rs.getInt("id") );
 				activity.setName( rs.getString("name") );
 				activity.setInstallationScriptLocation( rs.getString("installationScriptLocation") );
+				activity.setStatus( rs.getString("status") );
 				
 				activities.add(activity);
 			}

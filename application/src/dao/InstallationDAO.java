@@ -336,4 +336,71 @@ public class InstallationDAO {
 		}
 		return installations.toArray( new Installation [installations.size()] );
 	}
+
+
+	/**
+	 * Allows to get the worker ids that have the given activity already installed
+	 * @param activityId
+	 * @return an array of Installation objects
+	 */
+	public Installation[] selectInstalledByActivity ( int activityId ) {
+		
+		Connection con = null;
+		PreparedStatement statement = null;
+		ResultSet rs = null;
+		List<Installation> installations = new ArrayList<Installation>();
+		
+		try {
+			
+			con = ConnectionManager.getConnection();
+			
+			String searchQuery = "SELECT * FROM installations WHERE activityId = ? AND status = 'installed'";
+			
+			statement = con.prepareStatement(searchQuery);
+			statement.setInt(1, activityId );
+			
+			rs = statement.executeQuery();
+			
+			while (rs.next()) {
+				
+				Installation installation = new Installation();
+				installation.setActivityId(activityId);
+				installation.setWorkerId( rs.getInt("workerId") );
+				installation.setStatus( rs.getString("status") );
+				installation.setErrorDescription( rs.getString("errorDescription") );
+				
+				installations.add(installation);
+			}
+			
+		} catch (SQLException e) {
+			error = e.toString();
+			e.printStackTrace();
+		}
+		
+		finally {
+			if (rs != null)	{
+			    try {
+			     	rs.close();
+			    } catch (Exception e) { System.err.println(e); }
+			        rs = null;
+			    }
+		     
+		     if (statement != null) {
+		        try {
+		        	statement.close();
+		        } catch (Exception e) { System.err.println(e); }
+		        	statement = null;
+		        }
+		
+		     if (con != null) {
+		        try {
+		        	con.close();
+		        } catch (Exception e) { System.err.println(e); }
+		
+		        con = null;
+		     }
+		}
+		return installations.toArray( new Installation [installations.size()] );
+	}
+
 }

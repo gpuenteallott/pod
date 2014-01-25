@@ -8,7 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import master.MasterRequestHandler;
+import manager.ManagerRequestHandler;
 import servlet.ServerProperties;
 import worker.WorkerRequestHandler;
 
@@ -36,7 +36,7 @@ public class Sender {
 	 */
 	public String send() throws MalformedURLException, IOException {
 		
-		if ( "master".equals(destinationRole) )
+		if ( "manager".equals(destinationRole) )
 			this.message.add("workerId", ServerProperties.getWorkerId());
 		
 		// Logging
@@ -72,7 +72,7 @@ public class Sender {
 	private String sendToMyself() {
 		
 		// Who is this message for?
-		if ( "master".equals(destinationRole) ) 
+		if ( "manager".equals(destinationRole) ) 
 			return sendToMyMasterSelf();
 		
 		else
@@ -91,13 +91,13 @@ public class Sender {
 	}
 
 	/**
-	 * Execute directly the code that receives the messages at the master
-	 * @return String response from the master
+	 * Execute directly the code that receives the messages at the manager
+	 * @return String response from the manager
 	 */
 	private String sendToMyMasterSelf() {
 		
-		MasterRequestHandler master = new MasterRequestHandler();
-		return master.doMasterRequest(message).toString();
+		ManagerRequestHandler master = new ManagerRequestHandler();
+		return master.doManagerRequest(message).toString();
 		
 	}
 

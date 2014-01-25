@@ -68,6 +68,5 @@ public class WorkerServlet extends HttpServlet {
 		out.print(jsonResponse.toString());
 		out.close();
 		return;
-		
 	}
 }

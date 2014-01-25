@@ -9,13 +9,14 @@ package interaction;
 public enum Action {
 	
 	NULL(0),
+	ACK(1),
 	
 	INSTALL_ACTIVITY(10),
 	UNINSTALL_ACTIVITY(11),
 	INSTALL_ACTIVITY_REPORT(12),
 	
 	NEW_EXECUTION(20),
-	GET_EXECUTION_STATUS(21);
+	EXECUTION_REPORT(21);
 	
 	
 	private int id;

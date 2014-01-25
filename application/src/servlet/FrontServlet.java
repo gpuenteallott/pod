@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.eclipsesource.json.JsonObject;
 
-import master.ActivityHandler;
-import master.ExecutionHandler;
+import manager.ActivityHandler;
+import manager.ExecutionHandler;
 
 /**
  * Servlet implementation class FrontServlet
@@ -64,15 +64,15 @@ public class FrontServlet extends HttpServlet {
 		// A new execution is requested
 		else if ( action.equals("newExecution") ) {
 			
-			String activityName = request.getParameter("activityName");
+			String name = request.getParameter("name");
 			String input = request.getParameter("input");
 			
 			// Logging
-				System.out.println("Message log. From outside. action:"+action+", activityName:"+activityName+", input:"+input); System.out.println();
+				System.out.println("Message log. From outside. action:"+action+", name:"+name+", input:"+input); System.out.println();
 			// End logging
 			
 			ExecutionHandler eh = new ExecutionHandler();
-			JsonObject jsonResponse = eh.newExecution (activityName, input);
+			JsonObject jsonResponse = eh.newExecution (name, input);
 			
 			// Send response
 			response.setContentType("text/plain");
@@ -91,7 +91,16 @@ public class FrontServlet extends HttpServlet {
 			// Logging
 				System.out.println("Message log. From outside. action:"+action+", executionId:"+executionId); System.out.println();
 			// End logging
-			
+				
+			ExecutionHandler eh = new ExecutionHandler();
+			JsonObject jsonResponse = eh.getExecutionStatus (executionId);
+				
+			// Send response
+			response.setContentType("text/plain");
+			PrintWriter out = response.getWriter();
+			out.print( jsonResponse.toString() );
+			out.close();
+		
 			return;
 		}
 		

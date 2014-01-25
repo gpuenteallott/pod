@@ -23,7 +23,7 @@ import model.Activity;
  * The activity to handle is given in the constructor
  * If the purpose of the runnable is performing an uninstallation, it must be specified through the uninstall flag
  * 
- * After the (un)installation, a message will be sent to the master of this worker informing about the result
+ * After the (un)installation, a message will be sent to the manager of this worker informing about the result
  */
 public class ActivityInstaller implements Runnable {
 	
@@ -37,6 +37,7 @@ public class ActivityInstaller implements Runnable {
 	}
 	
 	public ActivityInstaller (Activity activity, boolean uninstall){
+		
 		this.activity = activity;
 		this.uninstall = uninstall;
 		this.errorDescription = "";
@@ -62,7 +63,7 @@ public class ActivityInstaller implements Runnable {
 			delete( new File ("/home/user/app/"+activity.getName()) );
 		}
 		
-		// Send message to master when done
+		// Send message to manager when done
 		Sender sender = new Sender();
 		
 		JsonObject message = new JsonObject();
@@ -82,7 +83,7 @@ public class ActivityInstaller implements Runnable {
 		
 		sender.setMessage(message);
 		sender.setDestinationIP( ServerProperties.getMasterDns() );
-		sender.setDestinationRole("master");
+		sender.setDestinationRole("manager");
 		try {
 			sender.send();
 		} catch (IOException e) {
@@ -198,15 +199,39 @@ public class ActivityInstaller implements Runnable {
 			return false;
 		}
 		
+		// We try to make the file executable
+		if ( !executionScript.setExecutable(true) ) {
+			errorDescription = "Unable to install, problem with main.sh file permissions";
+			return false;
+		}
+		
+		// The executables might have been created in a Windows system
+		// In that case, the newlines are represented by \r\n instead of \n
+		// This is a problem for executing scripts in the system
+		// So we must change that for main.sh in case it comes from Windows
+		try {
+			new ProcessBuilder("dos2unix", appDirectory.getPath() + "/main.sh").start();
+		} catch (IOException e) {
+			errorDescription = "Unable to install, problem using dos2unix to modify encoding of main executable";
+			e.printStackTrace();
+			return false;
+		}
+		
 		// At this point, everything went well!
 		return true;
 	}
 	
 	/**
 	 * Deletes all files about this activity in this worker
-	 * @return
+	 * It the app wasn't installed in the worker, returns true
+	 * @return true if by the end of the execution of this method, the activity isn't installed
 	 */
 	private boolean uninstall() {
+		
+		// If the app isn't installed, we return true to the uninstallation request
+		if ( !new File ("/home/user/app/"+activity.getName()).exists() )
+			return true;
+		
 		boolean deleted = delete( new File ("/home/user/app/"+activity.getName()) );
 		if ( !deleted )
 			errorDescription = "Unable to uninstall, error deleting project files";

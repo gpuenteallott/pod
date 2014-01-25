@@ -399,7 +399,7 @@ public class WorkerDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "SELECT workers.id, workers.status FROM workers, installations WHERE workers.id = installations.workerId AND installations.activityId = ?";
+			String searchQuery = "SELECT workers.id, workers.status, workers.dns FROM workers, installations WHERE workers.id = installations.workerId AND installations.activityId = ?";
 			
 			statement = con.prepareStatement(searchQuery);
 			statement.setInt(1, activityId );
@@ -463,7 +463,7 @@ public class WorkerDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "SELECT workers.id, workers.status FROM workers, installations, activities WHERE workers.id = installations.workerId AND installations.activityId = activities.id AND activities.name = ?";
+			String searchQuery = "SELECT workers.id, workers.status, workers.dns FROM workers, installations, activities WHERE workers.id = installations.workerId AND installations.activityId = activities.id AND activities.name = ?";
 			
 			statement = con.prepareStatement(searchQuery);
 			statement.setString(1, activityName );
@@ -508,6 +508,73 @@ public class WorkerDAO {
 		     }
 		}
 		return workers.toArray( new Worker [workers.size()] );
+	}
+	
+	/**
+	 * Retrieves the first available worker for work found in the database that has the given activity installed (installation status = installed)
+	 * @param activityId
+	 * @param status Status of the worker
+	 * @return Worker object
+	 */
+	public Worker getAvailableByActivityAndStatus ( int activityId , String status ) {
+		
+		Connection con = null;
+		PreparedStatement statement = null;
+		ResultSet rs = null;
+		Worker worker = null;
+		
+		try {
+			
+			con = ConnectionManager.getConnection();
+			
+			String searchQuery = "SELECT workers.id, workers.status, workers.dns FROM workers, installations "
+					+ "WHERE workers.id = installations.workerId AND installations.activityId = ? "
+					+ "AND installations.status = 'installed'"
+					+ "AND workers.status = ?";
+			
+			statement = con.prepareStatement(searchQuery);
+			statement.setInt(1, activityId );
+			statement.setString(2, status );
+			
+			rs = statement.executeQuery();
+			
+			while (rs.next()) {
+				
+				worker = new Worker();
+				worker.setId( rs.getInt("id") );
+				worker.setStatus( rs.getString("status") );
+				worker.setDns( rs.getString("dns") );
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			error = e.toString();
+		}
+		
+		finally {
+			if (rs != null)	{
+			    try {
+			     	rs.close();
+			    } catch (Exception e) { System.err.println(e); }
+			        rs = null;
+			    }
+		     
+		     if (statement != null) {
+		        try {
+		        	statement.close();
+		        } catch (Exception e) { System.err.println(e); }
+		        	statement = null;
+		        }
+		
+		     if (con != null) {
+		        try {
+		        	con.close();
+		        } catch (Exception e) { System.err.println(e); }
+		
+		        con = null;
+		     }
+		}
+		return worker;
 	}
 	
 	/**

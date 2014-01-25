@@ -2,12 +2,13 @@ package worker;
 
 import interaction.Action;
 import model.Activity;
+import model.Execution;
 
 import com.eclipsesource.json.JsonObject;
 
 /**
  * This class handles the requests directed to a worker
- * The reason to make this class is allow worker request handling either if the worker is a separate server or the same server than the master
+ * The reason to make this class is allow worker request handling either if the worker is a separate server or the same server than the manager
  */
 public class WorkerRequestHandler {
 	
@@ -28,20 +29,39 @@ public class WorkerRequestHandler {
 		int actionId = json.get("action").asInt();
 		Action action = Action.get(actionId);
 		
+		// Request to start a new execution of a given activity
+		if ( action == Action.NEW_EXECUTION ) {
+			
+			// Get message information
+			JsonObject executionJson = json.get("execution").asObject();
+			Execution execution = new Execution (executionJson);
+			
+			// Start execution in a new thread
+			new Thread ( new ExecutionPerformer(execution) ).start();
+			
+			// Compose response
+			JsonObject jsonResponse = new JsonObject();
+			jsonResponse.add("execution", executionJson);
+			jsonResponse.add("status", "inProgress");
+			return jsonResponse;
+		}
+		
 		// Request to install a new activity, retrieving its code
-		if ( action == Action.INSTALL_ACTIVITY ) {
+		else if ( action == Action.INSTALL_ACTIVITY ) {
 			
 			// Get message information
 			JsonObject activityJson = json.get("activity").asObject();
 			int id = activityJson.get("id").asInt();
 			String name = activityJson.get("name").asString();
 			String installationScriptLocation = activityJson.get("installationScriptLocation").asString();
+			String status = activityJson.get("status").asString();
 			
 			// Set up installer
 			Activity activity = new Activity();
 			activity.setId(id);
 			activity.setName(name);
 			activity.setInstallationScriptLocation(installationScriptLocation);
+			activity.setStatus(status);
 			
 			// Start installer execution in a new thread
 			new Thread ( new ActivityInstaller(activity) ).start();

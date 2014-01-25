@@ -11,6 +11,7 @@ public class Activity implements java.io.Serializable {
 	private int id;
 	private String name;
 	private String installationScriptLocation;
+	private String status;
 	
 	public Activity(){}
 	
@@ -18,6 +19,7 @@ public class Activity implements java.io.Serializable {
 		if (json.get("id") != null) id = json.get("id").asInt();
 		if (json.get("name") != null) name = json.get("name").asString();
 		if (json.get("installationScriptLocation") != null) installationScriptLocation = json.get("installationScriptLocation").asString();
+		if (json.get("status") != null) status = json.get("status").asString();
 	}
 	
 	public int getId() {
@@ -48,8 +50,9 @@ public class Activity implements java.io.Serializable {
 		
 		JsonObject json = new JsonObject();
 		json.add("id", id);
-		json.add("name", name);
-		json.add("installationScriptLocation", installationScriptLocation);
+		if ( name != null ) json.add("name", name);
+		if ( installationScriptLocation != null ) json.add("installationScriptLocation", installationScriptLocation);
+		if ( status != null ) json.add("status", status);
 		return json;
 	}
 	
@@ -62,7 +65,16 @@ public class Activity implements java.io.Serializable {
 		
 		JsonObject json = new JsonObject();
 		json.add("id", id);
-		json.add("name", name);
+		if ( name != null ) json.add("name", name);
+		if ( status != null ) json.add("status", status);
 		return json;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 }
