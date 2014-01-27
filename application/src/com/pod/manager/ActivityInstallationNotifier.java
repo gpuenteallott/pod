@@ -1,17 +1,16 @@
-package manager;
+package com.pod.manager;
 
 import java.io.IOException;
 
 import com.eclipsesource.json.JsonObject;
-
-import interaction.Action;
-import interaction.Sender;
-import dao.ActivityDAO;
-import dao.InstallationDAO;
-import dao.WorkerDAO;
-import model.Activity;
-import model.Installation;
-import model.Worker;
+import com.pod.dao.ActivityDAO;
+import com.pod.dao.InstallationDAO;
+import com.pod.dao.WorkerDAO;
+import com.pod.interaction.Action;
+import com.pod.interaction.Sender;
+import com.pod.model.Activity;
+import com.pod.model.Installation;
+import com.pod.model.Worker;
 
 /**
  * This class implements runnable. 
@@ -48,7 +47,11 @@ public class ActivityInstallationNotifier implements Runnable {
 		
 		// For each one of these
 		for ( Worker worker : workers ) {
-
+			
+			// If the worker isn't already in working state, we mark it as working so no new executions will be sent during this installation
+			if ( !worker.getStatus().equals("working") )
+				wdao.updateStatus( worker.getId() , "working");
+				
 			// Create an installation record with status notifyingInstallation (in case this is an installation process)
 			if ( this.action == Action.INSTALL_ACTIVITY ) {
 				InstallationDAO idao = new InstallationDAO();

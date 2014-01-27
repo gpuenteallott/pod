@@ -1,14 +1,12 @@
-package manager;
-
-import interaction.Action;
-import model.Activity;
-import model.Execution;
+package com.pod.manager;
 
 import com.eclipsesource.json.JsonObject;
-
-import dao.ActivityDAO;
-import dao.InstallationDAO;
-import dao.WorkerDAO;
+import com.pod.dao.ActivityDAO;
+import com.pod.dao.InstallationDAO;
+import com.pod.dao.WorkerDAO;
+import com.pod.interaction.Action;
+import com.pod.model.Activity;
+import com.pod.model.Execution;
 
 /**
  * This class handles the requests directed to a manager from inside the cloud
@@ -26,8 +24,11 @@ public class ManagerRequestHandler {
 	 */
 	public JsonObject doManagerRequest (JsonObject json) {
 		
+		// Prepare response object
+		JsonObject jsonResponse = new JsonObject();
+		
 		if ( json.get("action") == null ) {
-			JsonObject jsonResponse = new JsonObject();
+			jsonResponse = new JsonObject();
 			jsonResponse.add("error", "no action specified");
 			return jsonResponse;
 		}
@@ -47,7 +48,7 @@ public class ManagerRequestHandler {
 				ExecutionMap bag = new ExecutionMap();
 				bag.putError(execution.getId(), json.get("errorDescription").asString());
 				
-				JsonObject jsonResponse = new JsonObject();
+				jsonResponse = new JsonObject();
 				jsonResponse.add("action", Action.ACK.getId());
 				return jsonResponse;
 			}
@@ -56,16 +57,20 @@ public class ManagerRequestHandler {
 			ExecutionMap bag = new ExecutionMap();
 			bag.put(execution, status);
 			
+			// If the message contains executionChaining=false, we don't try to find another execution to send
+			// because the worker is busy installing something
+			if ( json.get("executionChaining") != null && !json.get("executionChaining").asBoolean() ) {
+				
+				jsonResponse.add("action", Action.ACK.getId());
+				return jsonResponse;
+			}
+			
 			// Check if there is a pending execution in the queue that this worker could handle
 			InstallationDAO idao = new InstallationDAO();
 			int[] activityIds = idao.selectInstalledActivityIdsByWorker( json.get("workerId").asInt() );
 			
 			ExecutionWaitingQueue queue = new ExecutionWaitingQueue();
 			Execution newExecution = queue.pull(activityIds);
-			System.out.println(newExecution != null);
-			
-			// Prepare response object
-			JsonObject jsonResponse = new JsonObject();
 			
 			// If no pending executions in the queue are found
 			// we set the worker status to "ready" because it's available
@@ -118,13 +123,31 @@ public class ManagerRequestHandler {
 				}
 			}
 			
-			// Send response
-			JsonObject jsonResponse = new JsonObject();
-			jsonResponse.add("action", Action.ACK.getId());
-			return jsonResponse;
+			// Now that the installation is completed (successfully or not), we check if there are new executions that this worker could handle
+			int[] activityIds = idao.selectInstalledActivityIdsByWorker( json.get("workerId").asInt() );
 			
+			ExecutionWaitingQueue queue = new ExecutionWaitingQueue();
+			Execution newExecution = queue.pull(activityIds);
+			
+			// If no pending executions in the queue are found
+			// we set the worker status to "ready" because it's available
+			if ( newExecution == null ) {
+				WorkerDAO wdao = new WorkerDAO();
+				wdao.updateStatus( json.get("workerId").asInt() , "ready");
+
+				jsonResponse.add("action", Action.ACK.getId());
+			}
+			
+			// If there is a pending execution we don't change the status of the worker (keep it "working")
+			else {
+				jsonResponse.add("action", Action.NEW_EXECUTION.getId());
+				jsonResponse.add("execution", newExecution.toJsonObject());
+			}
+			
+			
+			return jsonResponse;
 		}
 	
-		return  new JsonObject().add("error", "this manager doesn't recognize that request");
+		return jsonResponse.add("error", "this manager doesn't recognize that request");
 	}
 }

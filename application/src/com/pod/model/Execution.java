@@ -1,4 +1,4 @@
-package model;
+package com.pod.model;
 
 import com.eclipsesource.json.JsonObject;
 

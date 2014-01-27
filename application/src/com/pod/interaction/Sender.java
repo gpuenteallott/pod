@@ -1,4 +1,4 @@
-package interaction;
+package com.pod.interaction;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -8,11 +8,10 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import manager.ManagerRequestHandler;
-import servlet.ServerProperties;
-import worker.WorkerRequestHandler;
-
 import com.eclipsesource.json.JsonObject;
+import com.pod.manager.ManagerRequestHandler;
+import com.pod.servlet.ServerProperties;
+import com.pod.worker.WorkerRequestHandler;
 
 /**
  * This class abstracts the communication details between servers inside the cloud

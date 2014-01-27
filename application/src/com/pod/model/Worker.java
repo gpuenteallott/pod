@@ -1,4 +1,4 @@
-package model;
+package com.pod.model;
 
 /**
  * Represents a worker object

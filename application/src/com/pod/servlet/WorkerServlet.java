@@ -1,4 +1,4 @@
-package servlet;
+package com.pod.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -9,18 +9,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import manager.ManagerRequestHandler;
-
 import com.eclipsesource.json.JsonObject;
+import com.pod.worker.WorkerRequestHandler;
 
 /**
  * Servlet implementation class FrontServlet
- * This servlet receives all requests that are directed to the path /manager
- * These requests are the ones that the server should interpret as manager
+ * This servlet receives all requests that are directed to the path /worker
+ * These requests are the ones that the server should interpret as worker
  */
-@WebServlet("/ManagerServlet")
-public class ManagerServlet extends HttpServlet {
+@WebServlet("/WorkerServlet")
+public class WorkerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+       
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -33,19 +33,19 @@ public class ManagerServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	
-		doManagerFromWorker(request, response);
+		
+		doWorkerRequest(request,response);
 		
 	}
 
-
+	
 	/**
-	 * This method checks the message that was sent from the outside to this server from a worker, which is working in MANAGER mode
+	 * This method checks what message was sent to this server, which is working in WORKER mode
 	 * @param request
 	 * @param response
 	 */
-	private void doManagerFromWorker(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	
+	private void doWorkerRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
 		String jsonRaw = request.getParameter("json");
 		
 		// In case no action parameter was provided
@@ -59,14 +59,13 @@ public class ManagerServlet extends HttpServlet {
 		}
 		
 		// Create worker instance and attend request internally
-		ManagerRequestHandler worker = new ManagerRequestHandler();
-		JsonObject jsonResponse = worker.doManagerRequest(JsonObject.readFrom( jsonRaw ));
+		WorkerRequestHandler worker = new WorkerRequestHandler();
+		JsonObject jsonResponse = worker.doWorkerRequest(JsonObject.readFrom( jsonRaw ));
 		
 		// Send response
 		PrintWriter out = response.getWriter();
 		out.print(jsonResponse.toString());
 		out.close();
 		return;
-		
 	}
 }

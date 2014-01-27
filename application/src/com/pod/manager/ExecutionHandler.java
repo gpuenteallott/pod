@@ -1,18 +1,15 @@
-package manager;
-
-import interaction.Action;
-import interaction.Sender;
+package com.pod.manager;
 
 import java.io.IOException;
 
-import model.Activity;
-import model.Execution;
-import model.Worker;
-
 import com.eclipsesource.json.JsonObject;
-
-import dao.ActivityDAO;
-import dao.WorkerDAO;
+import com.pod.dao.ActivityDAO;
+import com.pod.dao.WorkerDAO;
+import com.pod.interaction.Action;
+import com.pod.interaction.Sender;
+import com.pod.model.Activity;
+import com.pod.model.Execution;
+import com.pod.model.Worker;
 
 public class ExecutionHandler {
 
@@ -162,7 +159,9 @@ public class ExecutionHandler {
 		String status = bag.getStatus(executionId);
 		
 		// In case the execution isn't in the bag
-		if ( status == null ) return json.add("error", "Execution with id "+executionId+" doesn't exist");
+		if ( status == null ) {
+			return json.add("error", "Execution with id "+executionId+" doesn't exist or its result has already been retrieved");
+		}
 		
 		// In case the execution is finished
 		if ( status.equals("finished") ) return json.add("execution", bag.pullExecution(executionId).toJsonObject())

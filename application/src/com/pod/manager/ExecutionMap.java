@@ -1,9 +1,9 @@
-package manager;
+package com.pod.manager;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import model.Execution;
+import com.pod.model.Execution;
 
 /**
  * This class represents a map containing all executions that are currently in the cloud

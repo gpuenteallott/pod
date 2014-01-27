@@ -1,4 +1,4 @@
-package worker;
+package com.pod.worker;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -10,13 +10,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
-import servlet.ServerProperties;
-
 import com.eclipsesource.json.JsonObject;
-
-import interaction.Action;
-import interaction.Sender;
-import model.Activity;
+import com.pod.interaction.Action;
+import com.pod.interaction.Sender;
+import com.pod.model.Activity;
+import com.pod.model.Execution;
+import com.pod.servlet.ServerProperties;
 
 /**
  * This class is a runnable that performs the (un)installation of activities
@@ -50,6 +49,12 @@ public class ActivityInstaller implements Runnable {
 	@Override
 	public void run() {
 		
+		ServerProperties.setWorking(true);
+		
+		// Logging
+			System.out.println("Worker: (un)installing activity "+activity.getName());
+		// End logging
+		
 		// Install or uninstall activity
 		boolean success = false;
 		if ( !uninstall )
@@ -62,6 +67,10 @@ public class ActivityInstaller implements Runnable {
 		if ( !success && !uninstall ) {
 			delete( new File ("/home/user/app/"+activity.getName()) );
 		}
+		
+		// Logging
+			System.out.println("Worker: done (un)installing activity "+activity.getName());
+		// End logging
 		
 		// Send message to manager when done
 		Sender sender = new Sender();
@@ -81,13 +90,45 @@ public class ActivityInstaller implements Runnable {
 			message.add("status", "uninstalled");
 		
 		
+		// Now we check if there are pending INSTALLATIONS
+		// In case there aren't, we do nothing
+		// In case there are, we start processing it and send the manager a flag indicating that we don't want a new execution right away
+		ActivityInstallationQueue aiqueue = new ActivityInstallationQueue();
+		if ( !aiqueue.isEmpty() ) {
+			
+			message.add("executionChaining", false);
+			
+			// Start installer execution in a new thread
+			new Thread ( new ActivityInstaller(aiqueue.pull()) ).start();
+		}
+		
+		
 		sender.setMessage(message);
 		sender.setDestinationIP( ServerProperties.getMasterDns() );
 		sender.setDestinationRole("manager");
+		String response = "";
 		try {
-			sender.send();
+			response = sender.send();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		
+		JsonObject jsonResponse = JsonObject.readFrom(response);
+		
+		// In case there is a new execution to perform
+		if ( jsonResponse.get("action").asInt() == Action.NEW_EXECUTION.getId() ) {
+			
+			Execution newExecution = new Execution (jsonResponse.get("execution").asObject());
+			
+			// Launch new thread to perform the execution, so this current thread will end
+			new Thread ( new ExecutionPerformer(newExecution) ).start();
+		}
+		
+		
+		// If there is no other execution to perform, we change the status of the worker
+		// This might happen because truly there are no pending executions, or because the executionChaining parameter was sent
+		else {
+			ServerProperties.setWorking(false);
 		}
 	}
 	

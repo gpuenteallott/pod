@@ -1,14 +1,12 @@
-package manager;
-
-import interaction.Action;
+package com.pod.manager;
 
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
-
-import model.Activity;
-import model.Installation;
-import dao.ActivityDAO;
-import dao.InstallationDAO;
+import com.pod.dao.ActivityDAO;
+import com.pod.dao.InstallationDAO;
+import com.pod.interaction.Action;
+import com.pod.model.Activity;
+import com.pod.model.Installation;
 
 /**
  * This class provides the necessary functions to make operations on activities, such us add or delete

@@ -1,10 +1,10 @@
-package worker;
-
-import interaction.Action;
-import model.Activity;
-import model.Execution;
+package com.pod.worker;
 
 import com.eclipsesource.json.JsonObject;
+import com.pod.interaction.Action;
+import com.pod.model.Activity;
+import com.pod.model.Execution;
+import com.pod.servlet.ServerProperties;
 
 /**
  * This class handles the requests directed to a worker
@@ -63,10 +63,19 @@ public class WorkerRequestHandler {
 			activity.setInstallationScriptLocation(installationScriptLocation);
 			activity.setStatus(status);
 			
-			// Start installer execution in a new thread
-			new Thread ( new ActivityInstaller(activity) ).start();
+
+			// If the worker is busy processing something, we add the installation request to the queue
+			if ( ServerProperties.isWorking() ) {
+				ActivityInstallationQueue aiqueue = new ActivityInstallationQueue();
+				aiqueue.put(activity);
+			}
 			
-			// Compose response
+			// Start installer execution in a new thread
+			else {
+				new Thread ( new ActivityInstaller(activity) ).start();
+			}
+			
+			// Compose response. In any case, we want the manager to know that it is in process of being installed
 			JsonObject jsonResponse = new JsonObject();
 			jsonResponse.add("name", name);
 			jsonResponse.add("status", "installing");

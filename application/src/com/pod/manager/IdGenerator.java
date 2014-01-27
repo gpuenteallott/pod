@@ -1,4 +1,4 @@
-package manager;
+package com.pod.manager;
 
 import java.util.Random;
 

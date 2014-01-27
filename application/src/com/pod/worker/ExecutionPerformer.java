@@ -1,7 +1,4 @@
-package worker;
-
-import interaction.Action;
-import interaction.Sender;
+package com.pod.worker;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,10 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import model.Execution;
-import servlet.ServerProperties;
-
 import com.eclipsesource.json.JsonObject;
+import com.pod.interaction.Action;
+import com.pod.interaction.Sender;
+import com.pod.model.Execution;
+import com.pod.servlet.ServerProperties;
 
 /**
  * This class is a runnable that performs the executions
@@ -30,6 +28,12 @@ public class ExecutionPerformer implements Runnable {
 	}
 	
 	public void run () {
+		
+		ServerProperties.setWorking(true);
+		
+		// Logging
+			System.out.println("Worker: starting execution "+execution.getActivityId()+" of "+execution.getActivityName());
+		// End logging
 		
 		// Prepare message in case of error
 		JsonObject message = null;
@@ -56,8 +60,28 @@ public class ExecutionPerformer implements Runnable {
 		else
 			message = execute();
 		
+		
+		// Logging
+			System.out.println("Worker: finished execution "+execution.getActivityId()+" of "+execution.getActivityName());
+		// End logging
+				
+		
+		
 		// Set message action
 		message.add("action", Action.EXECUTION_REPORT.getId());
+		
+		
+		// Now we check if there are pending INSTALLATIONS
+		// In case there aren't, we do nothing
+		// In case there are, we start processing it and send the manager a flag indicating that we don't want a new execution right away
+		ActivityInstallationQueue aiqueue = new ActivityInstallationQueue();
+		if ( !aiqueue.isEmpty() ) {
+			
+			message.add("executionChaining", false);
+			
+			// Start installer execution in a new thread
+			new Thread ( new ActivityInstaller(aiqueue.pull()) ).start();
+		}
 		
 		// Set the public DNS of the worker. If empty, it will mean this same machine
 		Sender sender = new Sender();
@@ -82,6 +106,13 @@ public class ExecutionPerformer implements Runnable {
 			
 			// Launch new thread to perform the execution, so this current thread will end
 			new Thread ( new ExecutionPerformer(newExecution) ).start();
+		}
+		
+		
+		// If there is no other execution to perform, we change the status of the worker
+		// This might happen because truly there are no pending executions, or because the executionChaining parameter was sent
+		else {
+			ServerProperties.setWorking(false);
 		}
 	}
 	

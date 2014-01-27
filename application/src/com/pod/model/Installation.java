@@ -1,4 +1,4 @@
-package model;
+package com.pod.model;
 
 /**
  * Represents an installation object

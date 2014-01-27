@@ -1,4 +1,4 @@
-package servlet;
+package com.pod.servlet;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,9 +8,9 @@ import java.util.logging.Logger;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import dao.ActivityDAO;
-import dao.WorkerDAO;
-import model.Worker;
+import com.pod.dao.ActivityDAO;
+import com.pod.dao.WorkerDAO;
+import com.pod.model.Worker;
 
 
 /**
@@ -31,6 +31,11 @@ public class ServerProperties implements ServletContextListener {
 	private static String dns;
 	private static int workerId;
 	private static String masterDns;
+	
+	/**
+	 * Is the worker part of this server processing an execution or installation?
+	 */
+	private static boolean working;
 
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
@@ -140,6 +145,14 @@ public class ServerProperties implements ServletContextListener {
 	    for (File c : f.listFiles())
 	      delete(c);
 	  }
+	}
+
+	public static boolean isWorking() {
+		return working;
+	}
+
+	public static void setWorking(boolean working) {
+		ServerProperties.working = working;
 	}
 
 }

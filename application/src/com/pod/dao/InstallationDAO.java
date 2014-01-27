@@ -1,4 +1,4 @@
-package dao;
+package com.pod.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,7 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.Installation;
+import com.pod.model.Installation;
 
 /**
  * InstallationDAO provides methods to add new records of activity installations in workers or delete them

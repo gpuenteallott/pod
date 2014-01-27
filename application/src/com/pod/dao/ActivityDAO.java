@@ -1,4 +1,4 @@
-package dao;
+package com.pod.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,7 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.Activity;
+import com.pod.model.Activity;
 
 /**
  * Class to interact with the table of activities in the database

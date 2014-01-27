@@ -1,4 +1,4 @@
-package interaction;
+package com.pod.interaction;
 
 /**
  * This enum includes all possible messages that can be sent INSIDE the cloud

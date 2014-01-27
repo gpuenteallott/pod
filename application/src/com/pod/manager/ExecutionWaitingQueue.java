@@ -1,9 +1,9 @@
-package manager;
+package com.pod.manager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import model.Execution;
+import com.pod.model.Execution;
 
 /**
  * Implements a queue to store executions

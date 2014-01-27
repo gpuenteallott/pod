@@ -1,4 +1,4 @@
-package servlet;
+package com.pod.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -10,9 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.eclipsesource.json.JsonObject;
-
-import manager.ActivityHandler;
-import manager.ExecutionHandler;
+import com.pod.manager.ActivityHandler;
+import com.pod.manager.ExecutionHandler;
 
 /**
  * Servlet implementation class FrontServlet
