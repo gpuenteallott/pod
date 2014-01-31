@@ -5,11 +5,11 @@
     <session-timeout>30</session-timeout>
   </session-config>
   <listener>
-    <listener-class>com.pod.servlet.ServerProperties</listener-class>
+    <listener-class>com.pod.listeners.ServerProperties</listener-class>
   </listener>
   <servlet>
     <servlet-name>FrontServlet</servlet-name>
-    <servlet-class>com.pod.servlet.FrontServlet</servlet-class>
+    <servlet-class>com.pod.interaction.HttpFrontServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>FrontServlet</servlet-name>
@@ -18,7 +18,7 @@
   
   <servlet>
     <servlet-name>ManagerServlet</servlet-name>
-    <servlet-class>com.pod.servlet.ManagerServlet</servlet-class>
+    <servlet-class>com.pod.interaction.HttpManagerServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>ManagerServlet</servlet-name>
@@ -27,7 +27,7 @@
   
   <servlet>
     <servlet-name>WorkerServlet</servlet-name>
-    <servlet-class>com.pod.servlet.WorkerServlet</servlet-class>
+    <servlet-class>com.pod.interaction.HttpWorkerServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>WorkerServlet</servlet-name>

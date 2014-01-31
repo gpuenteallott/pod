@@ -12,10 +12,10 @@ import java.net.URLConnection;
 
 import com.eclipsesource.json.JsonObject;
 import com.pod.interaction.Action;
-import com.pod.interaction.Sender;
+import com.pod.interaction.HttpSender;
+import com.pod.listeners.ServerProperties;
 import com.pod.model.Activity;
 import com.pod.model.Execution;
-import com.pod.servlet.ServerProperties;
 
 /**
  * This class is a runnable that performs the (un)installation of activities
@@ -52,7 +52,8 @@ public class ActivityInstaller implements Runnable {
 		ServerProperties.setWorking(true);
 		
 		// Logging
-			System.out.println("Worker: (un)installing activity "+activity.getName());
+			if ( ! uninstall ) System.out.println("Worker: installing activity "+activity.getName());
+			else System.out.println("Worker: (un)installing activity "+activity.getName());
 		// End logging
 		
 		// Install or uninstall activity
@@ -69,11 +70,12 @@ public class ActivityInstaller implements Runnable {
 		}
 		
 		// Logging
-			System.out.println("Worker: done (un)installing activity "+activity.getName());
+			if ( ! uninstall ) System.out.println("Worker: done installing activity "+activity.getName());
+			else System.out.println("Worker: done uninstalling activity "+activity.getName());
 		// End logging
 		
 		// Send message to manager when done
-		Sender sender = new Sender();
+		HttpSender sender = new HttpSender();
 		
 		JsonObject message = new JsonObject();
 		message.add("action", Action.INSTALL_ACTIVITY_REPORT.getId() );
@@ -116,7 +118,7 @@ public class ActivityInstaller implements Runnable {
 		JsonObject jsonResponse = JsonObject.readFrom(response);
 		
 		// In case there is a new execution to perform
-		if ( jsonResponse.get("action").asInt() == Action.NEW_EXECUTION.getId() ) {
+		if ( jsonResponse.get("action").asInt() == Action.PERFORM_EXECUTION.getId() ) {
 			
 			Execution newExecution = new Execution (jsonResponse.get("execution").asObject());
 			

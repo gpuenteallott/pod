@@ -8,9 +8,9 @@ import java.io.InputStreamReader;
 
 import com.eclipsesource.json.JsonObject;
 import com.pod.interaction.Action;
-import com.pod.interaction.Sender;
+import com.pod.interaction.HttpSender;
+import com.pod.listeners.ServerProperties;
 import com.pod.model.Execution;
-import com.pod.servlet.ServerProperties;
 
 /**
  * This class is a runnable that performs the executions
@@ -84,7 +84,7 @@ public class ExecutionPerformer implements Runnable {
 		}
 		
 		// Set the public DNS of the worker. If empty, it will mean this same machine
-		Sender sender = new Sender();
+		HttpSender sender = new HttpSender();
 		sender.setDestinationIP( ServerProperties.getMasterDns() );
 		sender.setDestinationRole("manager");
 		sender.setMessage(message);
@@ -100,7 +100,7 @@ public class ExecutionPerformer implements Runnable {
 		JsonObject jsonResponse = JsonObject.readFrom(response);
 		
 		// In case there is a new execution to perform
-		if ( jsonResponse.get("action").asInt() == Action.NEW_EXECUTION.getId() ) {
+		if ( jsonResponse.get("action").asInt() == Action.PERFORM_EXECUTION.getId() ) {
 			
 			Execution newExecution = new Execution (jsonResponse.get("execution").asObject());
 			
@@ -178,7 +178,8 @@ public class ExecutionPerformer implements Runnable {
 		JsonObject message = new JsonObject();
 		
 		execution.setOutput(stdout);
-		execution.setError(stderr);
+		if ( !stderr.equals("") )
+			execution.setError(stderr);
 		
 		message.add("execution", execution.toJsonObject());
 		message.add("status", "finished");

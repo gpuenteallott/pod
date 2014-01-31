@@ -11,12 +11,17 @@ public enum Action {
 	NULL(0),
 	ACK(1),
 	
-	INSTALL_ACTIVITY(10),
-	UNINSTALL_ACTIVITY(11),
-	INSTALL_ACTIVITY_REPORT(12),
+	NEW_ACTIVITY(10),  // Sent from client to manager to indicate a new activity
+	INSTALL_ACTIVITY(11),   // Sent from manager to worker to make it install the specified activity
+	UNINSTALL_ACTIVITY(12),
+	INSTALL_ACTIVITY_REPORT(13),
+	GET_ACTIVITY_STATUS(14),  // Send from the client to the manager in order to fetch information about the activity
+	DELETE_ACTIVITY(15),  // Send from the client to the manager in order to delete an activity from the cloud
 	
-	NEW_EXECUTION(20),
-	EXECUTION_REPORT(21);
+	NEW_EXECUTION(20),  // Sent from client to manager to ask for a new execution
+	PERFORM_EXECUTION(21),  // Sent from manager to worker to make it perform the specified execution
+	GET_EXECUTION_STATUS(22),
+	EXECUTION_REPORT(23);
 	
 	
 	private int id;

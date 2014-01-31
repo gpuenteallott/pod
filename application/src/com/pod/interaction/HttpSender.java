@@ -9,22 +9,21 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.eclipsesource.json.JsonObject;
+import com.pod.listeners.ServerProperties;
 import com.pod.manager.ManagerRequestHandler;
-import com.pod.servlet.ServerProperties;
 import com.pod.worker.WorkerRequestHandler;
 
 /**
  * This class abstracts the communication details between servers inside the cloud
  * It also abstracts the complexity of communicating with the same machine (but another role) or another one
  */
-public class Sender {
+public class HttpSender {
 	
 	private String destinationIP;
 	private String destinationRole; // can be "worker" or "manager"
-	private String origin;
 	private JsonObject message;
 	
-	public Sender() {
+	public HttpSender() {
 	}
 	
 	/**
@@ -149,12 +148,6 @@ public class Sender {
 	}
 	public void setDestinationIP(String destinationIP) {
 		this.destinationIP = destinationIP;
-	}
-	public String getOrigin() {
-		return origin;
-	}
-	public void setOrigin(String origin) {
-		this.origin = origin;
 	}
 	public JsonObject getMessage() {
 		return message;

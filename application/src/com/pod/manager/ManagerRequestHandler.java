@@ -1,12 +1,7 @@
 package com.pod.manager;
 
 import com.eclipsesource.json.JsonObject;
-import com.pod.dao.ActivityDAO;
-import com.pod.dao.InstallationDAO;
-import com.pod.dao.WorkerDAO;
 import com.pod.interaction.Action;
-import com.pod.model.Activity;
-import com.pod.model.Execution;
 
 /**
  * This class handles the requests directed to a manager from inside the cloud
@@ -38,114 +33,44 @@ public class ManagerRequestHandler {
 		
 		// A message from a worker informing about the result of an execution
 		if ( action == Action.EXECUTION_REPORT ) {
-			
-			String status = json.get("status").asString();
-			Execution execution = new Execution (json.get("execution").asObject());
-			
-			// In case there was an error in the worker with the execution
-			if ( "error".equals(status) ) {
-				
-				ExecutionMap bag = new ExecutionMap();
-				bag.putError(execution.getId(), json.get("errorDescription").asString());
-				
-				jsonResponse = new JsonObject();
-				jsonResponse.add("action", Action.ACK.getId());
-				return jsonResponse;
-			}
-			
-			// Put the execution object in the bag, so the client can retrieve it later
-			ExecutionMap bag = new ExecutionMap();
-			bag.put(execution, status);
-			
-			// If the message contains executionChaining=false, we don't try to find another execution to send
-			// because the worker is busy installing something
-			if ( json.get("executionChaining") != null && !json.get("executionChaining").asBoolean() ) {
-				
-				jsonResponse.add("action", Action.ACK.getId());
-				return jsonResponse;
-			}
-			
-			// Check if there is a pending execution in the queue that this worker could handle
-			InstallationDAO idao = new InstallationDAO();
-			int[] activityIds = idao.selectInstalledActivityIdsByWorker( json.get("workerId").asInt() );
-			
-			ExecutionWaitingQueue queue = new ExecutionWaitingQueue();
-			Execution newExecution = queue.pull(activityIds);
-			
-			// If no pending executions in the queue are found
-			// we set the worker status to "ready" because it's available
-			if ( newExecution == null ) {
-				WorkerDAO wdao = new WorkerDAO();
-				wdao.updateStatus( json.get("workerId").asInt() , "ready");
-
-				jsonResponse.add("action", Action.ACK.getId());
-			}
-			
-			// If there is a pending execution we don't change the status of the worker (keep it "working")
-			else {
-				jsonResponse.add("action", Action.NEW_EXECUTION.getId());
-				jsonResponse.add("execution", newExecution.toJsonObject());
-			}
-			
-			
-			return jsonResponse;
+			ExecutionHandler h = new ExecutionHandler();
+			return h.handleExecutionReport(json);
 		}
 		
 		// A message from a worker informing about the status of the installation of a new activity
 		else if ( action == Action.INSTALL_ACTIVITY_REPORT ) {
-			
-			// Get the activity that it's referring to and the status of the installation
-			Activity activity = new Activity(json.get("activity").asObject());
-			String status = json.get("status").asString();
-			int workerId = json.get("workerId").asInt();
-			
-			InstallationDAO idao = new InstallationDAO();
-			
-			// No error happened
-			if ( !status.equals("error") ) {
-				idao.update(activity.getId(), workerId, status);
-				
-				// In case the activity needed verification, we mark it as approved
-				if ( "verifying".equals(activity.getStatus()) ) {
-					ActivityDAO adao = new ActivityDAO();
-					adao.updateStatus( activity.getId() , "approved");
-				}
-			}
-
-			// In case that there was an error, we add the error description information
-			else {
-				idao.update(activity.getId(), workerId, status, json.get("errorDescription").asString());
-				
-				// If the activity needed verification, we mark it as rejected
-				if ( activity.getStatus().equals("verifying") ) {
-					ActivityDAO adao = new ActivityDAO();
-					adao.updateStatus( activity.getId() , "rejected");
-				}
-			}
-			
-			// Now that the installation is completed (successfully or not), we check if there are new executions that this worker could handle
-			int[] activityIds = idao.selectInstalledActivityIdsByWorker( json.get("workerId").asInt() );
-			
-			ExecutionWaitingQueue queue = new ExecutionWaitingQueue();
-			Execution newExecution = queue.pull(activityIds);
-			
-			// If no pending executions in the queue are found
-			// we set the worker status to "ready" because it's available
-			if ( newExecution == null ) {
-				WorkerDAO wdao = new WorkerDAO();
-				wdao.updateStatus( json.get("workerId").asInt() , "ready");
-
-				jsonResponse.add("action", Action.ACK.getId());
-			}
-			
-			// If there is a pending execution we don't change the status of the worker (keep it "working")
-			else {
-				jsonResponse.add("action", Action.NEW_EXECUTION.getId());
-				jsonResponse.add("execution", newExecution.toJsonObject());
-			}
-			
-			
-			return jsonResponse;
+			ActivityHandler h = new ActivityHandler();
+			return h.handleActivityReport(json);
+		}
+		
+		// A new activity has been submitted by the client to the cloud
+		else if ( action == Action.NEW_ACTIVITY ) {
+			ActivityHandler h = new ActivityHandler();
+			return h.newActivity(json);
+		}
+		
+		// Get execution status for client
+		else if ( action == Action.GET_EXECUTION_STATUS ) {
+			ExecutionHandler h = new ExecutionHandler();
+			return h.getExecutionStatus(json);
+		}
+		
+		// New execution request from the client
+		else if ( action == Action.NEW_EXECUTION ) {
+			ExecutionHandler h = new ExecutionHandler();
+			return h.newExecution(json);
+		}
+		
+		// Activity status request from the client
+		else if ( action == Action.GET_ACTIVITY_STATUS ) {
+			ActivityHandler h = new ActivityHandler();
+			return h.getActivityStatus(json);
+		}
+		
+		// Request from the client to delete an activity
+		else if ( action == Action.DELETE_ACTIVITY ) {
+			ActivityHandler h = new ActivityHandler();
+			return h.deleteActivity(json);
 		}
 	
 		return jsonResponse.add("error", "this manager doesn't recognize that request");

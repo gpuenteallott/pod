@@ -2,9 +2,9 @@ package com.pod.worker;
 
 import com.eclipsesource.json.JsonObject;
 import com.pod.interaction.Action;
+import com.pod.listeners.ServerProperties;
 import com.pod.model.Activity;
 import com.pod.model.Execution;
-import com.pod.servlet.ServerProperties;
 
 /**
  * This class handles the requests directed to a worker
@@ -30,7 +30,7 @@ public class WorkerRequestHandler {
 		Action action = Action.get(actionId);
 		
 		// Request to start a new execution of a given activity
-		if ( action == Action.NEW_EXECUTION ) {
+		if ( action == Action.PERFORM_EXECUTION ) {
 			
 			// Get message information
 			JsonObject executionJson = json.get("execution").asObject();

@@ -7,7 +7,7 @@ import com.pod.dao.ActivityDAO;
 import com.pod.dao.InstallationDAO;
 import com.pod.dao.WorkerDAO;
 import com.pod.interaction.Action;
-import com.pod.interaction.Sender;
+import com.pod.interaction.HttpSender;
 import com.pod.model.Activity;
 import com.pod.model.Installation;
 import com.pod.model.Worker;
@@ -59,7 +59,7 @@ public class ActivityInstallationNotifier implements Runnable {
 			}
 			
 			// Set the public DNS of the worker. If empty, it will mean this same machine
-			Sender sender = new Sender();
+			HttpSender sender = new HttpSender();
 			sender.setDestinationIP( worker.getDns() );
 			sender.setDestinationRole("worker");
 			sender.setMessage(message);
