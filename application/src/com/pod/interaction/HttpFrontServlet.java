@@ -149,8 +149,8 @@ public class HttpFrontServlet extends HttpServlet {
 		
 		// Requesting to delete an activity from the system
 		else if ( action.equals("deleteActivity") ) {
-			// Prepare json object to pass to the request handler
 			
+			// Prepare json object to pass to the request handler
 			json.add("action", Action.DELETE_ACTIVITY.getId());
 			JsonObject activityJson = new JsonObject();
 			activityJson.add("name", request.getParameter("name"));
@@ -158,6 +158,36 @@ public class HttpFrontServlet extends HttpServlet {
 						
 			// Logging
 				System.out.println("Message log. From outside. action:"+action+", name:"+request.getParameter("name")); System.out.println();
+			// End logging
+		}
+		
+		// Requesting termination of an execution
+		else if ( action.equals("terminateExecution") ) {
+			
+			// Convert HTTP parameter into int
+			String executionIdS = request.getParameter("executionId");
+			int executionId;
+			try {
+				executionId = Integer.parseInt(executionIdS);
+			} catch ( NumberFormatException e ){
+				jsonResponse.add("error", "Parameter executionId is not an integer");
+				// Send response
+				response.setContentType("application/json");
+				PrintWriter out = response.getWriter();
+				out.print( jsonResponse.toString() );
+				out.close();	
+				return;
+			}
+			
+			// Prepare json object to pass to the request handler
+			json = new JsonObject();
+			json.add("action", Action.TERMINATE_EXECUTION.getId());
+			JsonObject executionJson = new JsonObject();
+			executionJson.add("id", executionId);
+			json.add("execution", executionJson);
+			
+			// Logging
+				System.out.println("Message log. From outside. action:"+action+", executionId:"+executionId); System.out.println();
 			// End logging
 		}
 		

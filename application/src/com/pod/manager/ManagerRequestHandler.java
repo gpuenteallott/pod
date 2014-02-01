@@ -31,8 +31,20 @@ public class ManagerRequestHandler {
 		int actionId = json.get("action").asInt();
 		Action action = Action.get(actionId);
 		
+		// New execution request from the client
+		if ( action == Action.NEW_EXECUTION ) {
+			ExecutionHandler h = new ExecutionHandler();
+			return h.newExecution(json);
+		}
+		
+		// Get execution status for client
+		else if ( action == Action.GET_EXECUTION_STATUS ) {
+			ExecutionHandler h = new ExecutionHandler();
+			return h.getExecutionStatus(json);
+		}
+		
 		// A message from a worker informing about the result of an execution
-		if ( action == Action.EXECUTION_REPORT ) {
+		else if ( action == Action.EXECUTION_REPORT ) {
 			ExecutionHandler h = new ExecutionHandler();
 			return h.handleExecutionReport(json);
 		}
@@ -49,18 +61,6 @@ public class ManagerRequestHandler {
 			return h.newActivity(json);
 		}
 		
-		// Get execution status for client
-		else if ( action == Action.GET_EXECUTION_STATUS ) {
-			ExecutionHandler h = new ExecutionHandler();
-			return h.getExecutionStatus(json);
-		}
-		
-		// New execution request from the client
-		else if ( action == Action.NEW_EXECUTION ) {
-			ExecutionHandler h = new ExecutionHandler();
-			return h.newExecution(json);
-		}
-		
 		// Activity status request from the client
 		else if ( action == Action.GET_ACTIVITY_STATUS ) {
 			ActivityHandler h = new ActivityHandler();
@@ -71,6 +71,12 @@ public class ManagerRequestHandler {
 		else if ( action == Action.DELETE_ACTIVITY ) {
 			ActivityHandler h = new ActivityHandler();
 			return h.deleteActivity(json);
+		}
+		
+		// Request from the client to delete an activity
+		else if ( action == Action.TERMINATE_EXECUTION ) {
+			ExecutionHandler h = new ExecutionHandler();
+			return h.terminateExecution(json);
 		}
 	
 		return jsonResponse.add("error", "this manager doesn't recognize that request");

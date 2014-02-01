@@ -21,7 +21,8 @@ public enum Action {
 	NEW_EXECUTION(20),  // Sent from client to manager to ask for a new execution
 	PERFORM_EXECUTION(21),  // Sent from manager to worker to make it perform the specified execution
 	GET_EXECUTION_STATUS(22),
-	EXECUTION_REPORT(23);
+	EXECUTION_REPORT(23),
+	TERMINATE_EXECUTION(24); // Send by client and by manager. Its meaning is that the given execution must be terminated
 	
 	
 	private int id;

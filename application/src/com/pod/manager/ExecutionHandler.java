@@ -20,8 +20,7 @@ public class ExecutionHandler {
 	 * This method will check that the given activity is valid. That means, it is in the system and its source code has been verified
 	 * After the check, this method will look for an available worker to send the execution request right away
 	 * If no worker is available at the moment, the execution request will be put in the queue
-	 * @param activityName
-	 * @param input
+	 * @param json with this structure { execution: { name: "name", input: "input" } }
 	 * @return JsonObject with the response for the client that requested the new execution
 	 */
 	public JsonObject newExecution( JsonObject json ) {
@@ -56,7 +55,6 @@ public class ExecutionHandler {
 				return jsonResponse.add("error", adao.getError());
 		}
 		
-		System.out.println("ACT: Adding activity "+activity.getName()+" with status "+activity.getStatus());
 		// Check that its status is approved or in process of being verified
 		if ( !"approved".equals(activity.getStatus()) && !"verifying".equals(activity.getStatus()) )
 			return jsonResponse.add("error", "The requested activity isn't approved for executions. Its current status is "+activity.getStatus());
@@ -66,13 +64,10 @@ public class ExecutionHandler {
 		
 		Execution execution = new Execution();
 		execution.setId(executionId);
-		execution.setInput(input);
+		execution.setStdin(input);
 		execution.setActivityName(name);
 		execution.setActivityId(activity.getId());
-		
-		// Put the execution in the execution bag, so the client can retrieve its status
-		ExecutionMap bag = new ExecutionMap();
-		bag.put(execution, "in progress");
+		execution.setStatus("in progress");
 		
 		// Check if there are completed installations for this worker
 		// If there are, we will try to send the execution request directly to the worker
@@ -116,7 +111,13 @@ public class ExecutionHandler {
 			
 			// If the message was sent, everything is wonderful
 			if ( sent ) {
-				jsonResponse.add("execution", execution.toJsonObject()).add("status", "in progress");
+				jsonResponse.add("execution", execution.toJsonObject());
+				
+				// We put the execution in the execution map including the workerIP
+				ExecutionMap bag = new ExecutionMap();
+				execution.setWorkerIP( worker.getDns() );
+				bag.put(execution);
+				
 			}
 			else {
 				// If there was an error sending this execution, problematic
@@ -124,6 +125,9 @@ public class ExecutionHandler {
 				worker.setStatus("error");
 				wdao.update(worker);
 
+				ExecutionMap bag = new ExecutionMap();
+				bag.put(execution);
+				
 				/*
 				 * ERROR HANDLING
 				 * SOMETHING MUST BE DONE HERE
@@ -138,9 +142,12 @@ public class ExecutionHandler {
 		// In case there is no worker available, the execution request must go to the waiting queue
 		else {
 			
+			ExecutionMap bag = new ExecutionMap();
+			bag.put(execution);
+			
 			ExecutionWaitingQueue queue = new ExecutionWaitingQueue();
 			queue.put(execution);
-			jsonResponse.add("execution", execution.toJsonObject()).add("status", "in progress");
+			jsonResponse.add("execution", execution.toJsonObject());
 		}
 		
 		return jsonResponse;
@@ -152,7 +159,7 @@ public class ExecutionHandler {
 	 * If the execution is done, the json response will contain the execution in json format
 	 * If there was an error, the json response will contain the error description
 	 * In any other case, the json response will only inform about the current status
-	 * @param executionIdS
+	 * @param json with this structure { execution: { id: id } }
 	 * @return
 	 */
 	public JsonObject getExecutionStatus (JsonObject json) {
@@ -170,52 +177,47 @@ public class ExecutionHandler {
 		
 		// Retrieve execution status
 		ExecutionMap map = new ExecutionMap();
-		String status = map.getStatus(executionId);
-		
-		// Prepare response
-		JsonObject jsonResponse = new JsonObject();
+		Execution execution = map.get(executionId);
 		
 		// In case the execution isn't in the bag
-		if ( status == null ) {
-			return jsonResponse.add("error", "Execution with id "+executionId+" doesn't exist or its result has already been retrieved");
+		if ( execution == null ) {
+			return new JsonObject().add("error", "Execution with id "+executionId+" doesn't exist or its result has already been retrieved");
 		}
 		
-		// In case the execution is finished
-		if ( status.equals("finished") ) return jsonResponse.add("execution", map.pullExecution(executionId).toJsonObject())
-													        .add("status", "finished");
+		// In case the execution is done, we pull it (remove it)
+		if ( "finished".equals(execution.getStatus()) || "error".equals(execution.getStatus()) ) {
+			return new JsonObject().add("execution", map.pull(executionId).toJsonObject());
+		}
 		
-		// In case there was an error
-		else if ( status.equals("error") ) return jsonResponse.add("status", "error")
-												              .add("errorDescription", map.pullError(executionId));
-		
-		// In other situation (not finished)
-		else return jsonResponse.add("status", status);
-		
+		// Otherwise, we just get it
+		return new JsonObject().add("execution", map.get(executionId).toJsonObject());
 	}
 
-
+	/**
+	 * This method will be invoked by a request from a worker
+	 * It will read the execution object passed via JSON and put it in the Execution map so the client can retrieve it
+	 * @param json with this structure { execution: { status : "status" } }
+	 * @return
+	 */
 	public JsonObject handleExecutionReport ( JsonObject json ) {
 		
 		// Prepare response object
 		JsonObject jsonResponse = new JsonObject();
 		
-		String status = json.get("status").asString();
 		Execution execution = new Execution (json.get("execution").asObject());
 		
+		// Put the execution object in the bag, so the client can retrieve it later
+		ExecutionMap map = new ExecutionMap();
+		map.put(execution);
+		
 		// In case there was an error in the worker with the execution
-		if ( "error".equals(status) ) {
-			
-			ExecutionMap bag = new ExecutionMap();
-			bag.putError(execution.getId(), json.get("errorDescription").asString());
+		if ( "error".equals(execution.getStatus()) ) {
 			
 			jsonResponse = new JsonObject();
 			jsonResponse.add("action", Action.ACK.getId());
 			return jsonResponse;
 		}
 		
-		// Put the execution object in the bag, so the client can retrieve it later
-		ExecutionMap map = new ExecutionMap();
-		map.put(execution, status);
 		
 		// If the message contains executionChaining=false, we don't try to find another execution to send
 		// because the worker is busy installing something
@@ -243,11 +245,71 @@ public class ExecutionHandler {
 		
 		// If there is a pending execution we don't change the status of the worker (keep it "working")
 		else {
+			
+			// We need to get its IP address to put it in the execution map
+			// This is necessary in order to allow clients to terminate executions
+			WorkerDAO wdao = new WorkerDAO();
+			Worker worker = wdao.select(json.get("workerId").asInt());
+			map.setWorkerIP(newExecution.getId(), worker.getDns());
+			
 			jsonResponse.add("action", Action.PERFORM_EXECUTION.getId());
 			jsonResponse.add("execution", newExecution.toJsonObject());
 		}
 		
-		
 		return jsonResponse;
+	}
+
+	/**
+	 * This method is triggered by the client. After verifying that the execution exists and it is being executed or waiting,
+	 * it is removed from the queue and a message is sent to the worker with the instruction of terminating it
+	 * @param json with this structure { execution: { id : id } }
+	 * @return
+	 */
+	public JsonObject terminateExecution(JsonObject json) {
+		
+		// Validate parameters
+		JsonValue executionJsonValue = json.get("execution");
+		if ( executionJsonValue == null ) return new JsonObject().add("error", "Parameter execution is null");
+		if ( !executionJsonValue.isObject() ) return new JsonObject().add("error", "Parameter execution isn't a json object");
+		JsonObject executionJson = executionJsonValue.asObject();
+		
+		JsonValue executionIdValue = executionJson.get("id");
+		if ( executionIdValue == null ) return new JsonObject().add("error", "Parameter id is null");
+		if ( !executionIdValue.isNumber() ) return new JsonObject().add("error", "Parameter id isn't a string");
+		int executionId = executionIdValue.asInt();
+		
+		// The execution is removed from the map
+		ExecutionMap map = new ExecutionMap();
+		Execution execution = map.pull(executionId);
+		
+		// In case the execution didn't exist, notify the client
+		if ( execution == null )
+			return new JsonObject().add("error", "The given execution wasn't being processed");
+		
+		// In case the execution is being processed right now by a worker
+		if ( execution.getWorkerIP() != null ) {
+			// Send termination request
+			JsonObject message = new JsonObject();
+			message.add("action", Action.TERMINATE_EXECUTION.getId());
+			message.add("execution", new JsonObject().add("id", executionId));
+			
+			HttpSender sender = new HttpSender();
+			sender.setDestinationIP( execution.getWorkerIP() );
+			sender.setDestinationRole("worker");
+			sender.setMessage(message);
+			String response = null;
+			try {
+				response = sender.send();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return JsonObject.readFrom(response);
+		}
+		
+		if ( "in progress".equals(execution.getStatus()) ) {
+			execution.setStatus("terminated");
+		}
+		
+		return new JsonObject().add("execution", execution.toJsonObject());
 	}
 }

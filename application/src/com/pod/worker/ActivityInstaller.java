@@ -49,7 +49,7 @@ public class ActivityInstaller implements Runnable {
 	@Override
 	public void run() {
 		
-		ServerProperties.setWorking(true);
+		ExecutionPerformer.setExecutionInProcess(true);
 		
 		// Logging
 			if ( ! uninstall ) System.out.println("Worker: installing activity "+activity.getName());
@@ -130,7 +130,7 @@ public class ActivityInstaller implements Runnable {
 		// If there is no other execution to perform, we change the status of the worker
 		// This might happen because truly there are no pending executions, or because the executionChaining parameter was sent
 		else {
-			ServerProperties.setWorking(false);
+			ExecutionPerformer.setExecutionInProcess(false);
 		}
 	}
 	

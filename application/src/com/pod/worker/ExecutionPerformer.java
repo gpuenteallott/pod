@@ -21,15 +21,24 @@ import com.pod.model.Execution;
  */
 public class ExecutionPerformer implements Runnable {
 	
-	private Execution execution;
+	// This variable has the process object, useful to be able to destroy it from another thread
+	private static Process process;
 	
-	public ExecutionPerformer ( Execution execution ) {
-		this.execution = execution;
+	// This is a flag to indicate if the ExecutionPerformer is performing now an execution
+	private static boolean executionInProcess;
+	
+	// Terminated flag. Used to give the final result
+	private static boolean terminated;
+	
+	private static Execution execution;
+	
+	public ExecutionPerformer ( Execution newExecution ) {
+		execution = newExecution;
 	}
 	
 	public void run () {
 		
-		ServerProperties.setWorking(true);
+		executionInProcess = true;
 		
 		// Logging
 			System.out.println("Worker: starting execution "+execution.getActivityId()+" of "+execution.getActivityName());
@@ -46,14 +55,14 @@ public class ExecutionPerformer implements Runnable {
 			message = new JsonObject();
 			
 			// We add the execution id to the error response so the manager can identify it
-			JsonObject executionJson = new JsonObject().add("id", execution.getId());
-			message.add("execution", executionJson);
+			JsonObject executionJson = new JsonObject().add("id", execution.getId()).add("status", "error");
 			
-			message.add("status", "error");
 			if ( new File ("/home/user/app/"+execution.getActivityName() ).exists() )
-				message.add("errorDescription", "The executable file is missing"); // Add error description to the response
+				executionJson.add("errorDescription", "The executable file is missing"); // Add error description to the response
 			else
-				message.add("errorDescription", "The specified activity isn't installed"); // Add error description to the response
+				executionJson.add("errorDescription", "The specified activity isn't installed"); // Add error description to the response
+			
+			message.add("execution", executionJson);
 			
 		}
 		// If the executable file is located
@@ -112,22 +121,20 @@ public class ExecutionPerformer implements Runnable {
 		// If there is no other execution to perform, we change the status of the worker
 		// This might happen because truly there are no pending executions, or because the executionChaining parameter was sent
 		else {
-			ServerProperties.setWorking(false);
+			executionInProcess = false;
 		}
 	}
 	
 	private JsonObject execute () {
 		
 		ProcessBuilder processBuilder;
-		if ( execution.getInput() != null )
-			processBuilder = new ProcessBuilder("/home/user/app/"+execution.getActivityName()+"/main.sh", execution.getInput());
+		if ( execution.getStdin() != null )
+			processBuilder = new ProcessBuilder("/home/user/app/"+execution.getActivityName()+"/main.sh", execution.getStdin());
 		else
 			processBuilder = new ProcessBuilder("/home/user/app/"+execution.getActivityName()+"/main.sh");
 
 		processBuilder.directory(new File ("/home/user/app/"+execution.getActivityName()));
 
-		
-		Process process = null;
 		InputStream is = null;
 		InputStreamReader isr = null;
 		BufferedReader br = null;
@@ -177,22 +184,40 @@ public class ExecutionPerformer implements Runnable {
 		// Prepare message to send to manager
 		JsonObject message = new JsonObject();
 		
-		execution.setOutput(stdout);
+		execution.setStdout(stdout);
 		if ( !stderr.equals("") )
-			execution.setError(stderr);
+			execution.setStderr(stderr);
+		
+		if ( terminated ) {
+			execution.setStatus("terminated");
+			terminated = false;
+		}
+		else
+			execution.setStatus("finished");
 		
 		message.add("execution", execution.toJsonObject());
-		message.add("status", "finished");
 		
 		return message;
+	}
+	
+	public static void terminate () {
+		terminated = true;
+		process.destroy();
 	}
 
 	public Execution getExecution() {
 		return execution;
 	}
 
-	public void setExecution(Execution execution) {
-		this.execution = execution;
+	public static void setExecution(Execution newExecution) {
+		execution = newExecution;
 	}
 
+	public static boolean isExecutionInProcess() {
+		return executionInProcess;
+	}
+
+	public static void setExecutionInProcess(boolean executionInProcess) {
+		ExecutionPerformer.executionInProcess = executionInProcess;
+	}
 }

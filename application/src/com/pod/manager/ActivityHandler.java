@@ -10,6 +10,7 @@ import com.pod.interaction.Action;
 import com.pod.model.Activity;
 import com.pod.model.Execution;
 import com.pod.model.Installation;
+import com.pod.model.Worker;
 
 /**
  * This class provides the necessary functions to make operations on activities, such us add or delete
@@ -19,9 +20,7 @@ public class ActivityHandler {
 	/**
 	 * Creates a new activity and puts it in the information database
 	 * If there is an error, the result accessible by 
-	 * @param activityName unique name of the activity
-	 * @param installationScriptLocation URL to the installation script
-	 * @param executionScriptLocation URL to the script to execute when there are execution requests
+	 * @param json with structure { activity: { name: "name", installationScriptLocation: "installationScriptLocation" } }
 	 * @return a JsonObject representing the just created activity, including its unique id
 	 */
 	public JsonObject newActivity( JsonObject json ) {
@@ -73,7 +72,7 @@ public class ActivityHandler {
 	
 	/**
 	 * Deletes the activity. If the activity can't be deleted, the result message should be checked using getResult()
-	 * @param activityName
+	 * @param json with structure { activity: { name: "name"} }
 	 * @return a JsonObject representing the activity and a status parameter that indicates if the activity is being uninstalled
 	 */
 	public JsonObject deleteActivity( JsonObject json ) {
@@ -118,7 +117,7 @@ public class ActivityHandler {
 	
 	/**
 	 * Retrieves the status and saves it in the object. It can be later accessed using getResult()
-	 * @param activityName
+	 * @param json with structure { activity: { name: "name"} }
 	 * @return JsonObject representing the status of the activity and its information
 	 */
 	public JsonObject getActivityStatus( JsonObject json ) {
@@ -172,7 +171,12 @@ public class ActivityHandler {
 		return jsonResponse;
 	}
 	
-
+	/**
+	 * This method is triggered by the worker when there is a report on an activity installation or uninstallation
+	 * The corresponding record in the database will be updated
+	 * @param json with structure { activity: { status: "status", workerId: workerId} }
+	 * @return
+	 */
 	public JsonObject handleActivityReport ( JsonObject json ) {
 		
 		// Prepare response object
@@ -212,7 +216,8 @@ public class ActivityHandler {
 				// For every pending execution for this rejected activity, we update its output status
 				ExecutionMap map = new ExecutionMap();
 				for ( Execution execution : deletedExecs ) {
-					map.put(execution, "Activity rejected");
+					execution.setStatus("Activity rejected");
+					map.put(execution);
 				}
 			}
 		}
@@ -234,12 +239,17 @@ public class ActivityHandler {
 		
 		// If there is a pending execution we don't change the status of the worker (keep it "working")
 		else {
+			// We need to get its IP address to put it in the execution map
+			// This is necessary in order to allow clients to terminate executions
+			WorkerDAO wdao = new WorkerDAO();
+			Worker worker = wdao.select(workerId);
+			ExecutionMap map = new ExecutionMap();
+			map.setWorkerIP(newExecution.getId(), worker.getDns());
+						
 			jsonResponse.add("action", Action.PERFORM_EXECUTION.getId());
 			jsonResponse.add("execution", newExecution.toJsonObject());
 		}
 		
 		return jsonResponse;
 	}
-
-
 }

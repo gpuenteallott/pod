@@ -2,7 +2,6 @@ package com.pod.worker;
 
 import com.eclipsesource.json.JsonObject;
 import com.pod.interaction.Action;
-import com.pod.listeners.ServerProperties;
 import com.pod.model.Activity;
 import com.pod.model.Execution;
 
@@ -41,8 +40,8 @@ public class WorkerRequestHandler {
 			
 			// Compose response
 			JsonObject jsonResponse = new JsonObject();
+			executionJson.set("status", "in progress");
 			jsonResponse.add("execution", executionJson);
-			jsonResponse.add("status", "inProgress");
 			return jsonResponse;
 		}
 		
@@ -65,7 +64,7 @@ public class WorkerRequestHandler {
 			
 
 			// If the worker is busy processing something, we add the installation request to the queue
-			if ( ServerProperties.isWorking() ) {
+			if ( ExecutionPerformer.isExecutionInProcess() ) {
 				ActivityInstallationQueue aiqueue = new ActivityInstallationQueue();
 				aiqueue.put(activity);
 			}
@@ -103,6 +102,28 @@ public class WorkerRequestHandler {
 			JsonObject jsonResponse = new JsonObject();
 			jsonResponse.add("name", name);
 			jsonResponse.add("status", "uninstalling");
+			return jsonResponse;
+		}
+		
+		// Request to terminate an execution
+		else if ( action == Action.TERMINATE_EXECUTION ) {
+			
+			// Get message information
+			JsonObject executionJson = json.get("execution").asObject();
+			Execution execution = new Execution (executionJson);
+			
+			// Check if there is one execution in process
+			if ( !ExecutionPerformer.isExecutionInProcess() ) {
+				return new JsonObject().add("error", "There isn't any execution working at the moment");
+			}
+			
+			// In case there is, stop it
+			ExecutionPerformer.terminate();
+			
+			// Compose response
+			JsonObject jsonResponse = new JsonObject();
+			JsonObject executionJsonResponse = new JsonObject().add("id", execution.getId()).add("status", "terminated");
+			jsonResponse.add("execution", executionJsonResponse);
 			return jsonResponse;
 		}
 		

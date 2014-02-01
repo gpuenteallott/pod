@@ -19,8 +19,6 @@ public class ExecutionMap {
 	
 	private static boolean initialized;
 	private static Map<Integer, Execution> executions;
-	private static Map<Integer, String> statuses;
-	private static Map<Integer, String> errors;
 	
 	/**
 	 * Create an execution map object and initialize internal static variables
@@ -31,33 +29,29 @@ public class ExecutionMap {
 		synchronized (this.getClass()){
 			if ( !initialized ) {
 				executions = new HashMap<Integer, Execution>();
-				statuses = new HashMap<Integer, String>();
-				errors = new HashMap<Integer, String>();
 				initialized = true;
 			}
 		}
 	}
 	
 	/**
-	 * Puts a copy of the execution object into the bag, as well as the given status
-	 * If the execution by its id already existed, it overrides both execution and status
+	 * Puts a copy of the execution object into the map
+	 * If the execution by its id already existed, it overrides the previous one
 	 * @param execution
-	 * @param status
 	 */
-	public void put ( Execution execution, String status ) {
+	public void put ( Execution execution ) {
 		executions.put(execution.getId(), execution);
-		statuses.put(execution.getId(), status);
 	}
 	
 	/**
 	 * Puts an error description associated with the execution id
 	 * It also sets the status of the execution with "error"
 	 * @param executionId
-	 * @param errorDescription
 	 */
-	public void putError ( int executionId, String errorDescription ) {
-		statuses.put(executionId, "error");
-		errors.put(executionId, new String(errorDescription));
+	public void setError ( int executionId , String error ) {
+		Execution execution = executions.get(executionId);
+		execution.setError(error);
+		executions.put(executionId, execution);
 	}
 	
 	/**
@@ -66,34 +60,57 @@ public class ExecutionMap {
 	 * @param executionId
 	 * @return
 	 */
-	public String getStatus ( int executionId ) {
-		return statuses.get(executionId);
+	/*public String getStatus ( int executionId ) {
+		return executions.get(executionId).getStatus();
+	}*/
+	
+	/**
+	 * Retrieves the error associated with the given execution id
+	 * This method returns null of there's no info associated with that id
+	 * @param executionId
+	 * @return
+	 */
+	public String getError ( int executionId ) {
+		return executions.get(executionId).getError();
 	}
 	
 	/**
-	 * Retrieves the Execution object associated with the given id and deletes it from the bag
+	 * Retrieves the associated worker IP to the given execution
+	 * @param executionId
+	 * @return
+	 */
+	public String getWorkerIP (int executionId) {
+		return executions.get(executionId).getWorkerIP();
+	}
+	
+	/**
+	 * Updates the associated worker IP to the given execution
+	 * @param executionId
+	 * @param workerIP
+	 */
+	public void setWorkerIP (int executionId, String workerIP) {
+		Execution execution = executions.get(executionId);
+		execution.setWorkerIP(workerIP);
+		executions.put(executionId, execution);
+	}
+	
+	/**
+	 * Retrieves the Execution object associated with the given id and deletes it from the map
 	 * The associated status is also removed
 	 * @param executionId
 	 * @return
 	 */
-	public Execution pullExecution ( int executionId ) {
-		statuses.remove(executionId);
-		errors.remove(executionId);
+	public Execution pull ( int executionId ) {
 		return executions.remove(executionId);
 	}
 	
-	
 	/**
-	 * Retrieves the error description associated with the executionId
-	 * Call this method only if getStatus() retrieved "error"
-	 * This method will also remove the execution and its status from the bag
+	 * Retrieves the execution object
 	 * @param executionId
-	 * @return error  description
+	 * @return
 	 */
-	public String pullError ( int executionId ) {
-		statuses.remove(executionId);
-		executions.remove(executionId);
-		return errors.remove(executionId);
+	public Execution get ( int executionId ) {
+		return executions.get(executionId);
 	}
 
 }
