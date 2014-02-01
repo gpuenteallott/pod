@@ -1,7 +1,9 @@
 package com.pod.worker;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.pod.model.Activity;
 
@@ -10,6 +12,7 @@ public class ActivityInstallationQueue {
 	
 	private static boolean initialized;
 	private static List<Activity> queue;
+	private static Map<Integer, Boolean> uninstallFlags;
 	
 	/**
 	 * Create an activity queue object and initialize internal static variables
@@ -20,6 +23,7 @@ public class ActivityInstallationQueue {
 			synchronized (this.getClass()){
 				initialized = true;
 				queue = new ArrayList<Activity>();
+				uninstallFlags = new HashMap<Integer, Boolean>();
 			}
 		}
 	}
@@ -40,5 +44,15 @@ public class ActivityInstallationQueue {
 		if ( queue.size() == 0 )
 			return null;
 		return queue.remove(0);
+	}
+	
+	public boolean pullFlag( int activityId ) {
+		Boolean flag = uninstallFlags.remove(activityId);
+		if (flag == null) return false;
+		return flag;
+	}
+	
+	public void putFlag( int activityId , boolean uninstall ) {
+		uninstallFlags.put(activityId, uninstall);
 	}
 }

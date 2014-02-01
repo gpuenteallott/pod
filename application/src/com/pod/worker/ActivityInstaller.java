@@ -48,7 +48,6 @@ public class ActivityInstaller implements Runnable {
 
 	@Override
 	public void run() {
-		
 		ExecutionPerformer.setExecutionInProcess(true);
 		
 		// Logging
@@ -101,9 +100,9 @@ public class ActivityInstaller implements Runnable {
 			message.add("executionChaining", false);
 			
 			// Start installer execution in a new thread
-			new Thread ( new ActivityInstaller(aiqueue.pull()) ).start();
+			Activity newActivity = aiqueue.pull();
+			new Thread ( new ActivityInstaller(newActivity, aiqueue.pullFlag(newActivity.getId())) ).start();
 		}
-		
 		
 		sender.setMessage(message);
 		sender.setDestinationIP( ServerProperties.getMasterDns() );

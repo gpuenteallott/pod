@@ -62,7 +62,6 @@ public class WorkerRequestHandler {
 			activity.setInstallationScriptLocation(installationScriptLocation);
 			activity.setStatus(status);
 			
-
 			// If the worker is busy processing something, we add the installation request to the queue
 			if ( ExecutionPerformer.isExecutionInProcess() ) {
 				ActivityInstallationQueue aiqueue = new ActivityInstallationQueue();
@@ -94,6 +93,13 @@ public class WorkerRequestHandler {
 			activity.setId(id);
 			activity.setName(name);
 			activity.setInstallationScriptLocation(installationScriptLocation);
+			
+			// If the worker is busy processing something, we add the installation request to the queue
+			if ( ExecutionPerformer.isExecutionInProcess() ) {
+				ActivityInstallationQueue aiqueue = new ActivityInstallationQueue();
+				aiqueue.put(activity);
+				aiqueue.putFlag(activity.getId(), true);
+			}
 			
 			// Start installer execution in a new thread. parameter true means that this is uninstallation
 			new Thread ( new ActivityInstaller(activity , true) ).start();
