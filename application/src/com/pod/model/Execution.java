@@ -15,6 +15,8 @@ public class Execution implements java.io.Serializable , Cloneable {
 	private String status;
 	private String error;
 	private String workerIP;
+	private long startTime;
+	private long finishTime;
 	
 	public Execution () {}
 	
@@ -28,6 +30,8 @@ public class Execution implements java.io.Serializable , Cloneable {
 		if (json.get("error") != null) error = json.get("error").asString();
 		if (json.get("activityId") != null) activityId = json.get("activityId").asInt();
 		if (json.get("activityName") != null) activityName = json.get("activityName").asString();
+		if (json.get("startTime") != null) startTime = json.get("startTime").asLong();
+		if (json.get("finishTime") != null) finishTime = json.get("finishTime").asLong();
 	}
 	
 	public JsonObject toJsonObject() {
@@ -40,8 +44,10 @@ public class Execution implements java.io.Serializable , Cloneable {
 		if ( status != null ) json.add("status", status);
 		if ( error != null ) json.add("error", error);
 		//if ( workerIP != null ) json.add("workerIP", workerIP);    We don't send this in the json messages so the client doesn't receive this private IPs
-		json.add("activityId", activityId);
+		if ( activityId != 0 ) json.add("activityId", activityId);
 		if ( activityName != null ) json.add("activityName", activityName);
+		if ( startTime != 0 ) json.add("startTime", startTime);
+		if ( finishTime != 0 ) json.add("finishTime", finishTime);
 		return json;
 	}
 	
@@ -118,5 +124,21 @@ public class Execution implements java.io.Serializable , Cloneable {
 
 	public void setWorkerIP(String workerIP) {
 		this.workerIP = workerIP;
+	}
+
+	public long getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(long startTime) {
+		this.startTime = startTime;
+	}
+
+	public long getFinishTime() {
+		return finishTime;
+	}
+
+	public void setFinishTime(long finishTime) {
+		this.finishTime = finishTime;
 	}
 }

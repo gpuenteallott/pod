@@ -20,6 +20,9 @@ public class ExecutionMap {
 	private static boolean initialized;
 	private static Map<Integer, Execution> executions;
 	
+	private static int oldestId;
+	private static int newestId;
+	
 	/**
 	 * Create an execution map object and initialize internal static variables
 	 * This method has the initialization synchronized, so no concurrent threads start the structures at the same time
@@ -41,6 +44,8 @@ public class ExecutionMap {
 	 */
 	public void put ( Execution execution ) {
 		executions.put(execution.getId(), execution);
+		newestId = newestId > execution.getId() ? newestId : execution.getId();
+		if ( oldestId == 0 ) oldestId = execution.getId();
 	}
 	
 	/**
@@ -53,16 +58,6 @@ public class ExecutionMap {
 		execution.setError(error);
 		executions.put(executionId, execution);
 	}
-	
-	/**
-	 * Retrieves the status associated with the given execution id
-	 * This method returns null of there's no info associated with that id
-	 * @param executionId
-	 * @return
-	 */
-	/*public String getStatus ( int executionId ) {
-		return executions.get(executionId).getStatus();
-	}*/
 	
 	/**
 	 * Retrieves the error associated with the given execution id
@@ -101,6 +96,7 @@ public class ExecutionMap {
 	 * @return
 	 */
 	public Execution pull ( int executionId ) {
+		oldestId = executionId <= oldestId ? executionId : oldestId;
 		return executions.remove(executionId);
 	}
 	
@@ -113,4 +109,43 @@ public class ExecutionMap {
 		return executions.get(executionId);
 	}
 
+	/**
+	 * Returns the id of the newest execution from the map
+	 * @return
+	 */
+	public static int getNewestId () {
+		return newestId;
+	}
+	
+	/**
+	 * Returns the id of the olders execution from the map
+	 * @return
+	 */
+	public static int getOldestId () {
+		return oldestId;
+	}
+	
+	/**
+	 * Delete all executions that have ids between the start id (included) and end id (not included)
+	 * @param startId
+	 * @param endId
+	 * @return
+	 */
+	public int deleteUntil (int endId ) {
+		
+		// Not go further than the newest
+		if ( newestId < endId ) endId = newestId;
+		
+		// Update oldest id
+		int oldestId2 = oldestId;
+		oldestId = endId;
+		
+		int deleted = 0;
+		for ( int i = oldestId2; i<endId; i++ ) {
+			executions.remove(i); deleted++;
+		}
+		
+		return deleted;
+	}
+	
 }

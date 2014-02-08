@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Date;
 
 import com.eclipsesource.json.JsonObject;
 import com.pod.interaction.Action;
@@ -30,10 +31,18 @@ public class ExecutionPerformer implements Runnable {
 	// Terminated flag. Used to give the final result
 	private static boolean terminated;
 	
+	// Current execution being handled
 	private static Execution execution;
+	
+	// stdout and stderr of the current execution being handled
+	// Useful to retrieve the progress of the execution before it's finished
+	private static String stdout;
+	private static String stderr;
 	
 	public ExecutionPerformer ( Execution newExecution ) {
 		execution = newExecution;
+		stdout = "";
+		stderr = "";
 	}
 	
 	public void run () {
@@ -41,7 +50,7 @@ public class ExecutionPerformer implements Runnable {
 		executionInProcess = true;
 		
 		// Logging
-			System.out.println("Worker: starting execution "+execution.getActivityId()+" of "+execution.getActivityName());
+			System.out.println("Worker: starting execution "+execution.getId()+" of activity '"+execution.getActivityName() +"'");
 		// End logging
 		
 		// Prepare message in case of error
@@ -71,14 +80,11 @@ public class ExecutionPerformer implements Runnable {
 		
 		
 		// Logging
-			System.out.println("Worker: finished execution "+execution.getActivityId()+" of "+execution.getActivityName());
+			System.out.println("Worker: finished execution "+execution.getId()+" of activity '"+execution.getActivityName() +"'");
 		// End logging
 				
-		
-		
 		// Set message action
 		message.add("action", Action.EXECUTION_REPORT.getId());
-		
 		
 		// Now we check if there are pending INSTALLATIONS
 		// In case there aren't, we do nothing
@@ -139,8 +145,8 @@ public class ExecutionPerformer implements Runnable {
 		InputStreamReader isr = null;
 		BufferedReader br = null;
 		String line = null;
-		String stdout = "";
-		String stderr = "";
+		
+		execution.setStartTime(new Date().getTime());
 		
 		// try catch for IO errors in the process
 		try {
@@ -181,6 +187,8 @@ public class ExecutionPerformer implements Runnable {
 			e.printStackTrace();
 		}
 		
+		execution.setFinishTime(new Date().getTime());
+		
 		// Prepare message to send to manager
 		JsonObject message = new JsonObject();
 		
@@ -219,5 +227,13 @@ public class ExecutionPerformer implements Runnable {
 
 	public static void setExecutionInProcess(boolean executionInProcess) {
 		ExecutionPerformer.executionInProcess = executionInProcess;
+	}
+	
+	public static String getStdout(){
+		return stdout;
+	}
+	
+	public static String getStderr () {
+		return stderr;
 	}
 }

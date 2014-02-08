@@ -181,12 +181,37 @@ public class ExecutionHandler {
 		
 		// In case the execution isn't in the bag
 		if ( execution == null ) {
-			return new JsonObject().add("error", "Execution with id "+executionId+" doesn't exist or its result has already been retrieved");
+			return new JsonObject().add("error", "Execution with id "+executionId+" doesn't exist, its result has already been retrieved or it expired");
 		}
 		
 		// In case the execution is done, we pull it (remove it)
 		if ( "finished".equals(execution.getStatus()) || "error".equals(execution.getStatus()) ) {
 			return new JsonObject().add("execution", map.pull(executionId).toJsonObject());
+		}
+		
+		// In case it's "in progress", we ask the worker about the progress
+		if ( "in progress".equals(execution.getStatus()) ) {
+			
+			JsonObject message = new JsonObject();
+			message.add("action", Action.GET_EXECUTION_PROGRESS.getId());
+			message.add("execution", new JsonObject().add("id", executionId));
+			
+			HttpSender sender = new HttpSender();
+			sender.setDestinationIP( execution.getWorkerIP() );
+			sender.setDestinationRole("worker");
+			sender.setMessage(message);
+			String response = null;
+			try {
+				response = sender.send();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			// We add the stdout and stderr to the execution object retrieved from the map
+			// That way, the response execution object contains all the info
+			JsonObject responseJson = JsonObject.readFrom(response);
+			execution.setStdout( responseJson.get("execution").asObject().get("stdout").asString() );
+			execution.setStderr( responseJson.get("execution").asObject().get("stderr").asString() );
+			return execution.toJsonObject();
 		}
 		
 		// Otherwise, we just get it

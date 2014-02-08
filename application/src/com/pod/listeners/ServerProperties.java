@@ -3,6 +3,7 @@ package com.pod.listeners;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.Timer;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletContextEvent;
@@ -10,6 +11,7 @@ import javax.servlet.ServletContextListener;
 
 import com.pod.dao.ActivityDAO;
 import com.pod.dao.WorkerDAO;
+import com.pod.manager.ExecutionMapCleaner;
 import com.pod.model.Worker;
 
 
@@ -31,7 +33,9 @@ public class ServerProperties implements ServletContextListener {
 	private static String dns;
 	private static int workerId;
 	private static String masterDns;
-
+	private static int executionMapExpirationTimeout;
+	private static int executionMapChunk;
+	
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
 		
@@ -72,7 +76,16 @@ public class ServerProperties implements ServletContextListener {
 				// Also, if this is the manager, put the masterDns value to "", so the Sender class detects it
 				masterDns = "";
 				
+				executionMapExpirationTimeout = Integer.parseInt(properties.getProperty("executionMapExpirationTimeout"))*60000;
+				executionMapChunk = Integer.parseInt(properties.getProperty("executionMapChunk"));
 				
+				if ( !ExecutionMapCleaner.isRunning() ) {
+					Timer timer = new Timer();
+			        timer.schedule(new ExecutionMapCleaner(),
+			        		Integer.parseInt(properties.getProperty("executionMapCheckPeriod"))*60000,   //initial delay
+			        		Integer.parseInt(properties.getProperty("executionMapCheckPeriod"))*60000);  //subsequent rate
+				}
+		        
 			}
 			// If this is a worker, read the property from the properties file
 			else
@@ -126,6 +139,13 @@ public class ServerProperties implements ServletContextListener {
 		ServerProperties.masterDns = masterDns;
 	}
 	
+	public static int getExecutionMapExpirationTimeout () {
+		return executionMapExpirationTimeout;
+	}
+	
+	public static int getExecutionMapChunk () {
+		return executionMapChunk;
+	}
 	
 
 	private boolean delete(File f) {

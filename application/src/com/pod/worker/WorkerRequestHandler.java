@@ -46,6 +46,24 @@ public class WorkerRequestHandler {
 		}
 		
 		// Request to install a new activity, retrieving its code
+		else if ( action == Action.GET_EXECUTION_PROGRESS ) {
+			
+			// Get message information
+			JsonObject executionJson = json.get("execution").asObject();
+			Execution execution = new Execution (executionJson);
+			
+			// Start execution in a new thread
+			execution.setStdout(ExecutionPerformer.getStdout());
+			execution.setStderr(ExecutionPerformer.getStderr());
+			
+			// Compose response
+			JsonObject jsonResponse = new JsonObject();
+			executionJson.set("status", "in progress");
+			jsonResponse.add("execution", execution.toJsonObject());
+			return jsonResponse;
+		}
+		
+		// Request to install a new activity, retrieving its code
 		else if ( action == Action.INSTALL_ACTIVITY ) {
 			
 			// Get message information
