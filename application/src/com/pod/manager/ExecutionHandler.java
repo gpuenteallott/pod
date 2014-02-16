@@ -1,6 +1,7 @@
 package com.pod.manager;
 
 import java.io.IOException;
+import java.util.Date;
 
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
@@ -67,7 +68,7 @@ public class ExecutionHandler {
 		execution.setStdin(input);
 		execution.setActivityName(name);
 		execution.setActivityId(activity.getId());
-		execution.setStatus("in progress");
+		execution.setStatus("waiting");
 		
 		// Check if there are completed installations for this worker
 		// If there are, we will try to send the execution request directly to the worker
@@ -89,6 +90,10 @@ public class ExecutionHandler {
 		
 		// If in the sync method a worker was assigned, we sent it a message so it starts the execution
 		if ( worker != null ) {
+			
+			// Update execution info
+			execution.setStatus("in progress");
+			execution.setStartTime(new Date().getTime());
 			
 			// Prepare message
 			JsonObject message = new JsonObject();
@@ -114,9 +119,9 @@ public class ExecutionHandler {
 				jsonResponse.add("execution", execution.toJsonObject());
 				
 				// We put the execution in the execution map including the workerIP
-				ExecutionMap bag = new ExecutionMap();
+				ExecutionMap map = new ExecutionMap();
 				execution.setWorkerIP( worker.getDns() );
-				bag.put(execution);
+				map.put(execution);
 				
 			}
 			else {
@@ -125,8 +130,8 @@ public class ExecutionHandler {
 				worker.setStatus("error");
 				wdao.update(worker);
 
-				ExecutionMap bag = new ExecutionMap();
-				bag.put(execution);
+				ExecutionMap map = new ExecutionMap();
+				map.put(execution);
 				
 				/*
 				 * ERROR HANDLING
@@ -142,8 +147,8 @@ public class ExecutionHandler {
 		// In case there is no worker available, the execution request must go to the waiting queue
 		else {
 			
-			ExecutionMap bag = new ExecutionMap();
-			bag.put(execution);
+			ExecutionMap map = new ExecutionMap();
+			map.put(execution);
 			
 			ExecutionWaitingQueue queue = new ExecutionWaitingQueue();
 			queue.put(execution);
@@ -226,35 +231,51 @@ public class ExecutionHandler {
 	 */
 	public JsonObject handleExecutionReport ( JsonObject json ) {
 		
-		// Prepare response object
-		JsonObject jsonResponse = new JsonObject();
-		
 		Execution execution = new Execution (json.get("execution").asObject());
+		
+		// If the execution finished without error, we update its finish time
+		// and use the total execution time to contribute to the mean
+		if( "finished".equals(execution.getStatus()) ) {
+			execution.setFinishTime(new Date().getTime());
+			
+			ActivityHandler ah = new ActivityHandler();
+			ah.newTimeRegister( execution.getActivityId() , (int)(execution.getFinishTime() - execution.getStartTime()) );
+		}
 		
 		// Put the execution object in the bag, so the client can retrieve it later
 		ExecutionMap map = new ExecutionMap();
 		map.put(execution);
 		
 		// In case there was an error in the worker with the execution
-		if ( "error".equals(execution.getStatus()) ) {
-			
-			jsonResponse = new JsonObject();
-			jsonResponse.add("action", Action.ACK.getId());
-			return jsonResponse;
-		}
+		if ( "error".equals(execution.getStatus()) )
+			return new JsonObject().add("action", Action.ACK.getId());
 		
 		
 		// If the message contains executionChaining=false, we don't try to find another execution to send
 		// because the worker is busy installing something
-		if ( json.get("executionChaining") != null && !json.get("executionChaining").asBoolean() ) {
-			
-			jsonResponse.add("action", Action.ACK.getId());
-			return jsonResponse;
-		}
+		if ( json.get("executionChaining") != null && !json.get("executionChaining").asBoolean() )
+			return new JsonObject().add("action", Action.ACK.getId());
+		
+		// Look for pending executions in the queue, and return a PERFORM_EXECUTION if there are
+		// If there aren't, the json message will be a simple ACK
+		return lookForPendingExecution ( json.get("workerId").asInt() );
+	}
+	
+	
+	/**
+	 * This method is used to look in the waiting queue for activities that the given worker could perform
+	 * The response object will be a simple ACK action or a PERFORM_EXECUTION action containing the info of the execution to perform
+	 * @param workerId
+	 * @return
+	 */
+	public JsonObject lookForPendingExecution ( int workerId ) {
+		
+		// Prepare response object
+		JsonObject jsonResponse = new JsonObject();
 		
 		// Check if there is a pending execution in the queue that this worker could handle
 		InstallationDAO idao = new InstallationDAO();
-		int[] activityIds = idao.selectInstalledActivityIdsByWorker( json.get("workerId").asInt() );
+		int[] activityIds = idao.selectInstalledActivityIdsByWorker( workerId );
 		
 		ExecutionWaitingQueue queue = new ExecutionWaitingQueue();
 		Execution newExecution = queue.pull(activityIds);
@@ -263,7 +284,7 @@ public class ExecutionHandler {
 		// we set the worker status to "ready" because it's available
 		if ( newExecution == null ) {
 			WorkerDAO wdao = new WorkerDAO();
-			wdao.updateStatus( json.get("workerId").asInt() , "ready");
+			wdao.updateStatus( workerId , "ready");
 
 			jsonResponse.add("action", Action.ACK.getId());
 		}
@@ -271,11 +292,18 @@ public class ExecutionHandler {
 		// If there is a pending execution we don't change the status of the worker (keep it "working")
 		else {
 			
+			ExecutionMap map = new ExecutionMap();
+			
 			// We need to get its IP address to put it in the execution map
 			// This is necessary in order to allow clients to terminate executions
 			WorkerDAO wdao = new WorkerDAO();
-			Worker worker = wdao.select(json.get("workerId").asInt());
+			Worker worker = wdao.select( workerId );
 			map.setWorkerIP(newExecution.getId(), worker.getDns());
+			
+			// Update execution info
+			newExecution.setStatus("in progress");
+			newExecution.setStartTime(new Date().getTime());
+			map.put(newExecution);
 			
 			jsonResponse.add("action", Action.PERFORM_EXECUTION.getId());
 			jsonResponse.add("execution", newExecution.toJsonObject());
@@ -283,6 +311,7 @@ public class ExecutionHandler {
 		
 		return jsonResponse;
 	}
+	
 
 	/**
 	 * This method is triggered by the client. After verifying that the execution exists and it is being executed or waiting,

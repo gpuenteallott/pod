@@ -1,21 +1,119 @@
 package com.pod.manager;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.collections4.queue.CircularFifoQueue;
+
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.pod.dao.ActivityDAO;
 import com.pod.dao.InstallationDAO;
-import com.pod.dao.WorkerDAO;
 import com.pod.interaction.Action;
 import com.pod.model.Activity;
 import com.pod.model.Execution;
 import com.pod.model.Installation;
-import com.pod.model.Worker;
 
 /**
  * This class provides the necessary functions to make operations on activities, such us add or delete
  */
 public class ActivityHandler {
+	
+	// Number of time samples used to calculate the mean execution time for an activity
+	private static int NUMBER_OF_TIME_SAMPLES = 5;
+	
+	// A map containing the execution times. It's not implicitly synchronized
+	// Time is saved as int in milliseconds
+	// This limits the maximum execution time to 24 days
+	private static Map<Integer, CircularFifoQueue<Integer>> executionTimes;
+	// This map indicates the number of samples taken so far from the given activity
+	// If the value is null, it means that the required samples were taken already
+	// This is to avoid saving lots of useless numbers in memory
+	private static Map<Integer, Integer> executionTimeSamples;
+	
+	/**
+	 * Constructor to initialize internal data structures
+	 */
+	public ActivityHandler() {
+		if (executionTimes == null) {
+			executionTimes = new HashMap<Integer, CircularFifoQueue<Integer>>();
+			executionTimeSamples = new HashMap<Integer, Integer>();
+		}
+	}
+	
+	/**
+	 * Set up a new activity in the system for time recording
+	 * @param activityId
+	 */
+	private void newActivityTimeRegister( int activityId ) {
+		
+		CircularFifoQueue<Integer> queue = new CircularFifoQueue<Integer>(NUMBER_OF_TIME_SAMPLES);
+		for ( int i = 0; i < NUMBER_OF_TIME_SAMPLES; i++ )
+			queue.add(0);
+		
+		executionTimes.put( activityId, queue );
+		executionTimeSamples.put( activityId , 0);
+	}
+	
+	/**
+	 * Add a new sample for the execution time of a given activity
+	 * @param activityId
+	 * @param time
+	 */
+	public void newTimeRegister ( int activityId, int time ) {
+		
+		// Update value in the mean time
+		CircularFifoQueue<Integer> queue = executionTimes.get(activityId);
+		queue.add(time);
+		executionTimes.put( activityId, queue);
+		
+		// Update the number of samples if necessary
+		// If we reached the required amount, we just remove it so it doesn't take space in memory
+		Integer samples = executionTimeSamples.get(activityId);
+		if ( samples != null ) {
+			
+			if ( samples+1 == NUMBER_OF_TIME_SAMPLES )
+				executionTimeSamples.remove(activityId);
+			else
+				executionTimeSamples.put(activityId, samples+1);
+		}
+		
+		//System.out.println("Activity "+activityId+" has a mean time of "+getMeanTime(activityId)+ ". Valid="+areSamplesTaken(activityId)+"   "+ executionTimeSamples.get(activityId));
+	}
+	
+	
+	/**
+	 * Returns the mean time of the previous recordings of execution time for the given activity
+	 * @param activityId
+	 * @return
+	 */
+	public int getMeanTime ( int activityId ) {
+		
+		// Prepare an array to dump the contents of the queue
+		// Algorithm speaking, there might be faster methods
+		Integer [] times = new Integer [NUMBER_OF_TIME_SAMPLES];
+		executionTimes.get(activityId).toArray(times);
+		
+		// Calculate sum
+		int sum = 0;
+		for ( int t : times )
+			sum += t;
+		
+		// Return mean
+		return sum / NUMBER_OF_TIME_SAMPLES;
+	}
+	
+	/**
+	 * This method will return true if the required amount of execution time samples was taken for the given activity
+	 * @param activityId
+	 * @return
+	 */
+	private boolean areSamplesTaken ( int activityId ) {
+		
+		return executionTimeSamples.get(activityId) == null ? true : false;
+	}
+	
 	
 	/**
 	 * Creates a new activity and puts it in the information database
@@ -184,9 +282,6 @@ public class ActivityHandler {
 	 */
 	public JsonObject handleActivityReport ( JsonObject json ) {
 		
-		// Prepare response object
-		JsonObject jsonResponse = new JsonObject();
-		
 		// Get the activity that it's referring to and the status of the installation
 		Activity activity = new Activity(json.get("activity").asObject());
 		String status = json.get("status").asString();
@@ -200,6 +295,11 @@ public class ActivityHandler {
 			
 			// In case the activity needed verification, we mark it as approved
 			if ( "verifying".equals(activity.getStatus()) ) {
+				
+				// Set up this new activity in the execution time recording system
+				// This allows future executions to save its time here and the mean will be calculated
+				newActivityTimeRegister(activity.getId());
+				
 				ActivityDAO adao = new ActivityDAO();
 				adao.updateStatus( activity.getId() , "approved");
 			}
@@ -228,33 +328,11 @@ public class ActivityHandler {
 		}
 		
 		// Now that the installation is completed (successfully or not), we check if there are new executions that this worker could handle
-		int[] activityIds = idao.selectInstalledActivityIdsByWorker( json.get("workerId").asInt() );
 		
-		ExecutionWaitingQueue queue = new ExecutionWaitingQueue();
-		Execution newExecution = queue.pull(activityIds);
+		ExecutionHandler eh = new ExecutionHandler();
 		
-		// If no pending executions in the queue are found
-		// we set the worker status to "ready" because it's available
-		if ( newExecution == null ) {
-			WorkerDAO wdao = new WorkerDAO();
-			wdao.updateStatus( json.get("workerId").asInt() , "ready");
-
-			jsonResponse.add("action", Action.ACK.getId());
-		}
-		
-		// If there is a pending execution we don't change the status of the worker (keep it "working")
-		else {
-			// We need to get its IP address to put it in the execution map
-			// This is necessary in order to allow clients to terminate executions
-			WorkerDAO wdao = new WorkerDAO();
-			Worker worker = wdao.select(workerId);
-			ExecutionMap map = new ExecutionMap();
-			map.setWorkerIP(newExecution.getId(), worker.getDns());
-						
-			jsonResponse.add("action", Action.PERFORM_EXECUTION.getId());
-			jsonResponse.add("execution", newExecution.toJsonObject());
-		}
-		
-		return jsonResponse;
+		// Look for pending executions in the queue, and return a PERFORM_EXECUTION if there are
+		// If there aren't, the json message will be a simple ACK
+		return eh.lookForPendingExecution ( json.get("workerId").asInt() );
 	}
 }

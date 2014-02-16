@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Date;
 
 import com.eclipsesource.json.JsonObject;
 import com.pod.interaction.Action;
@@ -146,7 +145,9 @@ public class ExecutionPerformer implements Runnable {
 		BufferedReader br = null;
 		String line = null;
 		
-		execution.setStartTime(new Date().getTime());
+		// Moved to the manager
+		// This info would be useful if we charge for usage to the client
+		//execution.setStartTime(new Date().getTime());
 		
 		// try catch for IO errors in the process
 		try {
@@ -187,7 +188,9 @@ public class ExecutionPerformer implements Runnable {
 			e.printStackTrace();
 		}
 		
-		execution.setFinishTime(new Date().getTime());
+		// Moved to the manager
+		// This info would be useful if we charge for usage to the client
+		//execution.setFinishTime(new Date().getTime());
 		
 		// Prepare message to send to manager
 		JsonObject message = new JsonObject();
