@@ -1,7 +1,10 @@
 package com.pod.manager;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import com.pod.model.Execution;
 
@@ -14,25 +17,29 @@ import com.pod.model.Execution;
  * 
  * An algorithm must be implemented in order to delete automatically the executions that are not removed externally before the expiration time
  * This is necessary to avoid a memory problem due to executions not retrieved by the client
+ * 
+ * This class has been coded without thinking about SYNCHRONIZATION, although that has to be taken care of in the future
  */
 public class ExecutionMap {
 	
-	private static boolean initialized;
+	// Map of executions in the system
 	private static Map<Integer, Execution> executions;
+	
+	private static Set<Integer> executionsInProgress;
 	
 	private static int oldestId;
 	private static int newestId;
 	
 	/**
-	 * Create an execution map object and initialize internal static variables
+	 * Create an execution map object and initialize internal static data structures
 	 * This method has the initialization synchronized, so no concurrent threads start the structures at the same time
 	 */
 	public ExecutionMap () {
 		
 		synchronized (this.getClass()){
-			if ( !initialized ) {
+			if ( executions == null ) {
 				executions = new HashMap<Integer, Execution>();
-				initialized = true;
+				executionsInProgress = new HashSet<Integer>();
 			}
 		}
 	}
@@ -44,6 +51,13 @@ public class ExecutionMap {
 	 */
 	public void put ( Execution execution ) {
 		executions.put(execution.getId(), execution);
+		
+		// The addition to the 'in progress' executions set could be done in another way to improve performance
+		// It could be done either outside this method, only when the case requires it
+		// or the status could be an enum instead of a string
+		if ( "in progress".equals(execution.getStatus()) ) executionsInProgress.add( execution.getId() );
+		else executionsInProgress.remove( execution.getId() );
+		
 		newestId = newestId > execution.getId() ? newestId : execution.getId();
 		if ( oldestId == 0 ) oldestId = execution.getId();
 	}
@@ -118,7 +132,7 @@ public class ExecutionMap {
 	}
 	
 	/**
-	 * Returns the id of the olders execution from the map
+	 * Returns the id of the oldest execution from the map
 	 * @return
 	 */
 	public static int getOldestId () {
@@ -146,6 +160,25 @@ public class ExecutionMap {
 		}
 		
 		return deleted;
+	}
+	
+	/**
+	 * Returns the executions that are currently being processed
+	 * @return
+	 */
+	public Execution[] executionsInProgress() {
+		
+		Iterator<Integer> iterator = executionsInProgress.iterator();
+		
+		Execution [] result = new Execution [ executionsInProgress.size() ];
+		
+		int i = 0;
+		while ( iterator.hasNext() ) {
+			result[i] = executions.get( iterator.next() );
+			i++;
+		}
+		
+		return result;
 	}
 	
 }

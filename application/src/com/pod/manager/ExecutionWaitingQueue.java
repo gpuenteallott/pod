@@ -63,20 +63,7 @@ public class ExecutionWaitingQueue {
 		}
 		return null;
 	}
-	/*public Execution pull ( int [] activityIds ) {
-		Execution e = null;
-		try {
-			for ( int i = 0; i < queue.size(); i++ )
-				for ( int id : activityIds )
-					if ( queue.get(i) != null && queue.get(i).getActivityId() == id )
-						e = queue.remove(i);
-		
-		} catch (IndexOutOfBoundsException ie){
-			// Used to avoid problems with concurrent threads removing elements
-			System.err.println(e);
-		}
-		return e;
-	}*/
+	
 	
 	/**
 	 * Deletes all executions with the given activityId from the queue
@@ -105,5 +92,14 @@ public class ExecutionWaitingQueue {
 			System.err.println(e);
 		}
 		return executions.toArray( new Execution [executions.size()] );
+	}
+	
+	
+	/**
+	 * Returns the entire queue of executions
+	 * @return
+	 */
+	public List<Execution> getAll () {
+		return queue;
 	}
 }

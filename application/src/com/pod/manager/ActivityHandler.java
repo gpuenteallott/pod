@@ -85,6 +85,10 @@ public class ActivityHandler {
 	
 	/**
 	 * Returns the mean time of the previous recordings of execution time for the given activity
+	 * 
+	 * This method can be improved using a cache system, that avoids performing the calculations if there's no new information
+	 * or if the last updates were similar to the mean
+	 * 
 	 * @param activityId
 	 * @return
 	 */
@@ -109,9 +113,8 @@ public class ActivityHandler {
 	 * @param activityId
 	 * @return
 	 */
-	private boolean areSamplesTaken ( int activityId ) {
-		
-		return executionTimeSamples.get(activityId) == null ? true : false;
+	public boolean areSamplesTaken ( int activityId ) {
+		return executionTimeSamples.get(activityId) == null;
 	}
 	
 	

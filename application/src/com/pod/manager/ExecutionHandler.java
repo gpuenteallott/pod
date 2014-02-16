@@ -2,6 +2,7 @@ package com.pod.manager;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
@@ -116,7 +117,8 @@ public class ExecutionHandler {
 			
 			// If the message was sent, everything is wonderful
 			if ( sent ) {
-				jsonResponse.add("execution", execution.toJsonObject());
+				ActivityHandler ah = new ActivityHandler();
+				jsonResponse.add("execution", execution.toJsonObject().add("predictedTime", ah.getMeanTime(execution.getActivityId())) );
 				
 				// We put the execution in the execution map including the workerIP
 				ExecutionMap map = new ExecutionMap();
@@ -152,7 +154,13 @@ public class ExecutionHandler {
 			
 			ExecutionWaitingQueue queue = new ExecutionWaitingQueue();
 			queue.put(execution);
-			jsonResponse.add("execution", execution.toJsonObject());
+			
+			// Add the execution object, including a field of predictedTime in case the required samples for this activity were registered
+			ActivityHandler ah = new ActivityHandler();
+			if ( ah.areSamplesTaken(execution.getActivityId()) )
+				jsonResponse.add("execution", execution.toJsonObject().add("predictedTime", calculateTimeToFinish(execution.getActivityId())) );
+			else
+				jsonResponse.add("execution", execution.toJsonObject() );
 		}
 		
 		return jsonResponse;
@@ -306,7 +314,7 @@ public class ExecutionHandler {
 			map.put(newExecution);
 			
 			jsonResponse.add("action", Action.PERFORM_EXECUTION.getId());
-			jsonResponse.add("execution", newExecution.toJsonObject());
+			jsonResponse.add("execution", newExecution.toJsonObject() );
 		}
 		
 		return jsonResponse;
@@ -366,4 +374,60 @@ public class ExecutionHandler {
 		
 		return new JsonObject().add("execution", execution.toJsonObject());
 	}
+	
+	/**
+	 * Assuming all workers are busy, returns the expected time to start for a new execution
+	 * It checks the pending executions in the waiting queue and also the executions being processed at the moment
+	 * 
+	 * If there is at least one available worker, the time to start should be cero and this method won't work
+	 * @return
+	 */
+	public int calculateTimeToStart() {
+		
+		long time = 0;
+		
+		// Retrieve executions being processed at the moment
+		ExecutionMap map = new ExecutionMap();
+		Execution[] executionsInProgress = map.executionsInProgress();
+		
+		// Get the predicted time for each of them to complete
+		// If time is negative, don't count them (this might happen)
+		ActivityHandler ah = new ActivityHandler();
+		Date d = new Date();
+		for ( Execution e : executionsInProgress ) {
+			long expectedTime = e.getStartTime() - d.getTime() + ah.getMeanTime(e.getActivityId());
+			time += expectedTime > 0 ? expectedTime : time; // don't change the time variable if the expected time results negative
+		}
+		
+		System.out.println("executions in progress "+executionsInProgress.length);
+		
+		// Retrieve all executions from the queue
+		ExecutionWaitingQueue queue = new ExecutionWaitingQueue();
+		List<Execution> pendingExecutions = queue.getAll();
+		
+		// Add their expected completion time
+		for ( Execution e : pendingExecutions )
+			time += ah.getMeanTime(e.getActivityId());
+		
+		System.out.println("pending executions "+pendingExecutions.size());
+		
+		// Calculate mean between workers
+		return (int)( time / executionsInProgress.length );
+		
+	}
+	
+	/**
+	 * Assuming all workers are busy, returns the expected time to finish for a new execution of the given activity type
+	 * It checks the pending executions in the waiting queue and also the executions being processed at the moment
+	 * 
+	 * If there is at least one available worker, the time to start should be zero and this method won't work
+	 * @return
+	 */
+	public int calculateTimeToFinish ( int activityId ) {
+		
+		ActivityHandler ah = new ActivityHandler();
+		return calculateTimeToStart() + ah.getMeanTime(activityId);
+		
+	}
+	
 }
