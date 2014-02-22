@@ -202,9 +202,9 @@ public class ActivityHandler {
 				return new JsonObject().add("error", adao.getError());
 		}
 		
-		// We only accept uninstallation requests if the activity status is installed or error
+		// We only accept uninstallation requests if the activity status is approved or error
 		// For example, if the activity status is installing, we shouldn't accept them
-		if ( ! ( "installed".equals(activity.getStatus()) || "error".equals(activity.getStatus()) ) )
+		if ( ! ( "approved".equals(activity.getStatus()) || "error".equals(activity.getStatus()) ) )
 			return new JsonObject().add("error", "The requested activity isn't available for uninstalling yet");
 		
 		// Update the activity status to uninstalling so we don't accept more execution requests

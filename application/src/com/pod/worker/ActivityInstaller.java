@@ -77,7 +77,7 @@ public class ActivityInstaller implements Runnable {
 		HttpSender sender = new HttpSender();
 		
 		JsonObject message = new JsonObject();
-		message.add("action", Action.INSTALL_ACTIVITY_REPORT.getId() );
+		message.add("action", Action.REPORT_ACTIVITY.getId() );
 		message.add("activity", activity.toSmallJsonObject());
 		
 		// Add status depending on flags

@@ -1,0 +1,112 @@
+#!/bin/bash
+
+if [[ $1 == "--help" ]]; then
+  	
+	echo "
+Welcome to POD - Processing On Demand
+This is the list of commands. To get more information about each command, type \"pod command --help\"
+
+    - newActivity 
+    - getActivityStatus
+    - deleteActivity
+    - newExecution
+    - getExecutionStatus
+    - terminateExecution
+
+"
+fi
+
+
+if [[ $1 == "newActivity --help" ]]; then
+
+	echo "
+POD newActivity name installationScriptLocation
+
+Creates a new activity and installs it in one worker to validate it. To check the result of the validation, a getActivityStatus request must be sent.
+The installation script must download the code for the activity and compile it if necessary. An executable file called main.sh must be in the root of the activity directory
+   - name is a unique string for the activity. If it exists, an error will be returned
+   - installationScriptLocation is a URL containing the script with the installation commands
+
+Example:
+    ./pod newActivity activity01 http://www.example.com/script.sh
+
+"
+fi
+
+
+if [[ $1 == "getActivityStatus --help" ]]; then
+
+	echo "
+POD getActivityStatus name
+
+Retrieves the activity status, informing about if it is rejected, being verified, uninstalling or approved. Also, an array including all workers where it is installed.
+   - name is the identifier of the activity
+
+Example:
+    ./pod getActivityStatus activity01
+
+"
+fi
+
+
+if [[ $1 == "deleteActivity --help" ]]; then
+
+	echo "
+POD deleteActivity name
+
+Deletes the activity given by its name. The deletion process starts by sending an uninstall notification to all workers. When the activity is uninstalled from all workers, it’s records will be removed from the system.
+   - name is the identifier of the activity
+
+Example:
+    ./pod deleteActivity activity01
+
+"
+fi
+
+
+if [[ $1 == "newExecution --help" ]]; then
+
+	echo "
+POD newExecution name [input]
+
+Start a new execution of the given activity. The execution will be queued if no workers can start it directly. To check the status of the execution use getExecutionStatus.
+The response will contain an executionId that will be necessary to check the status.
+   - name is the identifier of the activity
+   - input is optional, and it will be passed to the main.sh script as the first argument $1
+
+Example:
+    ./pod newExecution activity01 \"This input string wil be passed to the worker\"
+
+"
+fi
+
+
+if [[ $1 == "getExecutionStatus --help" ]]; then
+
+	echo "
+POD getExecutionStatus executionId
+
+The current status of the execution will be retrieved, including the standard output and standard error that the execution has produced so far. 
+In case the execution is finished, all it’s output will be retrieved and all record for this execution will be deleted from the system.
+   - executionId unique id that identifies an execution
+
+Example:
+    ./pod getExecutionStatus 495
+
+"
+fi
+
+
+if [[ $1 == "terminateExecution --help" ]]; then
+
+	echo "
+POD terminateExecution executionId
+
+Terminate an execution in case it isn’t finished. The execution will be stopped and marked as terminated.
+   - executionId unique id that identifies an execution
+
+Example:
+    ./pod terminateExecution 495
+
+"
+fi

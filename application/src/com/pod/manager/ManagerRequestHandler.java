@@ -44,13 +44,13 @@ public class ManagerRequestHandler {
 		}
 		
 		// A message from a worker informing about the result of an execution
-		else if ( action == Action.EXECUTION_REPORT ) {
+		else if ( action == Action.REPORT_EXECUTION ) {
 			ExecutionHandler h = new ExecutionHandler();
 			return h.handleExecutionReport(json);
 		}
 		
 		// A message from a worker informing about the status of the installation of a new activity
-		else if ( action == Action.INSTALL_ACTIVITY_REPORT ) {
+		else if ( action == Action.REPORT_ACTIVITY ) {
 			ActivityHandler h = new ActivityHandler();
 			return h.handleActivityReport(json);
 		}

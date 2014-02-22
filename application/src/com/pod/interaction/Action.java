@@ -14,15 +14,15 @@ public enum Action {
 	NEW_ACTIVITY(10),  // Sent from client to manager to indicate a new activity
 	INSTALL_ACTIVITY(11),   // Sent from manager to worker to make it install the specified activity
 	UNINSTALL_ACTIVITY(12),
-	INSTALL_ACTIVITY_REPORT(13),
-	GET_ACTIVITY_STATUS(14),  // Send from the client to the manager in order to fetch information about the activity
-	DELETE_ACTIVITY(15),  // Send from the client to the manager in order to delete an activity from the cloud
+	REPORT_ACTIVITY(13),     // Sent from the worker to the manager informing about a (un)installing activity result
+	GET_ACTIVITY_STATUS(14),  // Sent from the client to the manager in order to fetch information about the activity
+	DELETE_ACTIVITY(15),  // Sent from the client to the manager in order to delete an activity from the cloud
 	
 	NEW_EXECUTION(20),  // Sent from client to manager to ask for a new execution
 	PERFORM_EXECUTION(21),  // Sent from manager to worker to make it perform the specified execution
 	GET_EXECUTION_STATUS(22),  // Sent from client to manager requesting the execution status
 	GET_EXECUTION_PROGRESS(23),    // Sent from manager to worker to retrieve the current stdout and stderr
-	EXECUTION_REPORT(24),
+	REPORT_EXECUTION(24),     // Sent from the worker to the manager informing about a finished execution
 	TERMINATE_EXECUTION(25); // Send by client and by manager. Its meaning is that the given execution must be terminated
 	
 	

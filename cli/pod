@@ -1,0 +1,138 @@
+#!/bin/bash
+#####################################################
+#
+#  POD - Processing On Demand open source platform
+#
+#####################################################
+#
+#  Command Line Interface
+#
+#####################################################
+
+if [[ $# == 0 ]]; then
+	echo "Usage: pod <command> [parameters]"
+	echo "Use --help to get more indications"
+	exit
+fi
+
+if [[ $1 == '--help' ]]; then
+    ./print --help
+    exit
+fi
+
+if [[ -z $POD_HOST ]]; then
+	echo "Environment variable POD_HOST has no value. Please set it up"
+	exit
+fi
+
+if [[ $1 == 'newExecution' ]]; then
+
+	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
+		curl "$POD_HOST/?action=newExecution&name=$2" | python -mjson.tool
+		exit
+	fi
+	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]] ; then
+		curl "$POD_HOST/?action=newExecution&name=$2&input=$3" | python -mjson.tool
+		exit
+	fi
+	
+	if [[ $2 == '--help' ]]; then
+		./print "newExecution --help"
+		exit
+	else 
+		echo "Usage: pod newExecution name"
+		echo "Type pod newExecution --help for more information"
+		exit
+	fi
+fi
+
+
+if [[ $1 == 'getExecutionStatus' ]]; then
+
+	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
+		curl "$POD_HOST/?action=getExecutionStatus&executionId=$2" | python -mjson.tool
+		exit
+	fi
+	
+	if [[ $2 == '--help' ]]; then
+		./print "getExecutionStatus --help"
+		exit
+	else 
+		echo "Usage: pod getExecutionStatus name"
+		echo "Type pod getExecutionStatus --help for more information"
+		exit
+	fi
+fi
+
+if [[ $1 == 'newActivity' ]]; then
+
+	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]]; then
+		curl "$POD_HOST/?action=newActivity&installationScriptLocation=$3&name=$2" | python -mjson.tool
+		exit
+	fi
+	
+	if [[ $2 == '--help' ]]; then
+		./print "newActivity --help"
+		exit
+	else 
+		echo "Usage: pod newActivity name installationScriptLocation"
+		echo "Type pod newActivity --help for more information"
+		exit
+	fi
+fi
+
+
+if [[ $1 == 'getActivityStatus' ]]; then
+
+	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
+		curl "$POD_HOST/?action=getActivityStatus&name=$2" | python -mjson.tool
+		exit
+	fi
+	
+	if [[ $2 == '--help' ]]; then
+		./print "getActivityStatus --help"
+		exit
+	else 
+		echo "Usage: pod getActivityStatus name"
+		echo "Type pod getActivityStatus --help for more information"
+		exit
+	fi
+fi
+
+if [[ $1 == 'deleteActivity' ]]; then
+
+	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
+		curl "$POD_HOST/?action=deleteActivity&name=$2" | python -mjson.tool
+		exit
+	fi
+	
+	if [[ $2 == '--help' ]]; then
+		./print "deleteActivity --help"
+		exit
+	else 
+		echo "Usage: pod deleteActivity name"
+		echo "Type pod deleteActivity --help for more information"
+		exit
+	fi
+fi
+
+
+if [[ $1 == 'terminateExecution' ]]; then
+
+	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
+		curl "http://localhost:8080/POD/?action=terminateExecution&executionId=$2" | python -mjson.tool
+		exit
+	fi
+	
+	if [[ $2 == '--help' ]]; then
+		./print "terminateExecution --help"
+		exit
+	else 
+		echo "Usage: pod terminateExecution name"
+		echo "Type pod terminateExecution --help for more information"
+		exit
+	fi
+fi
+
+echo "Unknown command. Use --help to get indications"
+exit

@@ -83,7 +83,7 @@ public class ExecutionPerformer implements Runnable {
 		// End logging
 				
 		// Set message action
-		message.add("action", Action.EXECUTION_REPORT.getId());
+		message.add("action", Action.REPORT_EXECUTION.getId());
 		
 		// Now we check if there are pending INSTALLATIONS
 		// In case there aren't, we do nothing
