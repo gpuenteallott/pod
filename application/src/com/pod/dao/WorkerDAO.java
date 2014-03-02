@@ -86,6 +86,63 @@ public class WorkerDAO {
 	}
 	
 	/**
+	 * Inserts a worker object in the database, with the specified if
+	 * @param worker
+	 * @return the id of the worker. The given object by reference is also modified to include it
+	 */
+	public int insertWithId ( Worker worker ) {
+		
+		Connection con = null;
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+		int id = -1;
+		
+		try {
+			con = ConnectionManager.getConnection();
+			
+			String searchQuery = "INSERT INTO workers ( id, status , dns ) VALUES ( ? , ? , ? )";
+			
+			statement = con.prepareStatement(searchQuery, Statement.RETURN_GENERATED_KEYS);
+			statement.setInt(1, worker.getId() );
+			statement.setString(2, worker.getStatus() );
+			statement.setString(3, worker.getDns() );
+			
+			statement.executeUpdate();
+			
+			resultSet = statement.getGeneratedKeys();
+			while (resultSet.next()) {
+				id = resultSet.getInt(1);
+				worker.setId(id);
+				break;
+			}
+			
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+			error = e.toString();
+		}
+		
+		finally {
+		     
+		     if (statement != null) {
+		        try {
+		        	statement.close();
+		        } catch (Exception e) { System.err.println(e); }
+		        	statement = null;
+		        }
+		
+		     if (con != null) {
+		        try {
+		        	con.close();
+		        } catch (Exception e) { System.err.println(e); }
+		
+		        con = null;
+		     }
+		}
+		return id;
+	}
+	
+	/**
 	 * Updates the worker record in the database with the information of the given worker object
 	 * @param worker worker with a valid id
 	 * @return true if updated, false otherwise

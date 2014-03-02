@@ -1,7 +1,9 @@
 package com.pod.listeners;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -26,11 +28,19 @@ public class ServerProperties implements ServletContextListener {
 	
 	Logger logger = Logger.getLogger(ServerProperties.class.getName());
 	
+	// This is the default location for the server properties, except in the case of the manager
+	private static final String PROPERTIES_FILE_PATH = "/home/user/server.properties";
+	
 	private static String role;
 	private static String name;
 	private static String dns;
+	private static String securityGroup;
+	private static String keypair;
 	private static int workerId;
 	private static String masterDns;
+	private static String repoURL;
+	private static String ami;
+	private static String instanceType;
 	
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
@@ -54,10 +64,20 @@ public class ServerProperties implements ServletContextListener {
 		
 		// Load properties
 		try {
+			// Load the file in the usual path of the file in the project (case of the manager)
+			File serverProperties = new File(PROPERTIES_FILE_PATH);
+			InputStream is = serverProperties.exists() ? new FileInputStream(serverProperties) : getClass().getResourceAsStream("/main/resources/server.properties");
+			
 			Properties properties = new Properties();
-			properties.load( getClass().getResourceAsStream("/Server.properties"));
+			properties.load(is);
+			
 			role = properties.getProperty("role");
 			name = properties.getProperty("name");
+			securityGroup = properties.getProperty("securityGroup");
+			keypair = properties.getProperty("keypair");
+			repoURL = properties.getProperty("repoURL");
+			ami = properties.getProperty("ami");
+			instanceType = properties.getProperty("instanceType");
 			
 			if ( role.equals("manager") ) {
 				
@@ -65,14 +85,14 @@ public class ServerProperties implements ServletContextListener {
 				Worker worker = new Worker();
 				worker.setDns("");
 				worker.setStatus("ready");
+				worker.setId(0);
 				
 				WorkerDAO wdao = new WorkerDAO();
-				workerId = wdao.insert(worker);
+				workerId = wdao.insertWithId(worker);
 				
 				// Also, if this is the manager, put the masterDns value to "", so the Sender class detects it
 				masterDns = "";
 				
-		        
 			}
 			// If this is a worker, read the property from the properties file
 			else
@@ -126,6 +146,23 @@ public class ServerProperties implements ServletContextListener {
 		ServerProperties.masterDns = masterDns;
 	}
 	
+	public static String getKeypair(){
+		return keypair;
+	}
+	
+	public static String getSecutiryGroup(){
+		return securityGroup;
+	}
+	
+	public static String getRepoURL(){
+		return repoURL;
+	}
+	public static String getAMI(){
+		return ami;
+	}
+	public static String getInstanceType(){
+		return instanceType;
+	}
 	
 
 	private boolean delete(File f) {

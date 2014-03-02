@@ -1,6 +1,7 @@
 *.class
 *.war
 *.ear
+*.jar
 .settings
 .classpath
 .project
