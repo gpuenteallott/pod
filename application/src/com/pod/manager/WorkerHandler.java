@@ -135,7 +135,7 @@ public class WorkerHandler {
 			CreateTagsRequest createTagsRequest = new CreateTagsRequest();
 			instanceId = instance.getInstanceId();
 			createTagsRequest.withResources(instanceId)
-			   .withTags(new Tag("Name", ServerProperties.getInstanceType()+"-wkr" ));
+			   .withTags(new Tag("Name", ServerProperties.getName()+"-wkr" ));
 			amazonEC2Client.createTags(createTagsRequest);
 		 }
 

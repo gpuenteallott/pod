@@ -78,6 +78,7 @@ public class ServerProperties implements ServletContextListener {
 			repoURL = properties.getProperty("repoURL");
 			ami = properties.getProperty("ami");
 			instanceType = properties.getProperty("instanceType");
+	
 			
 			if ( role.equals("manager") ) {
 				
@@ -85,19 +86,21 @@ public class ServerProperties implements ServletContextListener {
 				Worker worker = new Worker();
 				worker.setDns("");
 				worker.setStatus("ready");
-				worker.setId(0);
 				
 				WorkerDAO wdao = new WorkerDAO();
-				workerId = wdao.insertWithId(worker);
+				workerId = wdao.insert(worker);
 				
 				// Also, if this is the manager, put the masterDns value to "", so the Sender class detects it
 				masterDns = "";
 				
 			}
 			// If this is a worker, read the property from the properties file
-			else
+			else {
 				masterDns = properties.getProperty("masterDns");
 			
+				// We must 
+				
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

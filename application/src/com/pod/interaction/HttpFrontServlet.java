@@ -52,6 +52,7 @@ public class HttpFrontServlet extends HttpServlet {
 
 		String action = request.getParameter("action");
 		
+		
 		// Prepare json object with parameters
 		JsonObject json = new JsonObject();
 		// Prepare json response object
@@ -64,6 +65,19 @@ public class HttpFrontServlet extends HttpServlet {
 			out.close();
 			return;
 		}
+		
+        // ########################################################
+		//
+		// TEST FOR WORKER DEPLOYMENT
+		//
+		if ( action.equals("w") ) {
+			
+			com.pod.manager.WorkerHandler wh = new com.pod.manager.WorkerHandler();
+			wh.deployWorker();
+			
+			return;
+		}
+		// #######################################################
 
 		/*
 		 * We fill the json parameter object with the corresponding parameters received through HTTP
