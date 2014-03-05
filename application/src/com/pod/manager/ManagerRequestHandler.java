@@ -78,6 +78,42 @@ public class ManagerRequestHandler {
 			ExecutionHandler h = new ExecutionHandler();
 			return h.terminateExecution(json);
 		}
+		
+		// Request from client to create a new policy
+		else if ( action == Action.NEW_POLICY ) {
+			PolicyHandler h = new PolicyHandler();
+			return h.newPolicy(json);
+		}
+
+		// Request from client to apply a policy
+		else if ( action == Action.APPLY_POLICY ) {
+			PolicyHandler h = new PolicyHandler();
+			return h.applyPolicy(json);
+		}
+
+		// Request from client to delete a policy
+		else if ( action == Action.DELETE_POLICY ) {
+			PolicyHandler h = new PolicyHandler();
+			return h.deletePolicy(json);
+		}
+
+		// Request from client to reset policies
+		else if ( action == Action.RESET_POLICIES ) {
+			PolicyHandler h = new PolicyHandler();
+			return h.reset();
+		}
+
+		// Request from client to list all policies
+		else if ( action == Action.LIST_POLICIES ) {
+			PolicyHandler h = new PolicyHandler();
+			return h.listPolicies();
+		}
+		
+		// Request from client to view the info of the active policy
+		else if ( action == Action.VIEW_ACTIVE_POLICY ) {
+			PolicyHandler h = new PolicyHandler();
+			return h.viewActivePolicy();
+		}
 	
 		return jsonResponse.add("error", "this manager doesn't recognize that request");
 	}

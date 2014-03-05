@@ -11,6 +11,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import com.pod.dao.ActivityDAO;
+import com.pod.dao.PolicyDAO;
 import com.pod.dao.WorkerDAO;
 import com.pod.model.Worker;
 
@@ -44,9 +45,7 @@ public class ServerProperties implements ServletContextListener {
 	
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
-		
 		logger.info("Context destroyed");
-		
 	}
 
 	/**
@@ -58,6 +57,7 @@ public class ServerProperties implements ServletContextListener {
 		// Reset the database
 		new WorkerDAO().deleteAll();
 		new ActivityDAO().deleteAll();
+		new PolicyDAO().deleteAll();
 		// Reset the app directory
 		File appDirectory = new File ("/home/user/app");
 		deleteContents(appDirectory);

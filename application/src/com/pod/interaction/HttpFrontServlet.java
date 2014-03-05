@@ -205,6 +205,88 @@ public class HttpFrontServlet extends HttpServlet {
 			// End logging
 		}
 		
+		// Requesting a new policy
+		else if ( action.equals("newPolicy") ) {
+			
+			// Prepare json object to pass to the request handler
+			json = new JsonObject();
+			json.add("action", Action.NEW_POLICY.getId());
+			JsonObject policyJson = new JsonObject();
+			policyJson.add("name", request.getParameter("name"));
+			policyJson.add("rules", request.getParameter("rules"));
+			json.add("policy", policyJson);
+			
+			// Logging
+				System.out.println("Message log. From outside. action:"+action+", name:"+request.getParameter("name")+", rules:"+request.getParameter("rules")); System.out.println();
+			// End logging
+		}
+
+		// Requesting delete a policy
+		else if ( action.equals("deletePolicy") ) {
+			
+			// Prepare json object to pass to the request handler
+			json = new JsonObject();
+			json.add("action", Action.DELETE_POLICY.getId());
+			JsonObject policyJson = new JsonObject();
+			policyJson.add("name", request.getParameter("name"));
+			json.add("policy", policyJson);
+			
+			// Logging
+				System.out.println("Message log. From outside. action:"+action+", name:"+request.getParameter("name")); System.out.println();
+			// End logging
+		}
+		
+
+		// Requesting delete a policy
+		else if ( action.equals("applyPolicy") ) {
+			
+			// Prepare json object to pass to the request handler
+			json = new JsonObject();
+			json.add("action", Action.APPLY_POLICY.getId());
+			JsonObject policyJson = new JsonObject();
+			policyJson.add("name", request.getParameter("name"));
+			json.add("policy", policyJson);
+			
+			// Logging
+				System.out.println("Message log. From outside. action:"+action+", name:"+request.getParameter("name")); System.out.println();
+			// End logging
+		}
+
+		// Requesting information from the active policy
+		else if ( action.equals("viewActivePolicy") ) {
+			
+			// Prepare json object to pass to the request handler
+			json = new JsonObject();
+			json.add("action", Action.VIEW_ACTIVE_POLICY.getId());
+			
+			// Logging
+				System.out.println("Message log. From outside. action:"+action); System.out.println();
+			// End logging
+		}
+		
+		// Requesting information from the active policy
+		else if ( action.equals("listPolicies") ) {
+			
+			// Prepare json object to pass to the request handler
+			json = new JsonObject();
+			json.add("action", Action.LIST_POLICIES.getId());
+			
+			// Logging
+				System.out.println("Message log. From outside. action:"+action); System.out.println();
+			// End logging
+		}
+		
+		// Requesting information from the active policy
+		else if ( action.equals("resetPolicies") ) {
+			
+			// Prepare json object to pass to the request handler
+			json = new JsonObject();
+			json.add("action", Action.RESET_POLICIES.getId());
+			
+			// Logging
+				System.out.println("Message log. From outside. action:"+action); System.out.println();
+			// End logging
+		}
 		
 		// Handle request
 		ManagerRequestHandler handler = new ManagerRequestHandler();

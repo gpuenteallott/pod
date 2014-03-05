@@ -11,6 +11,7 @@ import java.util.List;
 import com.pod.model.Installation;
 
 /**
+ * Installation Data Access Object
  * InstallationDAO provides methods to add new records of activity installations in workers or delete them
  */
 public class InstallationDAO {

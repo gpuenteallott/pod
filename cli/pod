@@ -120,7 +120,7 @@ fi
 if [[ $1 == 'terminateExecution' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "http://localhost:8080/POD/?action=terminateExecution&executionId=$2" | python -mjson.tool
+		curl "$POD_HOST/?action=terminateExecution&executionId=$2" | python -mjson.tool
 		exit
 	fi
 	
@@ -133,6 +133,115 @@ if [[ $1 == 'terminateExecution' ]]; then
 		exit
 	fi
 fi
+
+if [[ $1 == 'newPolicy' ]]; then
+
+	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]]; then
+		curl "$POD_HOST/?action=newPolicy&name=$2&rules=$3" | python -mjson.tool
+		exit
+	fi
+	
+	if [[ $2 == '--help' ]]; then
+		./print "newPolicy --help"
+		exit
+	else 
+		echo "Usage: pod newPolicy name rules"
+		echo "Rules have the structure rule1=value1,rule2=value2"
+		echo "Type pod newPolicy --help for more information"
+		exit
+	fi
+fi
+
+if [[ $1 == 'applyPolicy' ]]; then
+
+	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
+		curl "$POD_HOST/?action=applyPolicy&name=$2" | python -mjson.tool
+		exit
+	fi
+	
+	if [[ $2 == '--help' ]]; then
+		./print "applyPolicy --help"
+		exit
+	else 
+		echo "Usage: pod applyPolicy name"
+		echo "Type pod applyPolicy --help for more information"
+		exit
+	fi
+fi
+
+
+if [[ $1 == 'deletePolicy' ]]; then
+
+	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
+		curl "$POD_HOST/?action=deletePolicy&name=$2" | python -mjson.tool
+		exit
+	fi
+	
+	if [[ $2 == '--help' ]]; then
+		./print "deletePolicy --help"
+		exit
+	else 
+		echo "Usage: pod deletePolicy name"
+		echo "Type pod deletePolicy --help for more information"
+		exit
+	fi
+fi
+
+
+if [[ $1 == 'viewActivePolicy' ]]; then
+
+	if [[ $# == 1 ]] ; then
+		curl "$POD_HOST/?action=viewActivePolicy" | python -mjson.tool
+		exit
+	fi
+	
+	if [[ $# == 2 ]] && [[ $2 == '--help' ]]; then
+		./print "viewActivePolicy --help"
+		exit
+	else 
+		echo "Usage: pod viewActivePolicy"
+		echo "Type pod viewActivePolicy --help for more information"
+		exit
+	fi
+fi
+
+
+if [[ $1 == 'resetPolicies' ]]; then
+
+	if [[ $# == 1 ]] ; then
+		curl "$POD_HOST/?action=resetPolicies" | python -mjson.tool
+		exit
+	fi
+	
+	if [[ $# == 2 ]] && [[ $2 == '--help' ]]; then
+		./print "resetPolicies --help"
+		exit
+	else 
+		echo "Usage: pod resetPolicies"
+		echo "Type pod resetPolicies --help for more information"
+		exit
+	fi
+fi
+
+
+
+if [[ $1 == 'listPolicies' ]]; then
+
+	if [[ $# == 1 ]] ; then
+		curl "$POD_HOST/?action=listPolicies" | python -mjson.tool
+		exit
+	fi
+	
+	if [[ $# == 2 ]] && [[ $2 == '--help' ]]; then
+		./print "listPolicies --help"
+		exit
+	else 
+		echo "Usage: pod listPolicies"
+		echo "Type pod listPolicies --help for more information"
+		exit
+	fi
+fi
+
 
 echo "Unknown command. Use --help to get indications"
 exit

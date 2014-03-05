@@ -167,7 +167,7 @@ public class ActivityHandler {
 		// Launch a thread that for every worker, sends a request to perform the installation
 		new Thread ( new ActivityInstallationNotifier(activity, Action.INSTALL_ACTIVITY ) ).start();
 		
-		// No error happened"uninstallActivity
+		// No error happened
 		return jsonResponse.add("activity", activity.toJsonObject()).add("status", "installing");
 	}
 	

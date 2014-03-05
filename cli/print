@@ -110,3 +110,92 @@ Example:
 
 "
 fi
+
+if [[ $1 == "newPolicy --help" ]]; then
+
+  echo "
+POD newPolicy name rules
+
+Creates a new policy to describe the way the POD cloud grows and shrinks.
+   - name is a unique string for the policy. If it exists, an error will be returned
+   - rules is a set of key pairs with the structure rule=value, separated by commas
+
+Example:
+    ./pod newPolicy policy01 minWorkers=1,maxWorkers=3
+
+"
+fi
+
+
+if [[ $1 == "applyPolicy --help" ]]; then
+
+  echo "
+POD applyPolicy name
+
+Sets the given policy as the active one, the one that will control the behaviour of the POD cloud
+   - name is a unique string for the policy. If it exists, an error will be returned
+
+Example:
+    ./pod applyPolicy policy01
+
+"
+fi
+
+
+if [[ $1 == "deletePolicy --help" ]]; then
+
+  echo "
+POD deletePolicy name
+
+Deletes the policy given by its name. If this policy was the active one, the cloud will be managed by the default activity
+   - name is a unique string for the policy. If it exists, an error will be returned
+
+Example:
+    ./pod deletePolicy policy01
+
+"
+fi
+
+
+if [[ $1 == "viewActivePolicy --help" ]]; then
+
+  echo "
+POD viewActivePolicy
+
+Returns the information of the currently active policy. This policy has the rules that define the behaviour of the POD cloud
+
+Example:
+    ./pod viewActivePolicy
+
+"
+fi
+
+
+
+if [[ $1 == "resetPolicies --help" ]]; then
+
+  echo "
+POD resetPolicies
+
+Deactivates the policy that was defining the behaviour of the POD cloud. The cloud will now operate according to the default policy.
+
+Example:
+    ./pod resetPolicies
+
+"
+fi
+
+
+
+if [[ $1 == "listPolicies --help" ]]; then
+
+  echo "
+POD listPolicies
+
+Returns a list of all the policies in the system
+
+Example:
+    ./pod listPolicies
+
+"
+fi

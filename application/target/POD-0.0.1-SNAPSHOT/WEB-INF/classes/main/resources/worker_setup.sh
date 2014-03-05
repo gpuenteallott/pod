@@ -1,9 +1,9 @@
 #!/bin/bash
 
-ln -s /home/debian /home/pod
-ln -s /home/ubuntu /home/pod
+ln -s /home/ubuntu /home/user
+ln -s /home/debian /home/user
 
-LOG="/home/pod/setup.log"
+LOG="/home/user/setup.log"
 
 echo `date` "Setup started" >> $LOG
 
@@ -29,12 +29,12 @@ SECUTIRY_GROUP=
 
 ##########################################################
 
-echo "name=$NAME" >> /home/pod/server.properties
-echo "corePublicDNS=$CORE_PUBLIC_DNS" > /home/pod/server.properties
-echo "workerId=$WORKER_ID" >> /home/pod/server.properties
-echo "role=worker" >> /home/pod/server.properties
-echo "securityGroup=$SECURITY_GROUP" >> /home/pod/server.properties
-echo "keypair=$KEYPAIR" >> /home/pod/server.properties
+echo "name=$NAME" >> /home/user/server.properties
+echo "corePublicDNS=$CORE_PUBLIC_DNS" > /home/user/server.properties
+echo "workerId=$WORKER_ID" >> /home/user/server.properties
+echo "role=worker" >> /home/user/server.properties
+echo "securityGroup=$SECURITY_GROUP" >> /home/user/server.properties
+echo "keypair=$KEYPAIR" >> /home/user/server.properties
 
 ##########################################################
 
@@ -53,7 +53,7 @@ sudo update-java-alternatives -s java-1.7.0-openjdk-amd64
 echo "Getting the project $REPO_NAME" >> $LOG
 #
 # Get the project
-#cd /home/pod
+#cd /home/user
 #wget $REPO_URL/archive/master.zip
 #unzip master.zip
 #rm master.zip
@@ -78,27 +78,27 @@ echo "Getting the project $REPO_NAME" >> $LOG
 #ant
 #
 # Clean up
-#rm /home/pod/master.zip
+#rm /home/user/master.zip
 #
 # Set up log files
-#touch /home/pod/java_output.txt
-#touch /home/pod/java_error_output.txt
-#chmod 644 /home/pod/java_output.txt
-#chmod 644 /home/pod/java_error_output.txt
+#touch /home/user/java_output.txt
+#touch /home/user/java_error_output.txt
+#chmod 644 /home/user/java_output.txt
+#chmod 644 /home/user/java_error_output.txt
 #
 #echo "Starting execution" >> $LOG
 #
 # Start execution
-#cd /home/pod/$REPO_NAME/bin
-#java com.kaerusproject.worker.CoreCommunicationAgent 2> /home/pod/java_error_output.txt > /home/pod/java_output.txt &
+#cd /home/user/$REPO_NAME/bin
+#java com.kaerusproject.worker.CoreCommunicationAgent 2> /home/user/java_error_output.txt > /home/user/java_output.txt &
 #
 #echo "Configuring system to start the worker execution during startup" >> $LOG
 #
 # Set up the execution for every next start of the system
 #touch /etc/init.d/kaerus.sh
 #echo '#!/bin/bash' > /etc/init.d/kaerus.sh
-#echo "cd /home/pod/$REPO_NAME/bin" >> /etc/init.d/kaerus.sh
-#echo 'java com.kaerusproject.worker.CoreCommunicationAgent 2> /home/pod/java_error_output.txt > /home/pod/java_output.txt &' >> /etc/init.d/kaerus.sh
+#echo "cd /home/user/$REPO_NAME/bin" >> /etc/init.d/kaerus.sh
+#echo 'java com.kaerusproject.worker.CoreCommunicationAgent 2> /home/user/java_error_output.txt > /home/user/java_output.txt &' >> /etc/init.d/kaerus.sh
 #
 # Add the kaerus script to be executed only in startup
 #sudo update-rc.d kaerus.sh start 20 2 3 4 5 .

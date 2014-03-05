@@ -11,6 +11,7 @@ import java.util.List;
 import com.pod.model.Worker;
 
 /**
+ * Worker Data Access Object
  * Class to interact with the table of workers in the database
  */
 public class WorkerDAO {

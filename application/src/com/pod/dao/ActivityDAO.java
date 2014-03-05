@@ -11,6 +11,7 @@ import java.util.List;
 import com.pod.model.Activity;
 
 /**
+ * Activity Data Access Object
  * Class to interact with the table of activities in the database
  */
 public class ActivityDAO {
