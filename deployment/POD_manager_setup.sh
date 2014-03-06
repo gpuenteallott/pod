@@ -78,6 +78,13 @@ mvn clean install
 
 mv target/*.war /var/lib/tomcat7/webapps/ROOT.war
 
+echo `date` " - Importing database" >> $LOG
+
+# Import database schema
+cd ~
+mv pod-master/application/database/*.sql pod.sql
+mysql -u root --password=kaerus_123 -h localhost < pod.sql
+
 echo `date` " - Setting up properties" >> $LOG
 
 # Give time to Tomcat to deploy the app in a folder

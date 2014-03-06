@@ -48,6 +48,8 @@ if [ -z $ACCESS_KEY ] || [ -z $SECRET_KEY ]; then
 	exit 1
 fi
 
+echo ""
+
 # Modify the install.sh script to include the AWS security credentials for the servers
 # We will pass the EC2 instance the modified script file which includes the files
 # We sent the secret slashes encoded with the char sequence ########
@@ -73,3 +75,13 @@ done < instance_ids.tmp
 #rm instance_ids.tmp
 rm $INSTANCE_SETUP.tmp
 rm instance_ids.tmp
+
+# Retrieve information from the instance launched
+DESCRIPTION=`aws ec2 describe-instances --output=json`
+
+echo "Manager DNS:"
+echo "$DESCRIPTION" | grep -i 'PublicDnsName' | cut -f4 -d\"
+
+echo ""
+echo "Run aws \"ec2 describe-instances --output=json\" to get more info"
+echo ""
