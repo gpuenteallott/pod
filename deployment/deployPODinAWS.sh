@@ -13,9 +13,8 @@
 # http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-set-up.html
 #
 # Previous steps:
-#       Export your Access Key and Secret Key by:
-#       export ACCESS_KEY <your_access_key>
-#	    export SECRET_KEY <your_secret_key>
+#       Save your Access Key and Secret Key by:
+#       $ aws config
 #
 # Usage: 
 #        ./deployPODinAWS.sh  security_group_name  key_pair_name
@@ -27,20 +26,27 @@ AMI=ami-0b9c9f62 # http://cloud-images.ubuntu.com/locator/ec2/
 INSTANCE_SETUP=POD_manager_setup.sh
 
 # Check number of arguments
-if [ $# < 1 ]; then
+if [[ $# < 2 ]]; then
 	echo 'Usage:'
 	echo '       ./deployPODinAWS.sh  security_group_name  key_pair_name'
 	exit 1
 fi
 
+NAME="POD"
+SECURITY_GROUP="$1"
+KEY_PAIR="$2"
+
+ACCESS_KEY=`grep -i 'aws_access_key_id' ~/.aws/config  | cut -f2 -d'='`
+SECRET_KEY=`grep -i 'aws_secret_access_key' ~/.aws/config  | cut -f2 -d'='`
+
 # Check for the access and secret key
 if [ -z $ACCESS_KEY ] || [ -z $SECRET_KEY ]; then
-	echo 'Access key and Secret key not found in environment'
+	echo 'Access key and Secret key not found'
+	echo 'Run the configure command for the AWS CLI'
+	echo '     $ aws configure'
+	echo 'It will create a file ~/.aws/config with the properties'
+	exit 1
 fi
-
-NAME="POD"
-SECURITY_GROUP= $1
-KEY_PAIR= $2
 
 # Modify the install.sh script to include the AWS security credentials for the servers
 # We will pass the EC2 instance the modified script file which includes the files
@@ -59,7 +65,7 @@ aws ec2 run-instances --image-id $AMI --count 1 --instance-type $INSTANCE_TYPE -
 
 while read line
 do
-printf "EC2: " && aws ec2 create-tags --resources $line --tags Key=Name,Value=$NAME-Mgr
+printf "EC2: AMI $line. Tagged: " && aws ec2 create-tags --resources $line --tags Key=Name,Value=$NAME-Mgr --output text
     line=
 done < instance_ids.tmp
 

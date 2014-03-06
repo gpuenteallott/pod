@@ -66,3 +66,38 @@ export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre
 sudo update-java-alternatives -s java-1.7.0-openjdk-amd64
 
 echo `date` " - Setting up project" >> $LOG
+
+# Get the project
+cd ~
+wget https://github.com/gpuenteallott/pod/archive/master.zip
+unzip master.zip
+
+# Build the project
+cd pod-master/application
+mvn clean install
+
+mv target/*.war /var/lib/tomcat7/webapps/ROOT.war
+
+echo `date` " - Setting up properties" >> $LOG
+
+# Give time to Tomcat to deploy the app in a folder
+sleep 12
+
+# Setup aws credentials file
+# The string "########" is used to avoid problems with slashes while using 'sed'
+cd /var/lib/tomcat7/webapps/ROOT/WEB-INF/classes
+echo "accessKey=$ACCESS_KEY" > AwsCredentials.properties
+echo "secretKey=$SECRET_KEY" >> AwsCredentials.properties
+# The secret came with slashes converted into ######## to avoid problems
+sed -i "s/########/\//g" AwsCredentials.properties
+chown tomcat7 AwsCredentials.properties
+chgrp tomcat7 AwsCredentials.properties
+chmod 600 AwsCredentials.properties
+
+echo `date` " - Cleaning installation" >> $LOG
+
+cd ~
+rm master.zip
+rm pod-master
+
+echo `date` " - Server deployed" >> $LOG

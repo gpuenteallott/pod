@@ -9,3 +9,5 @@
 AwsCredentials.properties
 application/build
 application/bin
+application/target
+*.tmp
