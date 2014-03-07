@@ -21,9 +21,12 @@
 #
 #####################################################################
 
+echo ""
+echo "POD Command Line Interface"
+
 INSTANCE_TYPE=t1.micro
 AMI=ami-0b9c9f62 # http://cloud-images.ubuntu.com/locator/ec2/
-INSTANCE_SETUP=POD_manager_setup.sh
+INSTANCE_SETUP=POD_manager_install.sh
 
 # Check number of arguments
 if [[ $# < 2 ]]; then
@@ -48,8 +51,6 @@ if [ -z $ACCESS_KEY ] || [ -z $SECRET_KEY ]; then
 	exit 1
 fi
 
-echo ""
-
 # Modify the install.sh script to include the AWS security credentials for the servers
 # We will pass the EC2 instance the modified script file which includes the files
 # We sent the secret slashes encoded with the char sequence ########
@@ -64,11 +65,11 @@ sed -i "s/SECRET_KEY=/SECRET_KEY=$SECRET_SCAPED/g" $INSTANCE_SETUP.tmp
 aws ec2 run-instances --image-id $AMI --count 1 --instance-type $INSTANCE_TYPE --user-data file://$INSTANCE_SETUP.tmp --key-name $KEY_PAIR --security-groups $SECURITY_GROUP --output text | awk '{print $8}' | grep -E -o i-[0-9a-zA-Z]* > instance_ids.tmp
 
 # Change name to the instances
-
 while read line
 do
 printf "EC2: AMI $line. Tagged: " && aws ec2 create-tags --resources $line --tags Key=Name,Value=$NAME-Mgr --output text
-    line=
+INSTANCE_ID=$line
+line=
 done < instance_ids.tmp
 
 # Remove aws credentials file
@@ -76,8 +77,11 @@ done < instance_ids.tmp
 rm $INSTANCE_SETUP.tmp
 rm instance_ids.tmp
 
+echo ""
+sleep 5
+
 # Retrieve information from the instance launched
-DESCRIPTION=`aws ec2 describe-instances --output=json`
+DESCRIPTION=`aws ec2 describe-instances --output=json --instance-ids $INSTANCE_ID`
 
 echo "Manager DNS:"
 echo "$DESCRIPTION" | grep -i 'PublicDnsName' | cut -f4 -d\"

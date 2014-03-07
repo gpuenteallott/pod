@@ -65,7 +65,7 @@ public class ActivityInstaller implements Runnable {
 		
 		// If the installation was unsuccessful, we delete every files that were possibly downloaded in order be as if it didn't happen
 		if ( !success && !uninstall ) {
-			delete( new File ("/home/user/app/"+activity.getName()) );
+			delete( new File ("/home/pod/app/"+activity.getName()) );
 		}
 		
 		// Logging
@@ -166,7 +166,7 @@ public class ActivityInstaller implements Runnable {
 		
 
 		// Create directory for app
-		File appDirectory = new File ("/home/user/app/"+activity.getName());
+		File appDirectory = new File ("/home/pod/app/"+activity.getName());
 		
 		if ( !appDirectory.mkdirs() ) {
 			System.err.println("Directory for app couldn't be created: " + appDirectory.getPath());
@@ -272,10 +272,10 @@ public class ActivityInstaller implements Runnable {
 	private boolean uninstall() {
 		
 		// If the app isn't installed, we return true to the uninstallation request
-		if ( !new File ("/home/user/app/"+activity.getName()).exists() )
+		if ( !new File ("/home/pod/app/"+activity.getName()).exists() )
 			return true;
 		
-		boolean deleted = delete( new File ("/home/user/app/"+activity.getName()) );
+		boolean deleted = delete( new File ("/home/pod/app/"+activity.getName()) );
 		if ( !deleted )
 			errorDescription = "Unable to uninstall, error deleting project files";
 		return deleted;

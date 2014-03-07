@@ -6,7 +6,7 @@
 # Installation script of manager in a server
 # http://github.com/gpuenteallott/pod
 #
-# manager_setup.sh
+# POD_manager_install.sh
 # This script launches a server to deploy the POD Manager in AWS
 #
 ################################################
@@ -15,7 +15,7 @@ ln -s /home/ubuntu /home/pod
 
 LOG="/home/pod/setup.log"
 touch $LOG
-chown pod $LOG
+chown ubuntu $LOG
 echo `date` " - Server launched" >> $LOG
 
 # Name for the resources
@@ -101,10 +101,16 @@ chown tomcat7 AwsCredentials.properties
 chgrp tomcat7 AwsCredentials.properties
 chmod 600 AwsCredentials.properties
 
-echo `date` " - Cleaning installation" >> $LOG
+
+
+echo `date` " - Finishing installation" >> $LOG
+
+# Creating soft links to access easily the server logs from the home folder
+ln -s /var/lib/tomcat7/logs ~/server_logs
 
 cd ~
-rm master.zip
-rm pod-master
+#rm master.zip
+#rm -R pod-master
+#rm pod.sql
 
 echo `date` " - Server deployed" >> $LOG
