@@ -55,7 +55,7 @@ public class ExecutionPerformer implements Runnable {
 		// Prepare message in case of error
 		JsonObject message = null;
 		
-		File executableFile = new File ("/home/user/app/"+execution.getActivityName()+"/main.sh");
+		File executableFile = new File ("/home/pod/app/"+execution.getActivityName()+"/main.sh");
 		
 		// If the executable file isn't located, it might be because it was deleted or because the activity isn't installed
 		if ( !executableFile.exists() ) {
@@ -65,7 +65,7 @@ public class ExecutionPerformer implements Runnable {
 			// We add the execution id to the error response so the manager can identify it
 			JsonObject executionJson = new JsonObject().add("id", execution.getId()).add("status", "error");
 			
-			if ( new File ("/home/user/app/"+execution.getActivityName() ).exists() )
+			if ( new File ("/home/pod/app/"+execution.getActivityName() ).exists() )
 				executionJson.add("errorDescription", "The executable file is missing"); // Add error description to the response
 			else
 				executionJson.add("errorDescription", "The specified activity isn't installed"); // Add error description to the response
@@ -134,11 +134,11 @@ public class ExecutionPerformer implements Runnable {
 		
 		ProcessBuilder processBuilder;
 		if ( execution.getStdin() != null )
-			processBuilder = new ProcessBuilder("/home/user/app/"+execution.getActivityName()+"/main.sh", execution.getStdin());
+			processBuilder = new ProcessBuilder("/home/pod/app/"+execution.getActivityName()+"/main.sh", execution.getStdin());
 		else
-			processBuilder = new ProcessBuilder("/home/user/app/"+execution.getActivityName()+"/main.sh");
+			processBuilder = new ProcessBuilder("/home/pod/app/"+execution.getActivityName()+"/main.sh");
 
-		processBuilder.directory(new File ("/home/user/app/"+execution.getActivityName()));
+		processBuilder.directory(new File ("/home/pod/app/"+execution.getActivityName()));
 
 		InputStream is = null;
 		InputStreamReader isr = null;

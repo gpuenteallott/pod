@@ -62,6 +62,11 @@ mvn clean install > /dev/null
 
 sudo mv target/*.war /var/lib/tomcat7/webapps/ROOT.war
 
+cd ~
+if [ ! -d ~/app ]; then
+	mkdir ~/app
+	sudo chgrp tomcat7 ~/app
+fi
 
 # Import database schema
 cd ~

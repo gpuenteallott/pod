@@ -38,9 +38,9 @@ sudo apt-get -y install openjdk-7-jre openjdk-7-jdk
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre
 sudo update-java-alternatives -s java-1.7.0-openjdk-amd64
 
-echo `date` " - Installing Tomtat, Maven and Unzip" >> $LOG
+echo `date` " - Installing Tomtat, Maven, Unzip and dos2unix" >> $LOG
 
-sudo apt-get -y install tomcat7 maven2 unzip
+sudo apt-get -y install tomcat7 maven2 unzip dos2unix
 
 echo `date` " - Installing MySQL" >> $LOG
 
@@ -78,6 +78,9 @@ mvn clean install
 
 mv target/*.war /var/lib/tomcat7/webapps/ROOT.war
 
+mkdir ~/app
+sudo chgrp tomcat7 ~/app
+
 echo `date` " - Importing database" >> $LOG
 
 # Import database schema
@@ -100,7 +103,6 @@ sed -i "s/########/\//g" AwsCredentials.properties
 chown tomcat7 AwsCredentials.properties
 chgrp tomcat7 AwsCredentials.properties
 chmod 600 AwsCredentials.properties
-
 
 
 echo `date` " - Finishing installation" >> $LOG
