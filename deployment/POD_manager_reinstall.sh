@@ -62,11 +62,6 @@ mvn clean install > /dev/null
 
 sudo mv target/*.war /var/lib/tomcat7/webapps/ROOT.war
 
-cd ~
-if [ ! -d ~/app ]; then
-	mkdir ~/app
-	sudo chgrp tomcat7 ~/app
-fi
 
 # Import database schema
 cd ~
@@ -76,6 +71,14 @@ if [ $# == 1 ] && [ $1 == 'db' ]; then
 	echo `date` " - Importing database" >> $LOG
 	echo `date` " - Importing database"
 	mysql -u root --password=kaerus_123 -h localhost < pod.sql
+	rm -R ~/app
+fi
+
+
+cd ~
+if [ ! -d ~/app ]; then
+	mkdir ~/app
+	sudo chgrp tomcat7 ~/app
 fi
 
 echo `date` " - Waiting for deployment" >> $LOG

@@ -6,12 +6,20 @@ if [[ $1 == "--help" ]]; then
 Welcome to POD - Processing On Demand
 This is the list of commands. To get more information about each command, type \"pod command --help\"
 
+Usage: pod <command> [parameters]
+
     - newActivity 
     - getActivityStatus
     - deleteActivity
     - newExecution
     - getExecutionStatus
     - terminateExecution
+    - newPolicy
+    - applyPolicy
+    - deletePolicy
+    - viewActivePolicy
+    - listPolicies
+    - resetPolicies
 
 "
 fi

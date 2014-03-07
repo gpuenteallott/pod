@@ -10,9 +10,8 @@
 #####################################################
 
 if [[ $# == 0 ]]; then
-	echo "Usage: pod <command> [parameters]"
-	echo "Use --help to get more indications"
-	exit
+	./print --help
+    exit
 fi
 
 if [[ $1 == '--help' ]]; then
