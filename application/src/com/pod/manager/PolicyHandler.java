@@ -187,6 +187,23 @@ public class PolicyHandler {
 				return new JsonObject().add("error", pdao.getError());
 		}
 		
+		// Now we must launch a thread to test if the current configuration is adaptable to the policy, and if not, modify it
+		new Thread( new Runnable() {
+			public void run() {
+				
+				PolicyDAO pdao = new PolicyDAO();
+				Policy policy = pdao.getActive();
+				WorkerHandler wh = new WorkerHandler();
+				
+				// If the current nº of workers is less than the minimum specified, deploy more
+				if ( wh.getNumWorkers() < policy.getRules().get("minWorkers").asInt() ) {
+					for ( int i = 0; i < policy.getRules().get("minWorkers").asInt()-wh.getNumWorkers(); i++ )
+						wh.deployWorker();
+				}
+				
+			}
+		}).start();
+		
 		// Return the information of the new active policy
 		return viewActivePolicy();
 	}

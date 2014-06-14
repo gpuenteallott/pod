@@ -32,6 +32,13 @@ public class WorkerHandler {
 	public WorkerHandler(){
 	}
 	
+	public int getNumWorkers() {
+		return numWorkers + pendingWorkers;
+	}
+	public int getNumWorkersStrict() {
+		return numWorkers;
+	}
+	
 	public boolean deployWorker(){
 		
 		pendingWorkers++;
@@ -72,11 +79,11 @@ public class WorkerHandler {
 		return true;
 	}
 	
-	public void startWorker(){}
+	public void startWorker(int id){}
 	
-	public void stopWorker(){}
+	public void stopWorker(int id){}
 	
-	public void terminateWorker(){}
+	public void terminateWorker(int id){}
 
 
 	private String deployWorkerAction( int workerId ) throws IOException {
