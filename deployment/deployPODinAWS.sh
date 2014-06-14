@@ -1,5 +1,15 @@
 #!/bin/bash
 
+
+
+
+# REGION REGION REGION
+
+
+
+
+
+
 #####################################################################
 # POD - Processing On Demand open source platform
 #
@@ -41,6 +51,7 @@ KEY_PAIR="$2"
 
 ACCESS_KEY=`grep -i 'aws_access_key_id' ~/.aws/config  | cut -f2 -d'='`
 SECRET_KEY=`grep -i 'aws_secret_access_key' ~/.aws/config  | cut -f2 -d'='`
+REGION=`grep -i 'region' ~/.aws/config  | cut -f2 -d'='`
 
 # Check for the access and secret key
 if [ -z $ACCESS_KEY ] || [ -z $SECRET_KEY ]; then
@@ -61,15 +72,23 @@ sed -i "s/ACCESS_KEY=/ACCESS_KEY=$ACCESS_KEY/g" $INSTANCE_SETUP.tmp
 SECRET_SCAPED=`echo $SECRET_KEY | sed -e 's/[\/&]/########/g'`
 sed -i "s/SECRET_KEY=/SECRET_KEY=$SECRET_SCAPED/g" $INSTANCE_SETUP.tmp
 
+# Include other flags
+RANDOM_TAG_VALUE=$RANDOM
+sed -i "s/RANDOM_TAG_VALUE=/RANDOM_TAG_VALUE=$RANDOM_TAG_VALUE/g" $INSTANCE_SETUP.tmp
+sed -i "s/CLOUD=/CLOUD=aws/g" $INSTANCE_SETUP.tmp
+sed -i "s/KEYPAIR=/KEYPAIR=$KEY_PAIR/g" $INSTANCE_SETUP.tmp
+sed -i "s/AMI=/AMI=$AMI/g" $INSTANCE_SETUP.tmp
+sed -i "s/INSTANCE_TYPE=/INSTANCE_TYPE=$INSTANCE_TYPE/g" $INSTANCE_SETUP.tmp
+
 # Run
 aws ec2 run-instances --image-id $AMI --count 1 --instance-type $INSTANCE_TYPE --user-data file://$INSTANCE_SETUP.tmp --key-name $KEY_PAIR --security-groups $SECURITY_GROUP --output text | awk '{print $8}' | grep -E -o i-[0-9a-zA-Z]* > instance_ids.tmp
 
 # Change name to the instances
 while read line
 do
-printf "EC2: AMI $line. Tagged: " && aws ec2 create-tags --resources $line --tags Key=Name,Value=$NAME-Mgr --output text
-INSTANCE_ID=$line
-line=
+	printf "EC2: AMI $line. Tagged: " && aws ec2 create-tags --resources $line --tags Key=Name,Value=$NAME-Mgr Key=RandomId,Value=$RANDOM_TAG_VALUE --output text
+	INSTANCE_ID=$line
+	line=
 done < instance_ids.tmp
 
 # Remove aws credentials file
@@ -78,12 +97,12 @@ rm $INSTANCE_SETUP.tmp
 rm instance_ids.tmp
 
 echo ""
-sleep 5
+sleep 10
 
 # Retrieve information from the instance launched
 DESCRIPTION=`aws ec2 describe-instances --output=json --instance-ids $INSTANCE_ID`
 
-echo "Manager DNS:"
+echo "Trying to get manager DNS:"
 echo "$DESCRIPTION" | grep -i 'PublicDnsName' | cut -f4 -d\"
 
 echo ""

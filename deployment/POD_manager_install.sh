@@ -12,6 +12,7 @@
 ################################################
 
 ln -s /home/ubuntu /home/pod
+chown tomcat7 /home/
 
 LOG="/home/pod/setup.log"
 touch $LOG
@@ -25,6 +26,15 @@ NAME="POD"
 # They will be dinamically added from this file by installenv.sh
 ACCESS_KEY=
 SECRET_KEY=
+
+# This is the flag that indicates this is running in a cloud, contains the cloud name (aws)
+CLOUD=
+
+# This flag is used to identify the manager when retrieving its information from the cloud provider
+RANDOM_TAG_VALUE=
+
+# This flag is used to identify the keypair name, so in the future all workers will be launched using it
+KEYPAIR=
 
 echo `date` " - Updating dependencies" >> $LOG >> $LOG
 
@@ -59,8 +69,6 @@ sudo rm -R /var/lib/tomcat7/webapps/ROOT
 sudo sed -i "s/#AUTHBIND=no/AUTHBIND=yes/g" /etc/default/tomcat7
 sudo sed -i "s/port=\"8080\"/port=\"80\"/g" /var/lib/tomcat7/conf/server.xml
 
-sudo service tomcat7 start
-
 # Make sure Java 7 is being used
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre
 sudo update-java-alternatives -s java-1.7.0-openjdk-amd64
@@ -80,6 +88,17 @@ mv target/*.war /var/lib/tomcat7/webapps/ROOT.war
 
 mkdir ~/app
 sudo chgrp tomcat7 ~/app
+
+# Retrieve the IP addresses of the server and other information useful inside the cloud
+if [ -n $CLOUD ]; then
+	echo `date` " - Retrieving information from cloud provider" >> $LOG
+	DESCRIPTION=`aws ec2 describe-instances --output=json --filter Key=tag-value,Value=$RANDOM_TAG_VALUE`
+	PUBLIC_DNS=`echo "$DESCRIPTION" | grep -i 'PublicDnsName' | cut -f4 -d\"`
+	PRIVATE_DNS=`echo "$DESCRIPTION" | grep -i 'PrivateDnsName' | cut -f4 -d\"`
+	INSTANCE_ID=`echo "$DESCRIPTION" | grep -i 'InstanceId' | cut -f4 -d\"`
+fi
+
+sudo service tomcat7 start
 
 echo `date` " - Importing database" >> $LOG
 

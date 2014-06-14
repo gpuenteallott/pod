@@ -85,7 +85,7 @@ public class WorkerHandler {
 		AWSCredentialsProvider credentialsProvider = new ClasspathPropertiesFileCredentialsProvider("/main/resources/AwsCredentials.properties");
 		AmazonEC2 amazonEC2Client = new AmazonEC2Client(credentialsProvider);
 		
-		// Attempt to create secutiry group in case it isn't already created
+		// Attempt to create security group in case it isn't already created
 		if ( !securityGroupCreated ){
 			// This strange OR operation is to ensure that the boolean will stay true if set first one thread
 			securityGroupCreated = createSecurityGroup( amazonEC2Client , ServerProperties.getName()+"-wkr-grp" ) || securityGroupCreated;

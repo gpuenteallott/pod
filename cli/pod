@@ -19,19 +19,20 @@ if [[ $1 == '--help' ]]; then
     exit
 fi
 
-if [[ -z $POD_HOST ]]; then
-	echo "Environment variable POD_HOST has no value. Please set it up"
+if [[ -z $POD_URL ]]; then
+	echo "Environment variable POD_URL has no value. Please set it up"
+	echo "It must contain the URL to the manager"
 	exit
 fi
 
 if [[ $1 == 'newExecution' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD_HOST/?action=newExecution&name=$2" | python -mjson.tool
+		curl "$POD_URL/?action=newExecution&name=$2" | json_pp
 		exit
 	fi
 	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]] ; then
-		curl "$POD_HOST/?action=newExecution&name=$2&input=$3" | python -mjson.tool
+		curl "$POD_URL/?action=newExecution&name=$2&input=$3" | json_pp
 		exit
 	fi
 	
@@ -49,7 +50,7 @@ fi
 if [[ $1 == 'getExecutionStatus' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD_HOST/?action=getExecutionStatus&executionId=$2" | python -mjson.tool
+		curl "$POD_URL/?action=getExecutionStatus&executionId=$2" | json_pp
 		exit
 	fi
 	
@@ -66,7 +67,7 @@ fi
 if [[ $1 == 'newActivity' ]]; then
 
 	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]]; then
-		curl "$POD_HOST/?action=newActivity&installationScriptLocation=$3&name=$2" | python -mjson.tool
+		curl "$POD_URL/?action=newActivity&installationScriptLocation=$3&name=$2" | json_pp
 		exit
 	fi
 	
@@ -84,7 +85,7 @@ fi
 if [[ $1 == 'getActivityStatus' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD_HOST/?action=getActivityStatus&name=$2" | python -mjson.tool
+		curl "$POD_URL/?action=getActivityStatus&name=$2" | json_pp
 		exit
 	fi
 	
@@ -101,7 +102,7 @@ fi
 if [[ $1 == 'deleteActivity' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD_HOST/?action=deleteActivity&name=$2" | python -mjson.tool
+		curl "$POD_URL/?action=deleteActivity&name=$2" | json_pp
 		exit
 	fi
 	
@@ -119,7 +120,7 @@ fi
 if [[ $1 == 'terminateExecution' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD_HOST/?action=terminateExecution&executionId=$2" | python -mjson.tool
+		curl "$POD_URL/?action=terminateExecution&executionId=$2" | json_pp
 		exit
 	fi
 	
@@ -136,7 +137,7 @@ fi
 if [[ $1 == 'newPolicy' ]]; then
 
 	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]]; then
-		curl "$POD_HOST/?action=newPolicy&name=$2&rules=$3" | python -mjson.tool
+		curl "$POD_URL/?action=newPolicy&name=$2&rules=$3" | json_pp
 		exit
 	fi
 	
@@ -154,7 +155,7 @@ fi
 if [[ $1 == 'applyPolicy' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD_HOST/?action=applyPolicy&name=$2" | python -mjson.tool
+		curl "$POD_URL/?action=applyPolicy&name=$2" | json_pp
 		exit
 	fi
 	
@@ -172,7 +173,7 @@ fi
 if [[ $1 == 'deletePolicy' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD_HOST/?action=deletePolicy&name=$2" | python -mjson.tool
+		curl "$POD_URL/?action=deletePolicy&name=$2" | json_pp
 		exit
 	fi
 	
@@ -190,7 +191,7 @@ fi
 if [[ $1 == 'viewActivePolicy' ]]; then
 
 	if [[ $# == 1 ]] ; then
-		curl "$POD_HOST/?action=viewActivePolicy" | python -mjson.tool
+		curl "$POD_URL/?action=viewActivePolicy" | json_pp
 		exit
 	fi
 	
@@ -208,7 +209,7 @@ fi
 if [[ $1 == 'resetPolicies' ]]; then
 
 	if [[ $# == 1 ]] ; then
-		curl "$POD_HOST/?action=resetPolicies" | python -mjson.tool
+		curl "$POD_URL/?action=resetPolicies" | json_pp
 		exit
 	fi
 	
@@ -227,7 +228,7 @@ fi
 if [[ $1 == 'listPolicies' ]]; then
 
 	if [[ $# == 1 ]] ; then
-		curl "$POD_HOST/?action=listPolicies" | python -mjson.tool
+		curl "$POD_URL/?action=listPolicies" | json_pp
 		exit
 	fi
 	
