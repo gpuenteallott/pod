@@ -1,6 +1,5 @@
 #!/bin/bash
 
-ln -s /home/debian /home/pod
 ln -s /home/ubuntu /home/pod
 
 LOG="/home/pod/setup.log"
@@ -25,7 +24,7 @@ WORKER_CODE_URL=https://github.com/gpuenteallott/pod
 
 # The key pair and security group assigned
 KEYPAIR=
-SECUTIRY_GROUP=
+SECURITY_GROUP=
 
 ##########################################################
 

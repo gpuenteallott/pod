@@ -49,8 +49,8 @@ NAME="POD"
 SECURITY_GROUP="$1"
 KEY_PAIR="$2"
 
-ACCESS_KEY=`grep -i 'aws_access_key_id' ~/.aws/config  | cut -f2 -d'='`
-SECRET_KEY=`grep -i 'aws_secret_access_key' ~/.aws/config  | cut -f2 -d'='`
+ACCESS_KEY=`grep -i 'aws_access_key_id' ~/.aws/config  | cut -f2 -d'=' | tr -d ' '`
+SECRET_KEY=`grep -i 'aws_secret_access_key' ~/.aws/config  | cut -f2 -d'=' | tr -d ' '`
 REGION=`grep -i 'region' ~/.aws/config  | cut -f2 -d'='`
 
 # Check for the access and secret key

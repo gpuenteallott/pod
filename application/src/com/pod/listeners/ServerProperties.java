@@ -10,10 +10,16 @@ import java.util.logging.Logger;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import com.eclipsesource.json.JsonObject;
 import com.pod.dao.ActivityDAO;
 import com.pod.dao.PolicyDAO;
 import com.pod.dao.WorkerDAO;
+import com.pod.interaction.Action;
+import com.pod.interaction.HttpSender;
+import com.pod.model.Activity;
 import com.pod.model.Worker;
+import com.pod.worker.ActivityInstallationQueue;
+import com.pod.worker.ActivityInstaller;
 
 
 /**
@@ -98,7 +104,26 @@ public class ServerProperties implements ServletContextListener {
 			else {
 				masterDns = properties.getProperty("masterDns");
 			
-				// We must 
+				// We must contact the master here, so they know we've launched
+				// Send message to manager when done
+				
+				HttpSender sender = new HttpSender();
+				
+				// The workerId is automatically added to the message
+				JsonObject message = new JsonObject();
+				message.add("action", Action.WORKER_DEPLOYED.getId() );
+				
+				sender.setMessage(message);
+				sender.setDestinationIP( ServerProperties.getMasterDns() );
+				sender.setDestinationRole("manager");
+				String response = "";
+				try {
+					response = sender.send();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				JsonObject jsonResponse = JsonObject.readFrom(response);
 				
 			}
 		} catch (IOException e) {

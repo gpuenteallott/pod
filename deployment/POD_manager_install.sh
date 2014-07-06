@@ -110,11 +110,16 @@ mysql -u root --password=kaerus_123 -h localhost < pod.sql
 echo `date` " - Setting up properties" >> $LOG
 
 # Give time to Tomcat to deploy the app in a folder
-sleep 12
+while [ ! -d "/var/lib/tomcat7/webapps/ROOT/WEB-INF" ]
+do
+	sleep 1
+done
 
 # Setup aws credentials file
 # The string "########" is used to avoid problems with slashes while using 'sed'
-cd /var/lib/tomcat7/webapps/ROOT/WEB-INF/classes
+mkdir -p /var/lib/tomcat7/webapps/ROOT/WEB-INF/classes/main/resources
+cd /var/lib/tomcat7/webapps/ROOT/WEB-INF/classes/main/resources
+touch AwsCredentials.properties
 echo "accessKey=$ACCESS_KEY" > AwsCredentials.properties
 echo "secretKey=$SECRET_KEY" >> AwsCredentials.properties
 # The secret came with slashes converted into ######## to avoid problems

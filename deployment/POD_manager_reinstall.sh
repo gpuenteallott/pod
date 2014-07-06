@@ -27,7 +27,7 @@ echo `date` " - Saving properties"
 
 # Remove the default Tomcat Webapp
 sudo service tomcat7 stop > /dev/null
-sudo mv /var/lib/tomcat7/webapps/ROOT/WEB-INF/classes/AwsCredentials.properties ~/AwsCredentials.properties.tmp # Save credentials file
+sudo mv /var/lib/tomcat7/webapps/ROOT/WEB-INF/classes/resources/AwsCredentials.properties ~/AwsCredentials.properties.tmp # Save credentials file
 
 echo `date` " - Removing previous version" >> $LOG
 echo `date` " - Removing previous version"
@@ -84,14 +84,19 @@ fi
 echo `date` " - Waiting for deployment" >> $LOG
 echo `date` " - Waiting for deployment"
 
-# Give time to Tomcat to deploy the app in a folder
-sleep 12
 
 echo `date` " - Restoring credentials and properties file" >> $LOG
 echo `date` " - Restoring credentials and properties file"
 
+# Give time to Tomcat to deploy the app in a folder
+while [ ! -d "/var/lib/tomcat7/webapps/ROOT/WEB-INF" ]
+do
+	sleep 1
+done
+
 # Restore credentials and name file
-sudo mv ~/AwsCredentials.properties.tmp /var/lib/tomcat7/webapps/ROOT/WEB-INF/classes/AwsCredentials.properties
+mkdir -p /var/lib/tomcat7/webapps/ROOT/WEB-INF/classes/main/resources
+sudo mv ~/AwsCredentials.properties.tmp /var/lib/tomcat7/webapps/ROOT/WEB-INF/classes/resources/AwsCredentials.properties
 
 # Clean up
 rm ~/master.zip
