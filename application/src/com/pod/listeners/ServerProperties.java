@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Properties;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -42,6 +43,12 @@ public class ServerProperties implements ServletContextListener {
 	
 	// This is the default location for the server properties, except in the case of the manager
 	private static final String PROPERTIES_FILE_PATH = "/home/user/server.properties";
+	
+	private static final String IPADDRESS_PATTERN = 
+			"^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 	
 	private static String role;
 	private static String name;
@@ -109,8 +116,7 @@ public class ServerProperties implements ServletContextListener {
 			    URL u = new URL("http://bot.whatismyipaddress.com/");
 		    	BufferedReader in = new BufferedReader( new InputStreamReader(u.openStream()) );
 		    	while ((s = in.readLine()) != null) {
-		    		logger.info("reading "+s);
-		            dns += s;
+		            dns = s;
 		        }
 		    	in.close();
 			    
