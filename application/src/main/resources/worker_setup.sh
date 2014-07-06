@@ -29,7 +29,7 @@ SECURITY_GROUP=
 ##########################################################
 
 echo "name=$NAME" >> /home/pod/server.properties
-echo "corePublicDNS=$CORE_PUBLIC_DNS" > /home/pod/server.properties
+echo "corePublicDNS=$MANAGER_PUBLIC_DNS" > /home/pod/server.properties
 echo "workerId=$WORKER_ID" >> /home/pod/server.properties
 echo "role=worker" >> /home/pod/server.properties
 echo "securityGroup=$SECURITY_GROUP" >> /home/pod/server.properties

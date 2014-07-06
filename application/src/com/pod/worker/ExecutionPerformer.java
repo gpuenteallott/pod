@@ -99,7 +99,7 @@ public class ExecutionPerformer implements Runnable {
 		
 		// Set the public DNS of the worker. If empty, it will mean this same machine
 		HttpSender sender = new HttpSender();
-		sender.setDestinationIP( ServerProperties.getMasterDns() );
+		sender.setDestinationIP( ServerProperties.getManagerDns() );
 		sender.setDestinationRole("manager");
 		sender.setMessage(message);
 		

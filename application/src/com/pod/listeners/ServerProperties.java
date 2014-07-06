@@ -44,7 +44,7 @@ public class ServerProperties implements ServletContextListener {
 	private static String securityGroup;
 	private static String keypair;
 	private static int workerId;
-	private static String masterDns;
+	private static String managerDns;
 	private static String repoURL;
 	private static String ami;
 	private static String instanceType;
@@ -97,12 +97,12 @@ public class ServerProperties implements ServletContextListener {
 				workerId = wdao.insert(worker);
 				
 				// Also, if this is the manager, put the masterDns value to "", so the Sender class detects it
-				masterDns = "";
+				managerDns = "";
 				
 			}
 			// If this is a worker, read the property from the properties file
 			else {
-				masterDns = properties.getProperty("masterDns");
+				managerDns = properties.getProperty("managerDns");
 			
 				// We must contact the master here, so they know we've launched
 				// Send message to manager when done
@@ -114,7 +114,7 @@ public class ServerProperties implements ServletContextListener {
 				message.add("action", Action.WORKER_DEPLOYED.getId() );
 				
 				sender.setMessage(message);
-				sender.setDestinationIP( ServerProperties.getMasterDns() );
+				sender.setDestinationIP( ServerProperties.getManagerDns() );
 				sender.setDestinationRole("manager");
 				String response = "";
 				try {
@@ -166,12 +166,12 @@ public class ServerProperties implements ServletContextListener {
 		ServerProperties.workerId = workerId;
 	}
 
-	public static String getMasterDns() {
-		return masterDns;
+	public static String getManagerDns() {
+		return managerDns;
 	}
 
-	public static void setMasterDns(String masterDns) {
-		ServerProperties.masterDns = masterDns;
+	public static void setManagerDns(String masterDns) {
+		ServerProperties.managerDns = masterDns;
 	}
 	
 	public static String getKeypair(){

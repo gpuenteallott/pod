@@ -105,7 +105,7 @@ public class ActivityInstaller implements Runnable {
 		}
 		
 		sender.setMessage(message);
-		sender.setDestinationIP( ServerProperties.getMasterDns() );
+		sender.setDestinationIP( ServerProperties.getManagerDns() );
 		sender.setDestinationRole("manager");
 		String response = "";
 		try {
