@@ -109,6 +109,7 @@ public class ServerProperties implements ServletContextListener {
 			    URL u = new URL("http://bot.whatismyipaddress.com/");
 		    	BufferedReader in = new BufferedReader( new InputStreamReader(u.openStream()) );
 		    	while ((s = in.readLine()) != null) {
+		    		logger.info("reading "+s);
 		            dns += s;
 		        }
 		    	in.close();
