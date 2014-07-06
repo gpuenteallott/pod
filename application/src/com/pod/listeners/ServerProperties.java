@@ -1,9 +1,14 @@
 package com.pod.listeners;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -98,6 +103,18 @@ public class ServerProperties implements ServletContextListener {
 				
 				// Also, if this is the manager, put the masterDns value to "", so the Sender class detects it
 				managerDns = "";
+				
+				// Obtain our own public IP address
+			    String s;
+			    URL u = new URL("http://bot.whatismyipaddress.com/");
+		    	BufferedReader in = new BufferedReader( new InputStreamReader(u.openStream()) );
+		    	while ((s = in.readLine()) != null) {
+		            dns += s;
+		        }
+		    	in.close();
+			    
+			    logger.info("DNS "+dns);
+				
 				
 			}
 			// If this is a worker, read the property from the properties file

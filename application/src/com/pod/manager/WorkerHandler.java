@@ -110,7 +110,7 @@ public class WorkerHandler {
 		br.close();
 
 		// Set variables for the worker setup script
-		userData = userData.replace("MANAGER_PUBLIC_DNS=", "MANAGER_PUBLIC_DNS="+ServerProperties.getManagerDns())
+		userData = userData.replace("MANAGER_PUBLIC_DNS=", "MANAGER_PUBLIC_DNS="+ServerProperties.getDns())
 						   .replace("WORKER_ID=", "WORKER_ID=" + workerId)
 		                   .replace("REPO_URL=", "REPO_URL="+ServerProperties.getRepoURL())
 		                   .replace("KEYPAIR=", "KEYPAIR="+ServerProperties.getKeypair())
