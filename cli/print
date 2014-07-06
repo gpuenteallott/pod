@@ -21,6 +21,9 @@ Usage: pod <command> [parameters]
     - listPolicies
     - resetPolicies
 
+To use, export the URL of the POD Manager using 
+export POD_URL=
+
 "
 fi
 
