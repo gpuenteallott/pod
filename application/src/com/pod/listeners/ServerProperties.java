@@ -1,8 +1,6 @@
 package com.pod.listeners;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,7 +9,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Properties;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -22,10 +19,7 @@ import com.pod.dao.PolicyDAO;
 import com.pod.dao.WorkerDAO;
 import com.pod.interaction.Action;
 import com.pod.interaction.HttpSender;
-import com.pod.model.Activity;
 import com.pod.model.Worker;
-import com.pod.worker.ActivityInstallationQueue;
-import com.pod.worker.ActivityInstaller;
 
 
 /**

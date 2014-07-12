@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Logger;
 
 import com.eclipsesource.json.JsonObject;
 import com.pod.listeners.ServerProperties;
@@ -18,6 +19,8 @@ import com.pod.worker.WorkerRequestHandler;
  * It also abstracts the complexity of communicating with the same machine (but another role) or another one
  */
 public class HttpSender {
+
+	Logger logger = Logger.getLogger(HttpSender.class.getName());
 	
 	private String destinationIP;
 	private String destinationRole; // can be "worker" or "manager"
@@ -39,8 +42,8 @@ public class HttpSender {
 		
 		// Logging
 			int i = (int)(Math.random() * 1000);
-			System.out.println("Message log. Id "+i+". To "+destinationRole+" ("+destinationIP+")");
-			System.out.println("Req ("+i+"): "+message);
+			logger.info("Message log. Id "+i+". To "+destinationRole+" ("+destinationIP+")");
+			logger.info("Req ("+i+"): "+message);
 		// End logging
 		
 		String response = null;
@@ -54,8 +57,8 @@ public class HttpSender {
 			response = sendToRemote();
 		
 		// Logging
-			System.out.println("Res ("+i+"): "+response);
-			System.out.println();
+			logger.info("Res ("+i+"): "+response);
+			logger.info("");
 		// End logging
 			
 		return response;
