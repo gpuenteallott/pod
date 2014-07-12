@@ -43,9 +43,17 @@ echo `date` " - Updating dependencies" >> $LOG
 
 sudo apt-get -y update
 
-echo `date` " - Installing Java, Ant and Unzip" >> $LOG
+echo `date` " - Installing Java" >> $LOG
 
-sudo apt-get -y install openjdk-7-jre openjdk-7-jdk unzip 
+sudo apt-get -y install openjdk-7-jre openjdk-7-jdk 
+	
+# Make sure Java 7 is being used
+export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre
+sudo update-java-alternatives -s java-1.7.0-openjdk-amd64
+
+echo `date` " - Installing Tomtat, Maven, Unzip and dos2unix" >> $LOG
+
+sudo apt-get -y install tomcat7 maven2 unzip dos2unix
 
 # Make sure Java 7 is being used
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre
