@@ -71,6 +71,8 @@ public class ServerProperties implements ServletContextListener {
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
+		
+		logger.info("Initializing Context");
 
 		// Reset the database
 		new WorkerDAO().deleteAll();
@@ -147,8 +149,7 @@ public class ServerProperties implements ServletContextListener {
 				message.add("action", Action.WORKER_DEPLOYED.getId() );
 				message.add("dns", dns);
 				
-				
-				
+
 				sender.setMessage(message);
 				sender.setDestinationIP( ServerProperties.getManagerDns() );
 				sender.setDestinationRole("manager");

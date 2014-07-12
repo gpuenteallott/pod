@@ -36,7 +36,10 @@ public class Worker implements java.io.Serializable {
 		JsonObject json = new JsonObject();
 		json.add("id", id);
 		if ( status != null ) json.add("status", status);
-		if ( dns != null ) json.add("dns", dns);
+		if ( "".equals(dns) )
+			json.add("manager",true);
+		else
+			if ( dns != null ) json.add("dns", dns);
 		return json;
 	}
 }
