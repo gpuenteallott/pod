@@ -563,6 +563,68 @@ public class WorkerDAO {
 		return workers.toArray( new Worker [workers.size()] );
 	}
 	
+	
+	public Worker[] selectByStatus ( String [] statuses ) {
+		
+		Connection con = null;
+		PreparedStatement statement = null;
+		ResultSet rs = null;
+		List<Worker> workers = new ArrayList<Worker>();
+		
+		try {
+			
+			con = ConnectionManager.getConnection();
+			
+			String searchQuery = "SELECT * FROM workers WHERE workers.status = ?";
+			for (int i = 1; i < statuses.length; i++)
+				searchQuery += " AND workers.status = ?";
+			
+			statement = con.prepareStatement(searchQuery);
+			for (int i = 0; i < statuses.length; i++)
+				statement.setString(i+1, statuses[i] );
+			
+			rs = statement.executeQuery();
+			
+			while (rs.next()) {
+				
+				Worker worker = new Worker();
+				worker.setId( rs.getInt("id") );
+				worker.setStatus( rs.getString("status") );
+				worker.setDns( rs.getString("dns") );
+				workers.add(worker);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			error = e.toString();
+		}
+		
+		finally {
+			if (rs != null)	{
+			    try {
+			     	rs.close();
+			    } catch (Exception e) { System.err.println(e); }
+			        rs = null;
+			    }
+		     
+		     if (statement != null) {
+		        try {
+		        	statement.close();
+		        } catch (Exception e) { System.err.println(e); }
+		        	statement = null;
+		        }
+		
+		     if (con != null) {
+		        try {
+		        	con.close();
+		        } catch (Exception e) { System.err.println(e); }
+		
+		        con = null;
+		     }
+		}
+		return workers.toArray( new Worker [workers.size()] );
+	}
+	
 	/**
 	 * Retrieves the first available worker for work found in the database that has the given activity installed (installation status = installed)
 	 * @param activityId

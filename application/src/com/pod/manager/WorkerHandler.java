@@ -22,9 +22,6 @@ import com.pod.model.Worker;
  * This class is in charge of handling workers (deploying, starting, stopping, etc)
  */
 public class WorkerHandler {
-
-	private static int deployedWorkers;
-	private static int pendingWorkers;
 	
 	private static boolean securityGroupCreated;
 	
@@ -35,13 +32,25 @@ public class WorkerHandler {
 	}
 	
 	public int getTotalWorkers() {
-		return deployedWorkers + pendingWorkers;
+		return new WorkerDAO().list().length - getTerminatedWorkers();
 	}
-	public int getDeployedWorkers() {
-		return deployedWorkers;
+	public int getReadyWorkers() {
+		return new WorkerDAO().selectByStatus( new String[] {"ready"} ).length;
 	}
 	public int getPendingWorkers() {
-		return pendingWorkers;
+		return new WorkerDAO().selectByStatus( new String[] {"pending"} ).length;
+	}
+	public int getLaunchingWorkers() {
+		return new WorkerDAO().selectByStatus( new String[] {"launching"} ).length;
+	}
+	public int getWorkingWorkers() {
+		return new WorkerDAO().selectByStatus( new String[] {"working"} ).length;
+	}
+	public int getStoppedWorkers() {
+		return new WorkerDAO().selectByStatus( new String[] {"stopped"} ).length;
+	}
+	public int getTerminatedWorkers() {
+		return new WorkerDAO().selectByStatus( new String[] {"terminated"} ).length;
 	}
 
 	
@@ -49,9 +58,15 @@ public class WorkerHandler {
 		
 		JsonObject response = new JsonObject();
 		
-		response.add("deployedWorkers", getDeployedWorkers() );
-		response.add("pendingWorkers", getPendingWorkers());
-		response.add("totalWorkers", getTotalWorkers());
+		JsonObject countJson = new JsonObject();
+		countJson.add("ready", getReadyWorkers() );
+		countJson.add("pending", getPendingWorkers());
+		countJson.add("launching", getLaunchingWorkers() );
+		countJson.add("working", getWorkingWorkers() );
+		countJson.add("stopped", getStoppedWorkers() );
+		countJson.add("terminated", getTerminatedWorkers() );
+		countJson.add("totalWorkers", getTotalWorkers());
+		response.add("count", countJson);	
 		
 		JsonArray workersJson = new JsonArray();
 		for ( Worker w : new WorkerDAO().list() ) {
@@ -62,8 +77,6 @@ public class WorkerHandler {
 	}
 	
 	public boolean deployWorker(){
-		
-		pendingWorkers++;
 		
 		// Create worker object
 		Worker worker = new Worker();

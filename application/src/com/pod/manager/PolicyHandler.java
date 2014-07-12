@@ -198,7 +198,8 @@ public class PolicyHandler {
 				// If the current nº of workers is less than the minimum specified, deploy more
 				int minWorkers = Integer.parseInt( policy.getRules().get("minWorkers").asString() );
 				if ( wh.getTotalWorkers() < minWorkers ) {
-					for ( int i = 0; i < minWorkers-wh.getTotalWorkers(); i++ )
+					int totalWorkers = wh.getTotalWorkers();
+					for ( int i = 0; i < totalWorkers; i++ )
 						wh.deployWorker();
 				}
 				
