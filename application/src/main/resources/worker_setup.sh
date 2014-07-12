@@ -4,7 +4,7 @@ ln -s /home/ubuntu /home/pod
 
 LOG="/home/pod/setup.log"
 
-echo `date` "Setup started" >> $LOG
+echo `date` " - Worker setup started" >> $LOG
 
 #########################################################
 
@@ -20,7 +20,6 @@ echo "Core public DNS: $MANAGER_PUBLIC_DNS ; Worker Id: $WORKER_ID" >> $LOG
 # The repository URL
 REPO_URL=
 REPO_NAME=`echo $REPO_URL | cut -d'/' -f 5`
-WORKER_CODE_URL=https://github.com/gpuenteallott/pod
 
 # The key pair and security group assigned
 KEYPAIR=
@@ -37,11 +36,11 @@ echo "keypair=$KEYPAIR" >> /home/pod/server.properties
 
 ##########################################################
 
-echo "Updating dependencies" >> $LOG
+echo `date` " - Updating dependencies" >> $LOG
 
 sudo apt-get -y update
 
-echo "Installing Java, Ant and Unzip" >> $LOG
+echo `date` " - Installing Java, Ant and Unzip" >> $LOG
 
 sudo apt-get -y install openjdk-7-jre openjdk-7-jdk unzip 
 
@@ -49,27 +48,37 @@ sudo apt-get -y install openjdk-7-jre openjdk-7-jdk unzip
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre
 sudo update-java-alternatives -s java-1.7.0-openjdk-amd64
 
-echo "Getting the project $REPO_NAME" >> $LOG
-#
+echo `date` " - Getting the project $REPO_NAME" >> $LOG
+
+
 # Get the project
-#cd /home/pod
-#wget $REPO_URL/archive/master.zip
-#unzip master.zip
+cd ~
+wget $REPO_URL/archive/master.zip
+unzip master.zip
+
+# Build the project
+cd pod-master/application
+mvn clean install
+
+mv target/*.war /var/lib/tomcat7/webapps/ROOT.war
+
+mkdir ~/app
+sudo chgrp tomcat7 ~/app
+	
+sudo service tomcat7 start
+
+echo `date` " - Finishing installation" >> $LOG
+
+# Creating soft links to access easily the server logs from the home folder
+ln -s /var/lib/tomcat7/logs ~/server_logs
+
+cd ~
 #rm master.zip
-#mv $REPO_NAME-master $REPO_NAME
-#
-#echo "Getting the worker logic" >> $LOG
-#
-# Get the worker logic
-#wget $WORKER_CODE_URL/archive/master.zip
-#unzip master.zip
-#rm master.zip
-#mv kaerus-worker-master kaerus-worker
-#mkdir -p $REPO_NAME/src/com/kaerusproject/worker/
-#mv kaerus-worker/src/com/eclipsesource $REPO_NAME/src/com/
-#mv kaerus-worker/src/com/kaerusproject/worker/*.java $REPO_NAME/src/com/kaerusproject/worker/
-#rm -R kaerus-worker
-#
+#rm -R pod-master
+#rm pod.sql
+
+echo `date` " - Worker deployed" >> $LOG
+
 #echo "Building project" >> $LOG
 #
 # Build the project
