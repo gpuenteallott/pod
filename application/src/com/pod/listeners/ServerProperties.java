@@ -127,6 +127,15 @@ public class ServerProperties implements ServletContextListener {
 			// If this is a worker, read the property from the properties file
 			else {
 				managerDns = properties.getProperty("managerDns");
+				
+				// Obtain our own public IP address
+			    String s;
+			    URL u = new URL("http://bot.whatismyipaddress.com/");
+		    	BufferedReader in = new BufferedReader( new InputStreamReader(u.openStream()) );
+		    	while ((s = in.readLine()) != null) {
+		            dns = s;
+		        }
+		    	in.close();
 			
 				// We must contact the master here, so they know we've launched
 				// Send message to manager when done
@@ -136,6 +145,9 @@ public class ServerProperties implements ServletContextListener {
 				// The workerId is automatically added to the message
 				JsonObject message = new JsonObject();
 				message.add("action", Action.WORKER_DEPLOYED.getId() );
+				message.add("dns", dns);
+				
+				
 				
 				sender.setMessage(message);
 				sender.setDestinationIP( ServerProperties.getManagerDns() );

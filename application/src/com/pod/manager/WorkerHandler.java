@@ -15,6 +15,7 @@ import com.amazonaws.services.ec2.model.*;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.pod.dao.WorkerDAO;
+import com.pod.interaction.Action;
 import com.pod.listeners.ServerProperties;
 import com.pod.model.Worker;
 
@@ -184,6 +185,21 @@ public class WorkerHandler {
 		 return instanceId;
 	}
 
+	
+	public JsonObject workerDeployed (JsonObject json) {
+		
+		int workerId = json.get("workerId").asInt();
+		
+		Worker worker = new Worker();
+		worker.setId(workerId);
+		worker.setStatus("ready");
+		worker.setDns( json.get("dns").asString() );
+		
+		WorkerDAO wdao = new WorkerDAO();
+		wdao.update( worker );
+		
+		return new JsonObject().add("action", Action.ACK.getId());
+	}
 	
 	/** 
 	 * This method attempts to create a security group with the specified name 

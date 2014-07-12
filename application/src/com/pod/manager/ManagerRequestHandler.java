@@ -120,6 +120,12 @@ public class ManagerRequestHandler {
 			WorkerHandler h = new WorkerHandler();
 			return h.getWorkers();
 		}
+		
+		// A message from a worker informing that it is ready after deployment
+		else if ( action == Action.WORKER_DEPLOYED ) {
+			WorkerHandler h = new WorkerHandler();
+			return h.workerDeployed(json);
+		}
 	
 		return jsonResponse.add("error", "this manager doesn't recognize that request");
 	}
