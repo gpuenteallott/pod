@@ -55,6 +55,17 @@ echo `date` " - Installing Tomtat, Maven, Unzip and dos2unix" >> $LOG
 
 sudo apt-get -y install tomcat7 maven2 unzip dos2unix
 
+
+echo `date` " - Configuring Tomcat" >> $LOG
+
+# Remove the default Tomcat Webapp
+sudo service tomcat7 stop
+sudo rm -R /var/lib/tomcat7/webapps/ROOT
+
+# Make Tomcat listen in port 80
+sudo sed -i "s/#AUTHBIND=no/AUTHBIND=yes/g" /etc/default/tomcat7
+sudo sed -i "s/port=\"8080\"/port=\"80\"/g" /var/lib/tomcat7/conf/server.xml
+
 # Make sure Java 7 is being used
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre
 sudo update-java-alternatives -s java-1.7.0-openjdk-amd64

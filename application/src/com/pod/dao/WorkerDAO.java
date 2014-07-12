@@ -319,6 +319,7 @@ public class WorkerDAO {
 	
 	/**
 	 * Selects all the workers and puts them in an array
+	 * Doesn't retrieve workers with status terminated
 	 * @return
 	 */
 	public Worker[] list () {
@@ -332,7 +333,7 @@ public class WorkerDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "SELECT * FROM workers";
+			String searchQuery = "SELECT * FROM workers WHERE status != 'terminated'";
 			
 			statement = con.prepareStatement(searchQuery);
 			
