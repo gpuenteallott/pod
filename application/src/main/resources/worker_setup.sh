@@ -4,6 +4,7 @@ ln -s /home/ubuntu /home/pod
 
 LOG="/home/pod/setup.log"
 
+echo ''  >> $LOG
 echo `date` " - Worker setup started" >> $LOG
 
 #########################################################
@@ -15,7 +16,7 @@ WORKER_ID=
 #The identifier of the POD cloud
 NAME=
 
-echo "Core public DNS: $MANAGER_PUBLIC_DNS ; Worker Id: $WORKER_ID" >> $LOG
+echo "Core public DNS: $MANAGER_PUBLIC_DNS" >> $LOG
 
 # The repository URL
 REPO_URL=
@@ -24,6 +25,10 @@ REPO_NAME=`echo $REPO_URL | cut -d'/' -f 5`
 # The key pair and security group assigned
 KEYPAIR=
 SECURITY_GROUP=
+
+echo "Repo URL: $REPO_URL" >> $LOG
+echo "KEYPAIR: $KEYPAIR" >> $LOG
+echo "SECURITY_GROUP: $SECURITY_GROUP" >> $LOG
 
 ##########################################################
 
