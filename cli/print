@@ -18,7 +18,7 @@ Usage: pod <command> [parameters]
     - applyPolicy
     - deletePolicy
     - viewActivePolicy
-    - listPolicies
+    - getPolicies
     - resetPolicies
 
 To use, export the URL of the POD Manager using 
@@ -198,15 +198,28 @@ fi
 
 
 
-if [[ $1 == "listPolicies --help" ]]; then
+if [[ $1 == "getPolicies --help" ]]; then
 
   echo "
-POD listPolicies
+POD getPolicies
 
 Returns a list of all the policies in the system
 
 Example:
-    ./pod listPolicies
+    ./pod getPolicies
+
+"
+fi
+
+if [[ $1 == "getWorkers --help" ]]; then
+
+  echo "
+POD getWorkers
+
+Returns a list of all the workers in the system
+
+Example:
+    ./pod getWorkers
 
 "
 fi

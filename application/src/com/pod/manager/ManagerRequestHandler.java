@@ -104,15 +104,21 @@ public class ManagerRequestHandler {
 		}
 
 		// Request from client to list all policies
-		else if ( action == Action.LIST_POLICIES ) {
+		else if ( action == Action.GET_POLICIES ) {
 			PolicyHandler h = new PolicyHandler();
-			return h.listPolicies();
+			return h.getPolicies();
 		}
 		
 		// Request from client to view the info of the active policy
 		else if ( action == Action.VIEW_ACTIVE_POLICY ) {
 			PolicyHandler h = new PolicyHandler();
 			return h.viewActivePolicy();
+		}
+		
+		// Request from client to list all workers
+		else if ( action == Action.GET_WORKERS ) {
+			WorkerHandler h = new WorkerHandler();
+			return h.getWorkers();
 		}
 	
 		return jsonResponse.add("error", "this manager doesn't recognize that request");

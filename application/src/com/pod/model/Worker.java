@@ -1,5 +1,7 @@
 package com.pod.model;
 
+import com.eclipsesource.json.JsonObject;
+
 /**
  * Represents a worker object
  */
@@ -28,5 +30,13 @@ public class Worker implements java.io.Serializable {
 	}
 	public void setDns(String dns) {
 		this.dns = dns;
+	}
+	
+	public JsonObject toJsonObject() {
+		JsonObject json = new JsonObject();
+		json.add("id", id);
+		if ( status != null ) json.add("status", status);
+		if ( dns != null ) json.add("dns", dns);
+		return json;
 	}
 }

@@ -27,8 +27,6 @@ KEYPAIR=
 SECURITY_GROUP=
 
 echo "Repo URL: $REPO_URL" >> $LOG
-echo "KEYPAIR: $KEYPAIR" >> $LOG
-echo "SECURITY_GROUP: $SECURITY_GROUP" >> $LOG
 
 ##########################################################
 

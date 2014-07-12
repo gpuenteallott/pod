@@ -225,19 +225,36 @@ fi
 
 
 
-if [[ $1 == 'listPolicies' ]]; then
+if [[ $1 == 'getPolicies' ]]; then
 
 	if [[ $# == 1 ]] ; then
-		curl "$POD_URL/?action=listPolicies" | json_pp
+		curl "$POD_URL/?action=getPolicies" | json_pp
 		exit
 	fi
 	
 	if [[ $# == 2 ]] && [[ $2 == '--help' ]]; then
-		./print "listPolicies --help"
+		./print "getPolicies --help"
 		exit
 	else 
-		echo "Usage: pod listPolicies"
-		echo "Type pod listPolicies --help for more information"
+		echo "Usage: pod getPolicies"
+		echo "Type pod getPolicies --help for more information"
+		exit
+	fi
+fi
+
+if [[ $1 == 'getWorkers' ]]; then
+
+	if [[ $# == 1 ]] ; then
+		curl "$POD_URL/?action=getWorkers" | json_pp
+		exit
+	fi
+	
+	if [[ $# == 2 ]] && [[ $2 == '--help' ]]; then
+		./print "getWorkers --help"
+		exit
+	else 
+		echo "Usage: pod getWorkers"
+		echo "Type pod getWorkers --help for more information"
 		exit
 	fi
 fi

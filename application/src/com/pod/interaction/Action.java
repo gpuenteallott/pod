@@ -30,9 +30,11 @@ public enum Action {
 	APPLY_POLICY(32),
 	RESET_POLICIES(33),
 	VIEW_ACTIVE_POLICY(34),
-	LIST_POLICIES(35),
+	GET_POLICIES(35),
 	
-	WORKER_DEPLOYED(40); // sent from new deployed worker to manager
+	WORKER_DEPLOYED(40), // sent from new deployed worker to manager
+	
+	GET_WORKERS(50);
 	
 	
 	private int id;

@@ -265,11 +265,11 @@ public class HttpFrontServlet extends HttpServlet {
 		}
 		
 		// Requesting information from the active policy
-		else if ( action.equals("listPolicies") ) {
+		else if ( action.equals("getPolicies") ) {
 			
 			// Prepare json object to pass to the request handler
 			json = new JsonObject();
-			json.add("action", Action.LIST_POLICIES.getId());
+			json.add("action", Action.GET_POLICIES.getId());
 			
 			// Logging
 				System.out.println("Message log. From outside. action:"+action); System.out.println();
@@ -282,6 +282,18 @@ public class HttpFrontServlet extends HttpServlet {
 			// Prepare json object to pass to the request handler
 			json = new JsonObject();
 			json.add("action", Action.RESET_POLICIES.getId());
+			
+			// Logging
+				System.out.println("Message log. From outside. action:"+action); System.out.println();
+			// End logging
+		}
+		
+		// Obtain all workers
+		else if ( action.equals("getWorkers") ) {
+			
+			// Prepare json object to pass to the request handler
+			json = new JsonObject();
+			json.add("action", Action.GET_WORKERS.getId());
 			
 			// Logging
 				System.out.println("Message log. From outside. action:"+action); System.out.println();

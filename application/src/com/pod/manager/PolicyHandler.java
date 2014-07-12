@@ -129,7 +129,7 @@ public class PolicyHandler {
 	 * List all the policies in the system and return them in a Json array
 	 * @return
 	 */
-	public JsonObject listPolicies () {
+	public JsonObject getPolicies () {
 		
 		// Retrieve policies form database
 		PolicyDAO pdao = new PolicyDAO();
@@ -197,8 +197,8 @@ public class PolicyHandler {
 				
 				// If the current nº of workers is less than the minimum specified, deploy more
 				int minWorkers = Integer.parseInt( policy.getRules().get("minWorkers").asString() );
-				if ( wh.getNumWorkers() < minWorkers ) {
-					for ( int i = 0; i < minWorkers-wh.getNumWorkers(); i++ )
+				if ( wh.getTotalWorkers() < minWorkers ) {
+					for ( int i = 0; i < minWorkers-wh.getTotalWorkers(); i++ )
 						wh.deployWorker();
 				}
 				

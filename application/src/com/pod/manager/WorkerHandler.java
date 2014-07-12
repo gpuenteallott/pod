@@ -12,6 +12,8 @@ import com.amazonaws.auth.ClasspathPropertiesFileCredentialsProvider;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.*;
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
 import com.pod.dao.WorkerDAO;
 import com.pod.listeners.ServerProperties;
 import com.pod.model.Worker;
@@ -21,7 +23,7 @@ import com.pod.model.Worker;
  */
 public class WorkerHandler {
 
-	private static int numWorkers;
+	private static int deployedWorkers;
 	private static int pendingWorkers;
 	
 	private static boolean securityGroupCreated;
@@ -32,11 +34,31 @@ public class WorkerHandler {
 	public WorkerHandler(){
 	}
 	
-	public int getNumWorkers() {
-		return numWorkers + pendingWorkers;
+	public int getTotalWorkers() {
+		return deployedWorkers + pendingWorkers;
 	}
-	public int getNumWorkersStrict() {
-		return numWorkers;
+	public int getDeployedWorkers() {
+		return deployedWorkers;
+	}
+	public int getPendingWorkers() {
+		return pendingWorkers;
+	}
+
+	
+	public JsonObject getWorkers() {
+		
+		JsonObject response = new JsonObject();
+		
+		response.add("deployedWorkers", getDeployedWorkers() );
+		response.add("pendingWorkers", getPendingWorkers());
+		response.add("totalWorkers", getTotalWorkers());
+		
+		JsonArray workersJson = new JsonArray();
+		for ( Worker w : new WorkerDAO().list() ) {
+			workersJson.add(w.toJsonObject());
+		}
+		
+		return response.add("workers", workersJson);
 	}
 	
 	public boolean deployWorker(){
