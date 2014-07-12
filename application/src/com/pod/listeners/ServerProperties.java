@@ -92,9 +92,10 @@ public class ServerProperties implements ServletContextListener {
 			repoURL = properties.getProperty("repoURL");
 			ami = properties.getProperty("ami");
 			instanceType = properties.getProperty("instanceType");
-	
 			
 			if ( role.equals("manager") ) {
+				
+				logger.info("Performing Manager setup");
 				
 				// If this is the manager, we put ourself in the workers list
 				Worker worker = new Worker();
@@ -122,6 +123,9 @@ public class ServerProperties implements ServletContextListener {
 			}
 			// If this is a worker, read the property from the properties file
 			else {
+				
+				logger.info("Performing Worker setup");
+				
 				managerDns = properties.getProperty("managerDns");
 				
 				// Obtain our own public IP address

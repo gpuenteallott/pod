@@ -42,7 +42,7 @@ public class HttpSender {
 		
 		// Logging
 			int i = (int)(Math.random() * 1000);
-			logger.info("Message log. Id "+i+". To "+destinationRole+" ("+destinationIP+")");
+			logger.info("Message log. Id "+i+". To "+destinationRole+" ("+destinationIP+"/"+destinationRole+")");
 			logger.info("Req ("+i+"): "+message);
 		// End logging
 		
