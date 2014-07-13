@@ -288,12 +288,25 @@ public class HttpFrontServlet extends HttpServlet {
 			// End logging
 		}
 		
-		// Obtain all workers
+		// Request by client to obtain all workers
 		else if ( action.equals("getWorkers") ) {
 			
 			// Prepare json object to pass to the request handler
 			json = new JsonObject();
 			json.add("action", Action.GET_WORKERS.getId());
+			
+			// Logging
+				System.out.println("Message log. From outside. action:"+action); System.out.println();
+			// End logging
+		}
+		
+		// Request by client to obtain the server logs
+		else if ( action.equals("logs") ) {
+			
+			// Prepare json object to pass to the request handler
+			json = new JsonObject();
+			json.add("action", Action.GET_LOGS.getId());
+			json.add("type", request.getParameter("type"));
 			
 			// Logging
 				System.out.println("Message log. From outside. action:"+action); System.out.println();

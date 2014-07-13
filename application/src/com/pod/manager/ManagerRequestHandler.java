@@ -1,5 +1,14 @@
 package com.pod.manager;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.pod.interaction.Action;
 
@@ -126,7 +135,78 @@ public class ManagerRequestHandler {
 			WorkerHandler h = new WorkerHandler();
 			return h.workerDeployed(json);
 		}
+		
+		// A message from client requesting logs
+		else if ( action == Action.GET_LOGS ) {
+			return readLog(json);
+		}
 	
 		return jsonResponse.add("error", "this manager doesn't recognize that request");
+	}
+	
+	
+	public JsonObject readLog (JsonObject json) {
+		
+		JsonObject response = new JsonObject();
+		JsonArray logJson = new JsonArray();
+		
+		String filename = "";
+		String type = json.get("type").asString();
+		if ( "setup".equals(type) )
+			filename = "/home/pod/setup.log";
+		else if ( "properties".equals(type) )
+			filename = "/home/pod/server.properties";
+		else if ( "server".equals(type) )
+			filename = "/var/lib/tomcat7/logs/catalina.out";
+		
+		response.add("filename", filename);
+		
+		 try{
+			 
+			 int count = countLines(filename);
+			 
+			  // Open the file that is the first 
+			  // command line parameter
+			  FileInputStream fstream = new FileInputStream(filename);
+			  // Get the object of DataInputStream
+			  DataInputStream in = new DataInputStream(fstream);
+			  BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			  String strLine;
+			  //Read File Line By Line
+			  int line = 0;
+			  while ((strLine = br.readLine()) != null)   {
+				  if ( line > count - 20 )
+					  logJson.add(strLine);
+				  line++;
+			  }
+			  //Close the input stream
+			  in.close();
+		}catch (Exception e){//Catch exception if any
+			  System.err.println("Error: " + e.getMessage());
+		}
+		 
+		 return response.add("contents", logJson);
+	}
+
+
+	public static int countLines(String filename) throws IOException {
+	    InputStream is = new BufferedInputStream(new FileInputStream(filename));
+	    try {
+	        byte[] c = new byte[1024];
+	        int count = 0;
+	        int readChars = 0;
+	        boolean empty = true;
+	        while ((readChars = is.read(c)) != -1) {
+	            empty = false;
+	            for (int i = 0; i < readChars; ++i) {
+	                if (c[i] == '\n') {
+	                    ++count;
+	                }
+	            }
+	        }
+	        return (count == 0 && !empty) ? 1 : count;
+	    } finally {
+	        is.close();
+	    }
 	}
 }

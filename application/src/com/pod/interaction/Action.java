@@ -34,7 +34,9 @@ public enum Action {
 	
 	WORKER_DEPLOYED(40), // sent from new deployed worker to manager
 	
-	GET_WORKERS(50);
+	GET_WORKERS(50),
+	
+	GET_LOGS(60);
 	
 	
 	private int id;

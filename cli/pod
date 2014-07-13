@@ -259,6 +259,22 @@ if [[ $1 == 'getWorkers' ]]; then
 	fi
 fi
 
+if [[ $1 == 'logs' ]]; then
+
+	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
+		curl "$POD_URL/?action=logs&name=$2" | json_pp
+		exit
+	fi
+	
+	if [[ $2 == '--help' ]]; then
+		./print "logs type --help"
+		exit
+	else 
+		echo "Usage: pod logs type"
+		echo "Type pod logs --help for more information"
+		exit
+	fi
+fi
 
 echo "Unknown command. Use --help to get indications"
 exit

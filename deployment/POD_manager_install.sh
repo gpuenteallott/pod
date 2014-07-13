@@ -18,6 +18,7 @@ LOG="/home/pod/setup.log"
 touch $LOG
 chown ubuntu $LOG
 echo `date` " - Server launched" >> $LOG
+HOME=/home/pod
 
 # Name for the resources
 NAME="POD"
@@ -76,7 +77,7 @@ sudo update-java-alternatives -s java-1.7.0-openjdk-amd64
 echo `date` " - Setting up project" >> $LOG
 
 # Get the project
-cd ~
+cd $HOME
 wget https://github.com/gpuenteallott/pod/archive/master.zip
 unzip master.zip
 
@@ -86,8 +87,8 @@ mvn clean install
 
 mv target/*.war /var/lib/tomcat7/webapps/ROOT.war
 
-mkdir ~/app
-sudo chgrp tomcat7 ~/app
+mkdir $HOME/app
+sudo chgrp tomcat7 $HOME/app
 
 # Retrieve the IP addresses of the server and other information useful inside the cloud
 if [ -n $CLOUD ]; then
@@ -103,7 +104,7 @@ sudo service tomcat7 start
 echo `date` " - Importing database" >> $LOG
 
 # Import database schema
-cd ~
+cd $HOME
 mv pod-master/application/database/*.sql pod.sql
 mysql -u root --password=kaerus_123 -h localhost < pod.sql
 
@@ -134,7 +135,7 @@ echo `date` " - Finishing installation" >> $LOG
 # Creating soft links to access easily the server logs from the home folder
 ln -s /var/lib/tomcat7/logs ~/server_logs
 
-cd ~
+cd $HOME
 #rm master.zip
 #rm -R pod-master
 #rm pod.sql
