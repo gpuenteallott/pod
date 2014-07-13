@@ -150,14 +150,18 @@ public class ManagerRequestHandler {
 		JsonObject response = new JsonObject();
 		JsonArray logJson = new JsonArray();
 		
+		int linesToShow = 20;
+		
 		String filename = "";
 		String type = json.get("type").asString();
 		if ( "setup".equals(type) )
 			filename = "/home/pod/setup.log";
 		else if ( "properties".equals(type) )
 			filename = "/home/pod/server.properties";
-		else if ( "server".equals(type) )
+		else if ( "server".equals(type) ) {
 			filename = "/var/lib/tomcat7/logs/catalina.out";
+			linesToShow = 60;
+		}
 		
 		response.add("filename", filename);
 		
@@ -175,7 +179,7 @@ public class ManagerRequestHandler {
 			  //Read File Line By Line
 			  int line = 0;
 			  while ((strLine = br.readLine()) != null)   {
-				  if ( line > count - 20 )
+				  if ( line > count - linesToShow )
 					  logJson.add(strLine);
 				  line++;
 			  }

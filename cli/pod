@@ -262,7 +262,7 @@ fi
 if [[ $1 == 'logs' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD_URL/?action=logs&name=$2" | json_pp
+		curl "$POD_URL/?action=logs&type=$2" | json_pp
 		exit
 	fi
 	
