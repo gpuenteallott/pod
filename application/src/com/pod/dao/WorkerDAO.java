@@ -45,11 +45,14 @@ public class WorkerDAO {
 		try {
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "INSERT INTO workers ( status , dns ) VALUES ( ? , ? )";
+			String searchQuery = "INSERT INTO workers ( status , local_ip, public_ip, instance_id, is_manager ) VALUES ( ?,?,?,?,? )";
 			
 			statement = con.prepareStatement(searchQuery, Statement.RETURN_GENERATED_KEYS);
 			statement.setString(1, worker.getStatus() );
-			statement.setString(2, worker.getDns() );
+			statement.setString(2, worker.getLocalIp() );
+			statement.setString(3, worker.getPublicIp() );
+			statement.setString(4, worker.getInstanceId() );
+			statement.setBoolean(5, worker.isManager() );
 			
 			statement.executeUpdate();
 			
@@ -101,12 +104,15 @@ public class WorkerDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "UPDATE workers SET status=?, dns=? WHERE id = ?";
+			String searchQuery = "UPDATE workers SET status=?, local_ip=?, public_ip=?, instance_id=?, is_manager=? WHERE id = ?";
 			
 			statement = con.prepareStatement(searchQuery);
 			statement.setString(1, worker.getStatus() );
-			statement.setString(2, worker.getDns() );
-			statement.setInt(3, worker.getId() );
+			statement.setString(2, worker.getLocalIp() );
+			statement.setString(3, worker.getPublicIp() );
+			statement.setString(4, worker.getInstanceId() );
+			statement.setBoolean(5, worker.isManager() );
+			statement.setInt(6, worker.getId() );
 
 			int rows = statement.executeUpdate();
 			
@@ -217,7 +223,10 @@ public class WorkerDAO {
 				worker = new Worker();
 				worker.setId( id );
 				worker.setStatus( rs.getString("status") );
-				worker.setDns( rs.getString("dns") );
+				worker.setLocalIp( rs.getString("local_ip") );
+				worker.setPublicIp( rs.getString("public_ip") );
+				worker.setInstanceId( rs.getString("instance_id") );
+				worker.setManager( rs.getBoolean("is_manager") );
 				break;
 				
 			}
@@ -281,7 +290,10 @@ public class WorkerDAO {
 				worker = new Worker();
 				worker.setId( rs.getInt("id") );
 				worker.setStatus( rs.getString("status") );
-				worker.setDns( rs.getString("dns") );
+				worker.setLocalIp( rs.getString("local_ip") );
+				worker.setPublicIp( rs.getString("public_ip") );
+				worker.setInstanceId( rs.getString("instance_id") );
+				worker.setManager( rs.getBoolean("is_manager") );
 				break;
 				
 			}
@@ -344,7 +356,10 @@ public class WorkerDAO {
 				Worker worker = new Worker();
 				worker.setId( rs.getInt("id") );
 				worker.setStatus( rs.getString("status") );
-				worker.setDns( rs.getString("dns") );
+				worker.setLocalIp( rs.getString("local_ip") );
+				worker.setPublicIp( rs.getString("public_ip") );
+				worker.setInstanceId( rs.getString("instance_id") );
+				worker.setManager( rs.getBoolean("is_manager") );
 				workers.add(worker);
 			}
 			
@@ -453,7 +468,7 @@ public class WorkerDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "SELECT workers.id, workers.status, workers.dns FROM workers, installations WHERE workers.id = installations.workerId AND installations.activityId = ?";
+			String searchQuery = "SELECT workers.id, workers.status, workers.local_ip, workers.public_ip, workers.instance_id, workers.is_manager FROM workers, installations WHERE workers.id = installations.workerId AND installations.activityId = ?";
 			
 			statement = con.prepareStatement(searchQuery);
 			statement.setInt(1, activityId );
@@ -465,7 +480,10 @@ public class WorkerDAO {
 				Worker worker = new Worker();
 				worker.setId( rs.getInt("id") );
 				worker.setStatus( rs.getString("status") );
-				worker.setDns( rs.getString("dns") );
+				worker.setLocalIp( rs.getString("local_ip") );
+				worker.setPublicIp( rs.getString("public_ip") );
+				worker.setInstanceId( rs.getString("instance_id") );
+				worker.setManager( rs.getBoolean("is_manager") );
 				workers.add(worker);
 			}
 			
@@ -517,7 +535,7 @@ public class WorkerDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "SELECT workers.id, workers.status, workers.dns FROM workers, installations, activities WHERE workers.id = installations.workerId AND installations.activityId = activities.id AND activities.name = ?";
+			String searchQuery = "SELECT workers.id, workers.status, workers.local_ip, workers.public_ip, workers.instance_id, workers.is_manager FROM workers, installations, activities WHERE workers.id = installations.workerId AND installations.activityId = activities.id AND activities.name = ?";
 			
 			statement = con.prepareStatement(searchQuery);
 			statement.setString(1, activityName );
@@ -529,7 +547,10 @@ public class WorkerDAO {
 				Worker worker = new Worker();
 				worker.setId( rs.getInt("id") );
 				worker.setStatus( rs.getString("status") );
-				worker.setDns( rs.getString("dns") );
+				worker.setLocalIp( rs.getString("local_ip") );
+				worker.setPublicIp( rs.getString("public_ip") );
+				worker.setInstanceId( rs.getString("instance_id") );
+				worker.setManager( rs.getBoolean("is_manager") );
 				workers.add(worker);
 			}
 			
@@ -591,7 +612,10 @@ public class WorkerDAO {
 				Worker worker = new Worker();
 				worker.setId( rs.getInt("id") );
 				worker.setStatus( rs.getString("status") );
-				worker.setDns( rs.getString("dns") );
+				worker.setLocalIp( rs.getString("local_ip") );
+				worker.setPublicIp( rs.getString("public_ip") );
+				worker.setInstanceId( rs.getString("instance_id") );
+				worker.setManager( rs.getBoolean("is_manager") );
 				workers.add(worker);
 			}
 			
@@ -643,7 +667,7 @@ public class WorkerDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "SELECT workers.id, workers.status, workers.dns FROM workers, installations "
+			String searchQuery = "SELECT workers.id, workers.status, workers.local_ip, workers.public_ip, workers.instance_id, workers.is_manager FROM workers, installations "
 					+ "WHERE workers.id = installations.workerId AND installations.activityId = ? "
 					+ "AND installations.status = 'installed'"
 					+ "AND workers.status = ?";
@@ -659,7 +683,10 @@ public class WorkerDAO {
 				worker = new Worker();
 				worker.setId( rs.getInt("id") );
 				worker.setStatus( rs.getString("status") );
-				worker.setDns( rs.getString("dns") );
+				worker.setLocalIp( rs.getString("local_ip") );
+				worker.setPublicIp( rs.getString("public_ip") );
+				worker.setInstanceId( rs.getString("instance_id") );
+				worker.setManager( rs.getBoolean("is_manager") );
 			}
 			
 		} catch (SQLException e) {

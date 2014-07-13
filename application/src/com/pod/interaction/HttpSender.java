@@ -48,8 +48,8 @@ public class HttpSender {
 		
 		String response = null;
 		
-		// If there is no destination, send to this same machine
-		if ( destinationIP.equals("") )
+		// If the destination is this same machine
+		if ( destinationIP.equals( ServerProperties.getLocalIp() ) )
 			response = sendToMyself();
 		
 		// Or send to a remote worker

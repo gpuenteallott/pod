@@ -103,7 +103,7 @@ public class ExecutionHandler {
 			
 			// Set the public DNS of the worker. If empty, it will mean this same machine
 			HttpSender sender = new HttpSender();
-			sender.setDestinationIP( worker.getDns() );
+			sender.setDestinationIP( worker.getLocalIp() );
 			sender.setDestinationRole("worker");
 			sender.setMessage(message);
 			
@@ -122,7 +122,7 @@ public class ExecutionHandler {
 				
 				// We put the execution in the execution map including the workerIP
 				ExecutionMap map = new ExecutionMap();
-				execution.setWorkerIP( worker.getDns() );
+				execution.setWorkerIP( worker.getLocalIp() );
 				map.put(execution);
 				
 			}
@@ -306,7 +306,7 @@ public class ExecutionHandler {
 			// This is necessary in order to allow clients to terminate executions
 			WorkerDAO wdao = new WorkerDAO();
 			Worker worker = wdao.select( workerId );
-			map.setWorkerIP(newExecution.getId(), worker.getDns());
+			map.setWorkerIP(newExecution.getId(), worker.getLocalIp());
 			
 			// Update execution info
 			newExecution.setStatus("in progress");

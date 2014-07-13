@@ -26,12 +26,14 @@ DEFAULT CHARACTER SET = utf8;
 CREATE  TABLE IF NOT EXISTS `pod`.`workers` (
   `id` INT(11) NOT NULL AUTO_INCREMENT ,
   `status` VARCHAR(45) NULL DEFAULT NULL ,
-  `dns` VARCHAR(45) NULL DEFAULT NULL ,
+  `public_ip` VARCHAR(45) NULL DEFAULT NULL ,
+  `local_ip` VARCHAR(45) NULL DEFAULT NULL ,
+  `instance_id` VARCHAR(45) NULL DEFAULT NULL ,
+  `is_manager` INT(1) NOT NULL DEFAULT 0 ,
   PRIMARY KEY (`id`) )
 ENGINE = InnoDB
 AUTO_INCREMENT = 433
 DEFAULT CHARACTER SET = utf8;
-
 
 -- -----------------------------------------------------
 -- Table `pod`.`installations`

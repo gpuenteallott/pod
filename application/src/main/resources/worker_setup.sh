@@ -10,13 +10,13 @@ echo `date` " - Worker setup started" >> $LOG
 #########################################################
 
 # The core public dns will be dynamically added before passing the script to the worker
-MANAGER_PUBLIC_DNS=
+MANAGER_LOCAL_IP=
 # The worker id. Also dynamically set
 WORKER_ID=
 #The identifier of the POD cloud
 NAME=
 
-echo "Core public DNS: $MANAGER_PUBLIC_DNS" >> $LOG
+echo "Core Local IP: $MANAGER_LOCAL_IP" >> $LOG
 
 # The repository URL
 REPO_URL=
@@ -28,14 +28,21 @@ SECURITY_GROUP=
 
 echo "Repo URL: $REPO_URL" >> $LOG
 
+EC2_INSTANCE_ID=$(ec2metadata --instance-id)
+LOCAL_IP=$(ec2metadata --local-ipv4)
+PUBLIC_IP=$(ec2metadata --public-ipv4)
+
 ##########################################################
 
 echo "name=$NAME" >> /home/pod/server.properties
-echo "managerDns=$MANAGER_PUBLIC_DNS" >> /home/pod/server.properties
+echo "managerLocalIp=$MANAGER_LOCAL_IP" >> /home/pod/server.properties
 echo "workerId=$WORKER_ID" >> /home/pod/server.properties
 echo "role=worker" >> /home/pod/server.properties
 echo "securityGroup=$SECURITY_GROUP" >> /home/pod/server.properties
 echo "keypair=$KEYPAIR" >> /home/pod/server.properties
+echo "instanceId=$EC2_INSTANCE_ID" >> /home/pod/server.properties
+echo "localIp=$LOCAL_IP" >> /home/pod/server.properties
+echo "publicIp=$PUBLIC_IP" >> /home/pod/server.properties
 
 ##########################################################
 

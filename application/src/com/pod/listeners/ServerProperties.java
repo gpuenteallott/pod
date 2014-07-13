@@ -36,7 +36,7 @@ public class ServerProperties implements ServletContextListener {
 	Logger logger = Logger.getLogger(ServerProperties.class.getName());
 	
 	// This is the default location for the server properties, except in the case of the manager
-	private static final String PROPERTIES_FILE_PATH = "/home/user/server.properties";
+	private static final String PROPERTIES_FILE_PATH = "/home/pod/server.properties";
 	
 	private static final String IPADDRESS_PATTERN = 
 			"^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
@@ -50,10 +50,13 @@ public class ServerProperties implements ServletContextListener {
 	private static String securityGroup;
 	private static String keypair;
 	private static int workerId;
-	private static String managerDns;
+	private static String managerLocalIp;
 	private static String repoURL;
 	private static String ami;
 	private static String instanceType;
+	private static String localIp;
+	private static String publicIp;
+	private static String instanceId;
 	
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
@@ -73,14 +76,14 @@ public class ServerProperties implements ServletContextListener {
 		new ActivityDAO().deleteAll();
 		new PolicyDAO().deleteAll();
 		// Reset the app directory
-		File appDirectory = new File ("/home/user/app");
+		File appDirectory = new File ("/home/pod/app");
 		deleteContents(appDirectory);
 		
 		// Load properties
 		try {
 			// Load the file in the usual path of the file in the project (case of the manager)
 			File serverProperties = new File(PROPERTIES_FILE_PATH);
-			InputStream is = serverProperties.exists() ? new FileInputStream(serverProperties) : getClass().getResourceAsStream("/main/resources/server.properties");
+			InputStream is = new FileInputStream(serverProperties);
 			
 			Properties properties = new Properties();
 			properties.load(is);
@@ -92,6 +95,9 @@ public class ServerProperties implements ServletContextListener {
 			repoURL = properties.getProperty("repoURL");
 			ami = properties.getProperty("ami");
 			instanceType = properties.getProperty("instanceType");
+			localIp = properties.getProperty("localIp");
+			publicIp = properties.getProperty("publicIp");
+			instanceId = properties.getProperty("instanceId");
 			
 			if ( role.equals("manager") ) {
 				
@@ -99,14 +105,16 @@ public class ServerProperties implements ServletContextListener {
 				
 				// If this is the manager, we put ourself in the workers list
 				Worker worker = new Worker();
-				worker.setDns("");
+				worker.setLocalIp(localIp);
+				worker.setPublicIp(publicIp);
+				worker.setInstanceId(instanceId);
+				worker.setManager(true);
 				worker.setStatus("ready");
 				
 				WorkerDAO wdao = new WorkerDAO();
 				workerId = wdao.insert(worker);
 				
-				// Also, if this is the manager, put the masterDns value to "", so the Sender class detects it
-				managerDns = "";
+				managerLocalIp = localIp;
 				
 				// Obtain our own public IP address
 			    String s;
@@ -126,16 +134,8 @@ public class ServerProperties implements ServletContextListener {
 				
 				logger.info("Performing Worker setup");
 				
-				managerDns = properties.getProperty("managerDns");
-				
-				// Obtain our own public IP address
-			    String s;
-			    URL u = new URL("http://bot.whatismyipaddress.com/");
-		    	BufferedReader in = new BufferedReader( new InputStreamReader(u.openStream()) );
-		    	while ((s = in.readLine()) != null) {
-		            dns = s;
-		        }
-		    	in.close();
+				managerLocalIp = properties.getProperty("managerLocalIp");
+	
 			
 				// We must contact the master here, so they know we've launched
 				// Send message to manager when done
@@ -145,11 +145,13 @@ public class ServerProperties implements ServletContextListener {
 				// The workerId is automatically added to the message
 				JsonObject message = new JsonObject();
 				message.add("action", Action.WORKER_DEPLOYED.getId() );
-				message.add("dns", dns);
+				message.add("localIp", localIp);
+				message.add("publicIp", publicIp);
+				message.add("instanceId", instanceId);
 				
 
 				sender.setMessage(message);
-				sender.setDestinationIP( ServerProperties.getManagerDns() );
+				sender.setDestinationIP( ServerProperties.getManagerLocalIp() );
 				sender.setDestinationRole("manager");
 				String response = "";
 				try {
@@ -201,12 +203,12 @@ public class ServerProperties implements ServletContextListener {
 		ServerProperties.workerId = workerId;
 	}
 
-	public static String getManagerDns() {
-		return managerDns;
+	public static String getManagerLocalIp() {
+		return managerLocalIp;
 	}
 
-	public static void setManagerDns(String masterDns) {
-		ServerProperties.managerDns = masterDns;
+	public static void setManagerLocalIp(String managerLocalIp) {
+		ServerProperties.managerLocalIp = managerLocalIp;
 	}
 	
 	public static String getKeypair(){
@@ -225,6 +227,15 @@ public class ServerProperties implements ServletContextListener {
 	}
 	public static String getInstanceType(){
 		return instanceType;
+	}
+	public static String getLocalIp(){
+		return localIp;
+	}
+	public static String getPublicIp(){
+		return publicIp;
+	}
+	public static String getInstanceId(){
+		return instanceId;
 	}
 	
 

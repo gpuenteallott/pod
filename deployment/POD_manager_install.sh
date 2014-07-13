@@ -37,6 +37,8 @@ RANDOM_TAG_VALUE=
 # This flag is used to identify the keypair name, so in the future all workers will be launched using it
 KEYPAIR=
 
+SECURITY_GROUP=
+
 echo `date` " - Updating dependencies" >> $LOG >> $LOG
 
 sudo apt-get -y update
@@ -128,6 +130,27 @@ sed -i "s/########/\//g" AwsCredentials.properties
 chown tomcat7 AwsCredentials.properties
 chgrp tomcat7 AwsCredentials.properties
 chmod 600 AwsCredentials.properties
+
+
+EC2_INSTANCE_ID=$(ec2metadata --instance-id)
+LOCAL_IP=$(ec2metadata --local-ipv4)
+PUBLIC_IP=$(ec2metadata --public-ipv4)
+AMI="ami-0b9c9f62"
+
+##########################################################
+
+echo "name=$NAME" >> /home/pod/server.properties
+echo "role=manager" >> /home/pod/server.properties
+echo "securityGroup=$SECURITY_GROUP" >> /home/pod/server.properties
+echo "keypair=$KEYPAIR" >> /home/pod/server.properties
+echo "instanceId=$EC2_INSTANCE_ID" >> /home/pod/server.properties
+echo "localIp=$LOCAL_IP" >> /home/pod/server.properties
+echo "publicIp=$PUBLIC_IP" >> /home/pod/server.properties
+echo "ami=$AMI" >> /home/pod/server.properties
+echo "instance_type=t1.micro" >> /home/pod/server.properties
+
+
+##########################################################
 
 
 echo `date` " - Finishing installation" >> $LOG

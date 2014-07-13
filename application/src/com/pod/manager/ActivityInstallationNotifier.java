@@ -60,7 +60,7 @@ public class ActivityInstallationNotifier implements Runnable {
 			
 			// Set the public DNS of the worker. If empty, it will mean this same machine
 			HttpSender sender = new HttpSender();
-			sender.setDestinationIP( worker.getDns() );
+			sender.setDestinationIP( worker.getLocalIp() );
 			sender.setDestinationRole("worker");
 			sender.setMessage(message);
 			
