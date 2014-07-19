@@ -137,7 +137,7 @@ public class ServerProperties implements ServletContextListener {
 				logger.info("Performing Worker setup");
 				
 				managerLocalIp = properties.getProperty("managerLocalIp");
-	
+				workerId = Integer.parseInt( properties.getProperty("workerId") );
 			
 				// We must contact the master here, so they know we've launched
 				// Send message to manager when done

@@ -57,9 +57,17 @@ public class HttpManagerServlet extends HttpServlet {
 			return;
 		}
 		
+		// Logging
+		System.out.println("Message log. For Manager. "+jsonRaw); System.out.println();
+		// End logging
+		
 		// Create worker instance and attend request internally
 		ManagerRequestHandler worker = new ManagerRequestHandler();
 		JsonObject jsonResponse = worker.doManagerRequest(JsonObject.readFrom( jsonRaw ));
+		
+		// Logging
+		System.out.println("Message log. Response from Manager. "+jsonResponse); System.out.println();
+		// End logging
 		
 		// Send response
 		PrintWriter out = response.getWriter();
