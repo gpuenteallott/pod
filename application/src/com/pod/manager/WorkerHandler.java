@@ -147,7 +147,7 @@ public class WorkerHandler {
 
 		// Set variables for the worker setup script
 		userData = userData.replace("NAME=", "NAME="+ServerProperties.getName())
-						   .replace("MANAGER_PUBLIC_IP=", "MANAGER_PUBLIC_IP="+ServerProperties.getDns())
+						   .replace("MANAGER_LOCAL_IP=", "MANAGER_LOCAL_IP="+ServerProperties.getManagerLocalIp())
 						   .replace("WORKER_ID=", "WORKER_ID=" + workerId)
 		                   .replace("REPO_URL=", "REPO_URL="+ServerProperties.getRepoURL())
 		                   .replace("KEYPAIR=", "KEYPAIR="+ServerProperties.getKeypair())
