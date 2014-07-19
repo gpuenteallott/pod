@@ -28,7 +28,7 @@ fi
 if [[ $1 == 'newExecution' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD/?action=newExecution&name=$2" | json_pp
+		curl "$POD/?action=newExecution&name=$2"
 		exit
 	fi
 	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]] ; then

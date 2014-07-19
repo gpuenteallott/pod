@@ -94,6 +94,10 @@ public class ActivityHandler {
 	 */
 	public int getMeanTime ( int activityId ) {
 		
+		// If not defined, create a new register for it
+		if ( executionTimes.get(activityId) == null )
+			newActivityTimeRegister(activityId);
+		
 		// Prepare an array to dump the contents of the queue
 		// Algorithm speaking, there might be faster methods
 		Integer [] times = new Integer [NUMBER_OF_TIME_SAMPLES];

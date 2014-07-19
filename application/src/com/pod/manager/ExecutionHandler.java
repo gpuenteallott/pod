@@ -399,8 +399,6 @@ public class ExecutionHandler {
 			time += expectedTime > 0 ? expectedTime : time; // don't change the time variable if the expected time results negative
 		}
 		
-		System.out.println("executions in progress "+executionsInProgress.length);
-		
 		// Retrieve all executions from the queue
 		ExecutionWaitingQueue queue = new ExecutionWaitingQueue();
 		List<Execution> pendingExecutions = queue.getAll();
