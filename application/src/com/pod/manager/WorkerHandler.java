@@ -195,8 +195,8 @@ public class WorkerHandler {
 		worker.setId(workerId);
 		worker.setStatus("ready");
 		worker.setLocalIp( json.get("localIp").asString() );
-		worker.setLocalIp( json.get("publicIp").asString() );
-		worker.setLocalIp( json.get("instanceId").asString() );
+		worker.setPublicIp( json.get("publicIp").asString() );
+		worker.setInstanceId( json.get("instanceId").asString() );
 		
 		WorkerDAO wdao = new WorkerDAO();
 		wdao.update( worker );
