@@ -21,6 +21,7 @@ public class ActivityInstallationNotifier implements Runnable {
 
 	private Activity activity;
 	private Action action;   //installActivity or uninstallActivity
+	private Worker specificWorker; // A specific worker to notify (for instance, a just deployed one)
 	
 	public ActivityInstallationNotifier ( Activity activity , Action action ) {
 		this.activity = activity;
@@ -32,13 +33,24 @@ public class ActivityInstallationNotifier implements Runnable {
 	public void setActivity(Activity activity) {
 		this.activity = activity;
 	}
+	public ActivityInstallationNotifier setSpecificWorker(Worker worker) {
+		this.specificWorker = worker;
+		return this;
+	}
 	
 	@Override
 	public void run() {
 
-		// Retrieve all workers
+		Worker[] workers;
 		WorkerDAO wdao = new WorkerDAO();
-		Worker[] workers = wdao.list();
+		
+		if ( specificWorker != null ) {
+			workers = new Worker[] { specificWorker };
+		}
+		else {
+			// Retrieve all workers
+			workers = wdao.list();
+		}
 		
 		// Prepare message
 		JsonObject message = new JsonObject();

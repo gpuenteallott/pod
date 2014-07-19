@@ -224,7 +224,7 @@ public class ExecutionHandler {
 			JsonObject responseJson = JsonObject.readFrom(response);
 			execution.setStdout( responseJson.get("execution").asObject().get("stdout").asString() );
 			execution.setStderr( responseJson.get("execution").asObject().get("stderr").asString() );
-			return execution.toJsonObject();
+			return new JsonObject().add("execution", execution.toJsonObject() );
 		}
 		
 		// Otherwise, we just get it

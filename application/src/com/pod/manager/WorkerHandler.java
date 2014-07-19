@@ -14,9 +14,11 @@ import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.*;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
+import com.pod.dao.ActivityDAO;
 import com.pod.dao.WorkerDAO;
 import com.pod.interaction.Action;
 import com.pod.listeners.ServerProperties;
+import com.pod.model.Activity;
 import com.pod.model.Worker;
 
 /**
@@ -200,6 +202,12 @@ public class WorkerHandler {
 		
 		WorkerDAO wdao = new WorkerDAO();
 		wdao.update( worker );
+		
+		// Now that the manager knows that the worker exists, we must notify the installations to the worker
+		// Right now, we send one message per activity to the worker
+		ActivityDAO adao = new ActivityDAO();
+		for ( Activity activity : adao.list() )
+			new Thread ( new ActivityInstallationNotifier(activity, Action.INSTALL_ACTIVITY ).setSpecificWorker(worker) ).start();
 		
 		return new JsonObject().add("action", Action.ACK.getId());
 	}
