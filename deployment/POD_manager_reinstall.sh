@@ -97,7 +97,9 @@ do
 done
 
 # Restore credentials and name file
-mkdir -p /var/lib/tomcat7/webapps/ROOT/WEB-INF/classes/main/resources
+if [ ! -d /var/lib/tomcat7/webapps/ROOT/WEB-INF/classes/main/resources ]; then
+	mkdir -p /var/lib/tomcat7/webapps/ROOT/WEB-INF/classes/main/resources
+fi
 sudo mv ~/AwsCredentials.properties.tmp /var/lib/tomcat7/webapps/ROOT/WEB-INF/classes/main/resources/AwsCredentials.properties
 
 # Clean up

@@ -16,8 +16,6 @@ WORKER_ID=
 #The identifier of the POD cloud
 NAME=
 
-echo "Core Local IP: $MANAGER_LOCAL_IP" >> $LOG
-
 # The repository URL
 REPO_URL=
 REPO_NAME=`echo $REPO_URL | cut -d'/' -f 5`
@@ -25,8 +23,6 @@ REPO_NAME=`echo $REPO_URL | cut -d'/' -f 5`
 # The key pair and security group assigned
 KEYPAIR=
 SECURITY_GROUP=
-
-echo "Repo URL: $REPO_URL" >> $LOG
 
 EC2_INSTANCE_ID=$(ec2metadata --instance-id)
 LOCAL_IP=$(ec2metadata --local-ipv4)

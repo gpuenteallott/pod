@@ -71,10 +71,7 @@ public class ServerProperties implements ServletContextListener {
 		
 		logger.info("Initializing Context");
 
-		// Reset the database
-		new WorkerDAO().deleteAll();
-		new ActivityDAO().deleteAll();
-		new PolicyDAO().deleteAll();
+
 		// Reset the app directory
 		File appDirectory = new File ("/home/pod/app");
 		deleteContents(appDirectory);
@@ -102,6 +99,11 @@ public class ServerProperties implements ServletContextListener {
 			if ( role.equals("manager") ) {
 				
 				logger.info("Performing Manager setup");
+				
+				// Reset the database
+				new WorkerDAO().deleteAll();
+				new ActivityDAO().deleteAll();
+				new PolicyDAO().deleteAll();
 				
 				// If this is the manager, we put ourself in the workers list
 				Worker worker = new Worker();
