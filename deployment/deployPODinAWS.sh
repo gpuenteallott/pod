@@ -87,7 +87,7 @@ aws ec2 run-instances --image-id $AMI --count 1 --instance-type $INSTANCE_TYPE -
 # Change name to the instances
 while read line
 do
-	printf "EC2: AMI $line. Tagged: " && aws ec2 create-tags --resources $line --tags Key=Name,Value=$NAME-Mgr Key=RandomId,Value=$RANDOM_TAG_VALUE --output text
+	printf "EC2: AMI $line. Tagged: " && aws ec2 create-tags --resources $line --tags Key=Name,Value=$NAME-manager Key=RandomId,Value=$RANDOM_TAG_VALUE --output text
 	INSTANCE_ID=$line
 	line=
 done < instance_ids.tmp

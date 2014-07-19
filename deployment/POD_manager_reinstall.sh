@@ -67,11 +67,13 @@ sudo mv target/*.war /var/lib/tomcat7/webapps/ROOT.war
 cd ~
 mv pod-master/application/database/*.sql pod.sql
 
-if [ $# == 1 ] && [ $1 == 'db' ]; then
-	echo `date` " - Importing database" >> $LOG
-	echo `date` " - Importing database"
-	mysql -u root --password=kaerus_123 -h localhost < pod.sql
-	rm -R ~/app
+if [ $# == 1 ]; then
+	if [ $1 == 'db' ]; then
+		echo `date` " - Importing database" >> $LOG
+		echo `date` " - Importing database"
+		mysql -u root --password=kaerus_123 -h localhost < pod.sql
+		rm -R ~/app
+	fi
 fi
 
 

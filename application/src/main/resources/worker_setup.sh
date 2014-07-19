@@ -43,6 +43,7 @@ echo "keypair=$KEYPAIR" >> /home/pod/server.properties
 echo "instanceId=$EC2_INSTANCE_ID" >> /home/pod/server.properties
 echo "localIp=$LOCAL_IP" >> /home/pod/server.properties
 echo "publicIp=$PUBLIC_IP" >> /home/pod/server.properties
+echo "repoURL=$REPO_URL" >> /home/pod/server.properties
 
 ##########################################################
 
