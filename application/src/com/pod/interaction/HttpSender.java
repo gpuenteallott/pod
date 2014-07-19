@@ -119,7 +119,7 @@ public class HttpSender {
 		if ( destinationRole != null ) destination += "/"+destinationRole;
 		
 		// Open connection
-		URL obj = new URL(destination);
+		URL obj = new URL("http://"+destination);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 		
 		// Set HTTP method
