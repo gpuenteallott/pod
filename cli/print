@@ -20,9 +20,10 @@ Usage: pod <command> [parameters]
     - viewActivePolicy
     - getPolicies
     - resetPolicies
+    - log
 
 To use, export the URL of the POD Manager using 
-export POD_URL=
+export POD=
 
 "
 fi
@@ -227,13 +228,13 @@ fi
 if [[ $1 == "logs --help" ]]; then
 
   echo "
-POD logs type
+POD log type
 
 Returns the last lines of any of the specified system logs
    - type can either be setup, properties or server
 
 Example:
-    ./pod logs policy01
+    ./pod log policy01
 
 "
 fi

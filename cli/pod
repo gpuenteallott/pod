@@ -19,8 +19,8 @@ if [[ $1 == '--help' ]]; then
     exit
 fi
 
-if [[ -z $POD_URL ]]; then
-	echo "Environment variable POD_URL has no value. Please set it up"
+if [[ -z $POD ]]; then
+	echo "Environment variable POD has no value. Please set it up"
 	echo "It must contain the URL to the manager"
 	exit
 fi
@@ -28,11 +28,11 @@ fi
 if [[ $1 == 'newExecution' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD_URL/?action=newExecution&name=$2" | json_pp
+		curl "$POD/?action=newExecution&name=$2" | json_pp
 		exit
 	fi
 	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]] ; then
-		curl "$POD_URL/?action=newExecution&name=$2&input=$3" | json_pp
+		curl "$POD/?action=newExecution&name=$2&input=$3" | json_pp
 		exit
 	fi
 	
@@ -50,7 +50,7 @@ fi
 if [[ $1 == 'getExecutionStatus' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD_URL/?action=getExecutionStatus&executionId=$2" | json_pp
+		curl "$POD/?action=getExecutionStatus&executionId=$2" | json_pp
 		exit
 	fi
 	
@@ -67,7 +67,7 @@ fi
 if [[ $1 == 'newActivity' ]]; then
 
 	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]]; then
-		curl "$POD_URL/?action=newActivity&installationScriptLocation=$3&name=$2" | json_pp
+		curl "$POD/?action=newActivity&installationScriptLocation=$3&name=$2" | json_pp
 		exit
 	fi
 	
@@ -85,7 +85,7 @@ fi
 if [[ $1 == 'getActivityStatus' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD_URL/?action=getActivityStatus&name=$2" | json_pp
+		curl "$POD/?action=getActivityStatus&name=$2" | json_pp
 		exit
 	fi
 	
@@ -102,7 +102,7 @@ fi
 if [[ $1 == 'deleteActivity' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD_URL/?action=deleteActivity&name=$2" | json_pp
+		curl "$POD/?action=deleteActivity&name=$2" | json_pp
 		exit
 	fi
 	
@@ -120,7 +120,7 @@ fi
 if [[ $1 == 'terminateExecution' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD_URL/?action=terminateExecution&executionId=$2" | json_pp
+		curl "$POD/?action=terminateExecution&executionId=$2" | json_pp
 		exit
 	fi
 	
@@ -137,7 +137,7 @@ fi
 if [[ $1 == 'newPolicy' ]]; then
 
 	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]]; then
-		curl "$POD_URL/?action=newPolicy&name=$2&rules=$3" | json_pp
+		curl "$POD/?action=newPolicy&name=$2&rules=$3" | json_pp
 		exit
 	fi
 	
@@ -155,7 +155,7 @@ fi
 if [[ $1 == 'applyPolicy' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD_URL/?action=applyPolicy&name=$2" | json_pp
+		curl "$POD/?action=applyPolicy&name=$2" | json_pp
 		exit
 	fi
 	
@@ -173,7 +173,7 @@ fi
 if [[ $1 == 'deletePolicy' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD_URL/?action=deletePolicy&name=$2" | json_pp
+		curl "$POD/?action=deletePolicy&name=$2" | json_pp
 		exit
 	fi
 	
@@ -191,7 +191,7 @@ fi
 if [[ $1 == 'viewActivePolicy' ]]; then
 
 	if [[ $# == 1 ]] ; then
-		curl "$POD_URL/?action=viewActivePolicy" | json_pp
+		curl "$POD/?action=viewActivePolicy" | json_pp
 		exit
 	fi
 	
@@ -209,7 +209,7 @@ fi
 if [[ $1 == 'resetPolicies' ]]; then
 
 	if [[ $# == 1 ]] ; then
-		curl "$POD_URL/?action=resetPolicies" | json_pp
+		curl "$POD/?action=resetPolicies" | json_pp
 		exit
 	fi
 	
@@ -228,7 +228,7 @@ fi
 if [[ $1 == 'getPolicies' ]]; then
 
 	if [[ $# == 1 ]] ; then
-		curl "$POD_URL/?action=getPolicies" | json_pp
+		curl "$POD/?action=getPolicies" | json_pp
 		exit
 	fi
 	
@@ -245,7 +245,7 @@ fi
 if [[ $1 == 'getWorkers' ]]; then
 
 	if [[ $# == 1 ]] ; then
-		curl "$POD_URL/?action=getWorkers" | json_pp
+		curl "$POD/?action=getWorkers" | json_pp
 		exit
 	fi
 	
@@ -259,22 +259,24 @@ if [[ $1 == 'getWorkers' ]]; then
 	fi
 fi
 
-if [[ $1 == 'logs' ]]; then
+if [[ $1 == 'log' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD_URL/?action=logs&type=$2" | json_pp
+		curl "$POD/?action=logs&type=$2" | json_pp
 		exit
 	fi
 	
 	if [[ $2 == '--help' ]]; then
-		./print "logs type --help"
+		./print "log type --help"
 		exit
 	else 
 		echo "Usage: pod logs type"
-		echo "Type pod logs --help for more information"
+		echo "Type pod log --help for more information"
 		exit
 	fi
 fi
+
+
 
 echo "Unknown command. Use --help to get indications"
 exit

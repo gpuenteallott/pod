@@ -94,17 +94,33 @@ done < instance_ids.tmp
 
 # Remove aws credentials file
 #rm instance_ids.tmp
-rm $INSTANCE_SETUP.tmp
+#rm $INSTANCE_SETUP.tmp
 rm instance_ids.tmp
 
-echo ""
-sleep 10
+echo "Done launching. Waiting for Manager DNS..."
+echo -n "*"
+sleep 5
 
 # Retrieve information from the instance launched
-DESCRIPTION=`aws ec2 describe-instances --output=json --instance-ids $INSTANCE_ID`
+#DESCRIPTION=`aws ec2 describe-instances --output=json --instance-ids $INSTANCE_ID`
 
-echo "Trying to get manager DNS:"
-echo "$DESCRIPTION" | grep -i 'PublicDnsName' | cut -f4 -d\"
+#echo "Trying to get manager DNS:"
+#echo "$DESCRIPTION" | grep -i 'PublicDnsName' | cut -f4 -d\"
+
+MANAGER_DNS=`aws ec2 describe-instances --output=json --instance-ids $INSTANCE_ID | grep -i 'PublicDnsName' | cut -f4 -d\"`
+
+while [ -z "$MANAGER_DNS" ]
+do
+	echo -n "*"
+	sleep 7
+MANAGER_DNS=`aws ec2 describe-instances --output=json --instance-ids $INSTANCE_ID | grep -i 'PublicDnsName' | cut -f4 -d\"`
+	#echo $MANAGER_DNS
+done
+echo ""
+
+echo "Manager DNS obtained successfully"
+echo "$MANAGER_DNS"
+echo "For CLI, execute \$ export POD=\"$MANAGER_DNS\""
 
 echo ""
 echo "Run aws \"ec2 describe-instances --output=json\" to get more info"

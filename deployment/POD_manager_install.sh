@@ -13,12 +13,17 @@
 
 ln -s /home/ubuntu /home/pod
 chown tomcat7 /home/
+chown tomcat7 /home/pod
 
 LOG="/home/pod/setup.log"
 touch $LOG
 chown ubuntu $LOG
 echo `date` " - Server launched" >> $LOG
 HOME=/home/pod
+
+PROPS="/home/pod/server.properties"
+touch $PROPS
+chown ubuntu $PROPS
 
 # Name for the resources
 NAME="POD"
@@ -38,6 +43,8 @@ RANDOM_TAG_VALUE=
 KEYPAIR=
 
 SECURITY_GROUP=
+
+AMI=
 
 echo `date` " - Updating dependencies" >> $LOG >> $LOG
 
@@ -90,18 +97,8 @@ mvn clean install
 mv target/*.war /var/lib/tomcat7/webapps/ROOT.war
 
 mkdir $HOME/app
+sudo chown tomcat7 $HOME/app
 sudo chgrp tomcat7 $HOME/app
-
-# Retrieve the IP addresses of the server and other information useful inside the cloud
-if [ -n $CLOUD ]; then
-	echo `date` " - Retrieving information from cloud provider" >> $LOG
-	DESCRIPTION=`aws ec2 describe-instances --output=json --filter Key=tag-value,Value=$RANDOM_TAG_VALUE`
-	PUBLIC_DNS=`echo "$DESCRIPTION" | grep -i 'PublicDnsName' | cut -f4 -d\"`
-	PRIVATE_DNS=`echo "$DESCRIPTION" | grep -i 'PrivateDnsName' | cut -f4 -d\"`
-	INSTANCE_ID=`echo "$DESCRIPTION" | grep -i 'InstanceId' | cut -f4 -d\"`
-fi
-
-sudo service tomcat7 start
 
 echo `date` " - Importing database" >> $LOG
 
@@ -111,6 +108,27 @@ mv pod-master/application/database/*.sql pod.sql
 mysql -u root --password=kaerus_123 -h localhost < pod.sql
 
 echo `date` " - Setting up properties" >> $LOG
+
+##########################################################
+
+EC2_INSTANCE_ID=$(ec2metadata --instance-id)
+LOCAL_IP=$(ec2metadata --local-ipv4)
+PUBLIC_IP=$(ec2metadata --public-ipv4)
+
+echo "name=$NAME" >> $PROPS
+echo "role=manager" >> $PROPS
+echo "securityGroup=$SECURITY_GROUP" >> $PROPS
+echo "keypair=$KEYPAIR" >> $PROPS
+echo "instanceId=$EC2_INSTANCE_ID" >> $PROPS
+echo "localIp=$LOCAL_IP" >> $PROPS
+echo "publicIp=$PUBLIC_IP" >> $PROPS
+echo "ami=$AMI" >> $PROPS
+echo "instance_type=t1.micro" >> $PROPS
+
+
+##########################################################
+
+sudo service tomcat7 start
 
 # Give time to Tomcat to deploy the app in a folder
 while [ ! -d "/var/lib/tomcat7/webapps/ROOT/WEB-INF" ]
@@ -132,35 +150,14 @@ chgrp tomcat7 AwsCredentials.properties
 chmod 600 AwsCredentials.properties
 
 
-EC2_INSTANCE_ID=$(ec2metadata --instance-id)
-LOCAL_IP=$(ec2metadata --local-ipv4)
-PUBLIC_IP=$(ec2metadata --public-ipv4)
-AMI="ami-0b9c9f62"
-
-##########################################################
-
-echo "name=$NAME" >> /home/pod/server.properties
-echo "role=manager" >> /home/pod/server.properties
-echo "securityGroup=$SECURITY_GROUP" >> /home/pod/server.properties
-echo "keypair=$KEYPAIR" >> /home/pod/server.properties
-echo "instanceId=$EC2_INSTANCE_ID" >> /home/pod/server.properties
-echo "localIp=$LOCAL_IP" >> /home/pod/server.properties
-echo "publicIp=$PUBLIC_IP" >> /home/pod/server.properties
-echo "ami=$AMI" >> /home/pod/server.properties
-echo "instance_type=t1.micro" >> /home/pod/server.properties
-
-
-##########################################################
-
-
 echo `date` " - Finishing installation" >> $LOG
 
 # Creating soft links to access easily the server logs from the home folder
 ln -s /var/lib/tomcat7/logs ~/server_logs
 
 cd $HOME
-#rm master.zip
-#rm -R pod-master
-#rm pod.sql
+rm master.zip
+rm -R pod-master
+rm pod.sql
 
 echo `date` " - Server deployed" >> $LOG
