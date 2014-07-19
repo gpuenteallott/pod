@@ -116,7 +116,7 @@ public class HttpSender {
 		
 		// Prepare destination. eg: http://123-45-67-89/worker
 		String destination = destinationIP;
-		if ( destinationRole != null ) destination += destinationRole;
+		if ( destinationRole != null ) destination += "/"+destinationRole;
 		
 		// Open connection
 		URL obj = new URL(destination);

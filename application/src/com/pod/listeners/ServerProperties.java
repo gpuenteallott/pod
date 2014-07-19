@@ -102,8 +102,8 @@ public class ServerProperties implements ServletContextListener {
 				
 				// Reset the database
 				new WorkerDAO().deleteAll();
-				new ActivityDAO().deleteAll();
-				new PolicyDAO().deleteAll();
+				//new ActivityDAO().deleteAll();
+				//new PolicyDAO().deleteAll();
 				
 				// If this is the manager, we put ourself in the workers list
 				Worker worker = new Worker();
