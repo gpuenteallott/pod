@@ -27,6 +27,7 @@ chown ubuntu $PROPS
 
 # Name for the resources
 NAME="POD"
+REPO_URL="https://github.com/gpuenteallott/pod"
 
 # This are the AWS credentials for the server
 # They will be dinamically added from this file by installenv.sh
@@ -87,7 +88,7 @@ echo `date` " - Setting up project" >> $LOG
 
 # Get the project
 cd $HOME
-wget https://github.com/gpuenteallott/pod/archive/master.zip
+wget "$REPO_URL/archive/master.zip"
 unzip master.zip
 
 # Build the project
@@ -124,6 +125,7 @@ echo "localIp=$LOCAL_IP" >> $PROPS
 echo "publicIp=$PUBLIC_IP" >> $PROPS
 echo "ami=$AMI" >> $PROPS
 echo "instance_type=t1.micro" >> $PROPS
+echo "repoURL=$REPO_URL" >> $PROPS
 
 
 ##########################################################
