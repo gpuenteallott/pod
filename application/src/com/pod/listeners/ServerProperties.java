@@ -101,7 +101,7 @@ public class ServerProperties implements ServletContextListener {
 				logger.info("Performing Manager setup");
 				
 				// Reset the database
-				new WorkerDAO().deleteAll();
+				//new WorkerDAO().deleteAll();
 				//new ActivityDAO().deleteAll();
 				//new PolicyDAO().deleteAll();
 				
