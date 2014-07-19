@@ -172,7 +172,14 @@ public class PolicyHandler {
 		Policy previousPolicy = pdao.getActive();
 		
 		// Set it as active
-		boolean updated = pdao.setActive(name);
+		boolean updated = false;
+		if ( name.equals("default") ) {
+			updated = true;
+		}
+		else {
+			updated = pdao.setActive(name);
+		}
+		
 		
 		if ( !updated )
 			if ( pdao.getError() == null || pdao.getError().equals("") ) 

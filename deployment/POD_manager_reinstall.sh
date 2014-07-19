@@ -86,15 +86,15 @@ fi
 echo `date` " - Waiting for deployment" >> $LOG
 echo `date` " - Waiting for deployment"
 
-
-echo `date` " - Restoring credentials and properties file" >> $LOG
-echo `date` " - Restoring credentials and properties file"
-
 # Give time to Tomcat to deploy the app in a folder
 while [ ! -d "/var/lib/tomcat7/webapps/ROOT/WEB-INF" ]
 do
 	sleep 1
 done
+
+echo `date` " - Restoring credentials and properties file" >> $LOG
+echo `date` " - Restoring credentials and properties file"
+
 
 # Restore credentials and name file
 if [ ! -d /var/lib/tomcat7/webapps/ROOT/WEB-INF/classes/main/resources ]; then

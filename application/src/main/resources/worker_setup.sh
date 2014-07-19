@@ -1,8 +1,11 @@
 #!/bin/bash
 
 ln -s /home/ubuntu /home/pod
+chown tomcat7 /home/
+chown tomcat7 /home/pod
 
 LOG="/home/pod/setup.log"
+HOME=/home/pod
 
 echo ''  >> $LOG
 echo `date` " - Worker setup started" >> $LOG
@@ -30,16 +33,16 @@ PUBLIC_IP=$(ec2metadata --public-ipv4)
 
 ##########################################################
 
-echo "name=$NAME" >> /home/pod/server.properties
-echo "managerLocalIp=$MANAGER_LOCAL_IP" >> /home/pod/server.properties
-echo "workerId=$WORKER_ID" >> /home/pod/server.properties
-echo "role=worker" >> /home/pod/server.properties
-echo "securityGroup=$SECURITY_GROUP" >> /home/pod/server.properties
-echo "keypair=$KEYPAIR" >> /home/pod/server.properties
-echo "instanceId=$EC2_INSTANCE_ID" >> /home/pod/server.properties
-echo "localIp=$LOCAL_IP" >> /home/pod/server.properties
-echo "publicIp=$PUBLIC_IP" >> /home/pod/server.properties
-echo "repoURL=$REPO_URL" >> /home/pod/server.properties
+echo "name=$NAME" >> $HOME/server.properties
+echo "managerLocalIp=$MANAGER_LOCAL_IP" >> $HOME/server.properties
+echo "workerId=$WORKER_ID" >> $HOME/server.properties
+echo "role=worker" >> $HOME/server.properties
+echo "securityGroup=$SECURITY_GROUP" >> $HOME/server.properties
+echo "keypair=$KEYPAIR" >> $HOME/server.properties
+echo "instanceId=$EC2_INSTANCE_ID" >> $HOME/server.properties
+echo "localIp=$LOCAL_IP" >> $HOME/server.properties
+echo "publicIp=$PUBLIC_IP" >> $HOME/server.properties
+echo "repoURL=$REPO_URL" >> $HOME/server.properties
 
 ##########################################################
 
@@ -78,7 +81,7 @@ echo `date` " - Getting the project $REPO_NAME" >> $LOG
 
 
 # Get the project
-cd ~
+cd $HOME
 wget $REPO_URL/archive/master.zip
 unzip master.zip
 
@@ -88,17 +91,18 @@ mvn clean install
 
 mv target/*.war /var/lib/tomcat7/webapps/ROOT.war
 
-mkdir ~/app
-sudo chgrp tomcat7 ~/app
+mkdir $HOME/app
+sudo chown tomcat7 $HOME/app
+sudo chgrp tomcat7 $HOME/app
 	
 sudo service tomcat7 start
 
 echo `date` " - Finishing installation" >> $LOG
 
 # Creating soft links to access easily the server logs from the home folder
-ln -s /var/lib/tomcat7/logs ~/server_logs
+ln -s /var/lib/tomcat7/logs $HOME/server_logs
 
-cd ~
+cd $HOME
 #rm master.zip
 #rm -R pod-master
 #rm pod.sql
