@@ -28,11 +28,11 @@ fi
 if [[ $1 == 'newExecution' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD/?action=newExecution&name=$2"
+		curl "$POD/?action=newExecution&name=$2" | json_pp -json_opt canonical,indent
 		exit
 	fi
 	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]] ; then
-		curl "$POD/?action=newExecution&name=$2&input=$3" | json_pp
+		curl "$POD/?action=newExecution&name=$2&input=$3" | json_pp -json_opt canonical,indent
 		exit
 	fi
 	
@@ -50,7 +50,7 @@ fi
 if [[ $1 == 'getExecutionStatus' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD/?action=getExecutionStatus&executionId=$2" | json_pp
+		curl "$POD/?action=getExecutionStatus&executionId=$2" | json_pp -json_opt canonical,indent
 		exit
 	fi
 	
@@ -67,7 +67,7 @@ fi
 if [[ $1 == 'newActivity' ]]; then
 
 	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]]; then
-		curl "$POD/?action=newActivity&installationScriptLocation=$3&name=$2" | json_pp
+		curl "$POD/?action=newActivity&installationScriptLocation=$3&name=$2" | json_pp -json_opt canonical,indent
 		exit
 	fi
 	
@@ -85,7 +85,7 @@ fi
 if [[ $1 == 'getActivityStatus' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD/?action=getActivityStatus&name=$2" | json_pp
+		curl "$POD/?action=getActivityStatus&name=$2" | json_pp -json_opt canonical,indent
 		exit
 	fi
 	
@@ -102,7 +102,7 @@ fi
 if [[ $1 == 'deleteActivity' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD/?action=deleteActivity&name=$2" | json_pp
+		curl "$POD/?action=deleteActivity&name=$2" | json_pp -json_opt canonical,indent
 		exit
 	fi
 	
@@ -120,7 +120,7 @@ fi
 if [[ $1 == 'terminateExecution' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD/?action=terminateExecution&executionId=$2" | json_pp
+		curl "$POD/?action=terminateExecution&executionId=$2" | json_pp -json_opt canonical,indent
 		exit
 	fi
 	
@@ -137,7 +137,7 @@ fi
 if [[ $1 == 'newPolicy' ]]; then
 
 	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]]; then
-		curl "$POD/?action=newPolicy&name=$2&rules=$3" | json_pp
+		curl "$POD/?action=newPolicy&name=$2&rules=$3" | json_pp -json_opt canonical,indent
 		exit
 	fi
 	
@@ -155,7 +155,7 @@ fi
 if [[ $1 == 'applyPolicy' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD/?action=applyPolicy&name=$2" | json_pp
+		curl "$POD/?action=applyPolicy&name=$2" | json_pp -json_opt canonical,indent
 		exit
 	fi
 	
@@ -173,7 +173,7 @@ fi
 if [[ $1 == 'deletePolicy' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD/?action=deletePolicy&name=$2" | json_pp
+		curl "$POD/?action=deletePolicy&name=$2" | json_pp -json_opt canonical,indent
 		exit
 	fi
 	
@@ -191,7 +191,7 @@ fi
 if [[ $1 == 'viewActivePolicy' ]]; then
 
 	if [[ $# == 1 ]] ; then
-		curl "$POD/?action=viewActivePolicy" | json_pp
+		curl "$POD/?action=viewActivePolicy" | json_pp -json_opt canonical,indent
 		exit
 	fi
 	
@@ -209,7 +209,7 @@ fi
 if [[ $1 == 'resetPolicies' ]]; then
 
 	if [[ $# == 1 ]] ; then
-		curl "$POD/?action=resetPolicies" | json_pp
+		curl "$POD/?action=resetPolicies" | json_pp -json_opt canonical,indent
 		exit
 	fi
 	
@@ -228,7 +228,7 @@ fi
 if [[ $1 == 'getPolicies' ]]; then
 
 	if [[ $# == 1 ]] ; then
-		curl "$POD/?action=getPolicies" | json_pp
+		curl "$POD/?action=getPolicies" | json_pp -json_opt canonical,indent
 		exit
 	fi
 	
@@ -245,7 +245,7 @@ fi
 if [[ $1 == 'getWorkers' ]]; then
 
 	if [[ $# == 1 ]] ; then
-		curl "$POD/?action=getWorkers" | json_pp
+		curl "$POD/?action=getWorkers" | json_pp -json_opt canonical,indent
 		exit
 	fi
 	
@@ -262,7 +262,7 @@ fi
 if [[ $1 == 'log' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD/?action=logs&type=$2" | json_pp
+		curl "$POD/?action=logs&type=$2" | json_pp -json_opt canonical,indent
 		exit
 	fi
 	

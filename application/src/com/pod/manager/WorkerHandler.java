@@ -3,6 +3,7 @@ package com.pod.manager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
@@ -121,7 +122,48 @@ public class WorkerHandler {
 	
 	public void stopWorker(int id){}
 	
-	public void terminateWorker(int id){}
+	/**
+	 * At the moment, this method terminates the workers, interrupting whatever they were doing
+	 * For a future iteration, the correct process would be to try to notify the worker first, so the worker does it
+	 * @param workersToTerminate
+	 */
+	public void terminateWorkers ( int workersToTerminate ){
+		
+		List<String> instanceIds = new ArrayList<String>();
+
+		WorkerDAO wdao = new WorkerDAO();
+		
+		Worker[] workers = wdao.list();
+		
+		int flaggedWorkers = 0;
+		for ( Worker worker : workers ) {
+			
+			if ( flaggedWorkers >= workersToTerminate )
+				break;
+			
+			if ( !worker.isManager() && !worker.getStatus().equals("terminated") ) {
+				worker.setStatus("terminated");
+				wdao.update(worker);
+				instanceIds.add(worker.getInstanceId());
+				flaggedWorkers++;
+			}
+			
+		}
+
+		if ( !instanceIds.isEmpty() )
+			terminateWorkerAction( instanceIds );
+	}
+	
+	
+	private void terminateWorkerAction ( List<String> instanceIds ) {
+		
+		// Try to create the client
+		AWSCredentialsProvider credentialsProvider = new ClasspathPropertiesFileCredentialsProvider("/main/resources/AwsCredentials.properties");
+		AmazonEC2 amazonEC2Client = new AmazonEC2Client(credentialsProvider);
+		
+		TerminateInstancesRequest tir = new TerminateInstancesRequest ( instanceIds );
+		amazonEC2Client.terminateInstances(tir);
+	}
 
 
 	private String deployWorkerAction( int workerId ) throws IOException {

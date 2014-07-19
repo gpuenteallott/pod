@@ -410,7 +410,10 @@ public class ExecutionHandler {
 		System.out.println("pending executions "+pendingExecutions.size());
 		
 		// Calculate mean between workers
-		return (int)( time / executionsInProgress.length );
+		if ( executionsInProgress.length == 0 )
+			return 0;
+		else
+			return (int)( time / executionsInProgress.length );
 		
 	}
 	

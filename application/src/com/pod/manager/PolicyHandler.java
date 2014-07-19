@@ -202,12 +202,27 @@ public class PolicyHandler {
 				Policy policy = pdao.getActive();
 				WorkerHandler wh = new WorkerHandler();
 				
+				int minWorkers = 1;
+				int maxWorkers = 1;
+				if ( policy.getRules().get("fixedWorkers") != null ) {
+					minWorkers = Integer.parseInt( policy.getRules().get("fixedWorkers").asString() );
+					maxWorkers = Integer.parseInt( policy.getRules().get("fixedWorkers").asString() );
+				}
+				else {
+					if ( policy.getRules().get("minWorkers") != null ) minWorkers = Integer.parseInt( policy.getRules().get("minWorkers").asString() );
+					if ( policy.getRules().get("maxWorkers") != null ) maxWorkers = Integer.parseInt( policy.getRules().get("maxWorkers").asString() );
+				}
+				
+				
 				// If the current nº of workers is less than the minimum specified, deploy more
-				int minWorkers = Integer.parseInt( policy.getRules().get("minWorkers").asString() );
 				if ( wh.getTotalWorkers() < minWorkers ) {
 					int workersToDeploy = minWorkers-wh.getTotalWorkers();
 					for ( int i = 0; i < workersToDeploy; i++ )
 						wh.deployWorker();
+				}
+				if ( wh.getTotalWorkers() > maxWorkers ) {
+					int workersToTerminate = wh.getTotalWorkers()-maxWorkers;
+					wh.terminateWorkers(workersToTerminate);
 				}
 				
 			}
