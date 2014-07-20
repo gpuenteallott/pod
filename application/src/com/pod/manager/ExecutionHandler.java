@@ -167,6 +167,9 @@ public class ExecutionHandler {
 				WorkerHandler wh = new WorkerHandler();
 				
 				// Only consider launching a new worker if we haven't reach the maximum and if there is a maxWait specified
+
+				System.out.println("MAX WORKERS RETRIEVED "+  activePolicy.getMaxWorkers());
+				
 				if ( activePolicy.getMaxWorkers() < wh.getTotalWorkers() && activePolicy.getRule("maxWait") != null ) {
 					
 					int maxWait = Integer.parseInt( activePolicy.getRule("maxWait") );
@@ -454,6 +457,21 @@ public class ExecutionHandler {
 		
 		ActivityHandler ah = new ActivityHandler();
 		return calculateTimeToStart() + ah.getMeanTime(activityId);
+		
+	}
+	
+	
+	public JsonObject getAllExecutions () {
+		
+		JsonObject response = new JsonObject();
+		
+		ExecutionMap map = new ExecutionMap();
+		
+		for ( Execution e : map.getAllExecutions() ) {
+			response.add( e.getId() ,"activity="+ e.getActivityName()+ ", status="+e.getStatus() );
+		}
+		
+		return response;
 		
 	}
 	

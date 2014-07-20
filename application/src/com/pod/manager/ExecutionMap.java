@@ -181,4 +181,8 @@ public class ExecutionMap {
 		return result;
 	}
 	
+	public Execution[] getAllExecutions () {
+		 return executions.values().toArray( new Execution[0] );
+	}
+	
 }

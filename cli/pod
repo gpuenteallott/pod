@@ -328,6 +328,7 @@ if [[ $1 == 'push' ]]; then
 	if [[ $# == 2 ]] ; then
 		cd ..
 		git add .
+		git add -u
 		git commit -m "$2"
 		git push origin master
 		exit

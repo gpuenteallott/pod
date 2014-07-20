@@ -313,6 +313,18 @@ public class HttpFrontServlet extends HttpServlet {
 			// End logging
 		}
 		
+		// Request by client to obtain a summary of all executions
+		else if ( action.equals("getAllExecutions") ) {
+			
+			// Prepare json object to pass to the request handler
+			json = new JsonObject();
+			json.add("action", Action.GET_ALL_EXECUTIONS.getId());
+			
+			// Logging
+				System.out.println("Message log. From outside. action:"+action); System.out.println();
+			// End logging
+		}
+		
 		// Handle request
 		ManagerRequestHandler handler = new ManagerRequestHandler();
 		jsonResponse = handler.doManagerRequest(json);

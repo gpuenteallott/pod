@@ -23,7 +23,8 @@ public enum Action {
 	GET_EXECUTION_STATUS(22),  // Sent from client to manager requesting the execution status
 	GET_EXECUTION_PROGRESS(23),    // Sent from manager to worker to retrieve the current stdout and stderr
 	REPORT_EXECUTION(24),     // Sent from the worker to the manager informing about a finished execution
-	TERMINATE_EXECUTION(25), // Send by client and by manager. Its meaning is that the given execution must be terminated
+	TERMINATE_EXECUTION(25), // Sent by client and by manager. Its meaning is that the given execution must be terminated
+	GET_ALL_EXECUTIONS(26), // sent by the client to obtain a summary of all executions
 	
 	NEW_POLICY(30),
 	DELETE_POLICY(31),
