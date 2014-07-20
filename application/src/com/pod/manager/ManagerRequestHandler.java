@@ -142,7 +142,7 @@ public class ManagerRequestHandler {
 		}
 		
 		// A message from client requesting all executions in a summary
-		else if ( action == Action.GET_LOGS ) {
+		else if ( action == Action.GET_ALL_EXECUTIONS ) {
 			ExecutionHandler h = new ExecutionHandler();
 			return h.getAllExecutions();
 		}
