@@ -12,7 +12,7 @@ public class PolicyHandler {
 	
 	private static Policy defaultPolicy;
 	private static final String DEFAULT_POLICY_NAME = "default";
-	private static final int DEFAULT_MAX_WAIT = 60;
+	private static final String DEFAULT_MAX_WAIT = "60";
 	
 	/**
 	 * Constructor that initializes the default policy internal object

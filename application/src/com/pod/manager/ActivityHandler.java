@@ -69,13 +69,8 @@ public class ActivityHandler {
 		executionTimes.put( activityId, queue);
 		
 		// Update the number of samples if necessary
-		// If we reached the required amount, we just remove it so it doesn't take space in memory
 		Integer samples = executionTimeSamples.get(activityId);
-		if ( samples != null ) {
-			
-			if ( samples+1 == NUMBER_OF_TIME_SAMPLES )
-				executionTimeSamples.remove(activityId);
-			else
+		if ( samples != NUMBER_OF_TIME_SAMPLES ) {
 				executionTimeSamples.put(activityId, samples+1);
 		}
 		
@@ -118,7 +113,11 @@ public class ActivityHandler {
 	 * @return
 	 */
 	public boolean areSamplesTaken ( int activityId ) {
-		return executionTimeSamples.get(activityId) == null;
+		// If not defined, create a new register for it
+		if ( executionTimes.get(activityId) == null )
+			newActivityTimeRegister(activityId);
+				
+		return executionTimeSamples.get(activityId) == NUMBER_OF_TIME_SAMPLES;
 	}
 	
 	
@@ -302,10 +301,6 @@ public class ActivityHandler {
 			
 			// In case the activity needed verification, we mark it as approved
 			if ( "verifying".equals(activity.getStatus()) ) {
-				
-				// Set up this new activity in the execution time recording system
-				// This allows future executions to save its time here and the mean will be calculated
-				newActivityTimeRegister(activity.getId());
 				
 				ActivityDAO adao = new ActivityDAO();
 				adao.updateStatus( activity.getId() , "approved");
