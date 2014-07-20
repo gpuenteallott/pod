@@ -166,8 +166,11 @@ public class ExecutionHandler {
 				
 				if ( activePolicy.getRule("maxWait") != null ) {
 					int maxWait = Integer.parseInt( activePolicy.getRule("maxWait") );
-					if ( predictedTime > maxWait )
+					if ( predictedTime > maxWait ) {
 						jsonResponse.add("event", "launchingWorker");
+						WorkerHandler wh = new WorkerHandler();
+						wh.deployWorker();
+					}
 				}
 				
 			}

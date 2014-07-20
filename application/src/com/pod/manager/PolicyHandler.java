@@ -12,7 +12,7 @@ public class PolicyHandler {
 	
 	private static Policy defaultPolicy;
 	private static final String DEFAULT_POLICY_NAME = "default";
-	private static final String DEFAULT_MAX_WAIT = "60";
+	private static final int DEFAULT_MAX_WAIT = 60*1000;
 	
 	/**
 	 * Constructor that initializes the default policy internal object
@@ -74,7 +74,7 @@ public class PolicyHandler {
 		
 		// Set default max wait time if no max wait time was given and it is scalable
 		if ( policy.getRule("fixedWorkers") == null && policy.getRule("maxWait") == null ) {
-			policy.setRule( "maxWait", DEFAULT_MAX_WAIT );
+			policy.setRule( "maxWait", ""+DEFAULT_MAX_WAIT );
 		}
 		
 		// Insert policy in the database
