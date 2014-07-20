@@ -119,9 +119,6 @@ done
 echo ""
 
 echo "Manager DNS obtained successfully"
-echo "$MANAGER_DNS"
-echo "For CLI, execute \$ export POD=\"$MANAGER_DNS\""
-
-echo ""
-echo "Run aws \"ec2 describe-instances --output=json\" to get more info"
+echo "For CLI,"
+echo "\$ export POD=\"$MANAGER_DNS\""
 echo ""

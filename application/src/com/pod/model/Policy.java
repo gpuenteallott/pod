@@ -67,16 +67,16 @@ public class Policy implements java.io.Serializable {
 	 * @param ruleName
 	 * @param ruleValue
 	 */
-	public void addRule ( String ruleName, String ruleValue ) {
-		rules.add(ruleName, ruleValue);
+	public void setRule ( String ruleName, String ruleValue ) {
+		rules.set(ruleName, ruleValue);
 	}
 	/**
 	 * Adds the specified rule to the policy. If the rule existed previously, its value is updated,
 	 * @param ruleName
 	 * @param ruleValue
 	 */
-	public void addRule ( String ruleName, int ruleValue ) {
-		rules.add(ruleName, ruleValue);
+	public void setRule ( String ruleName, int ruleValue ) {
+		rules.set(ruleName, ruleValue);
 	}
 	/**
 	 * Retrieves the rule indicated by its name, or null if it's not found

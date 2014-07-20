@@ -12,6 +12,7 @@ public class PolicyHandler {
 	
 	private static Policy defaultPolicy;
 	private static final String DEFAULT_POLICY_NAME = "default";
+	private static final int DEFAULT_MAX_WAIT = 60;
 	
 	/**
 	 * Constructor that initializes the default policy internal object
@@ -21,7 +22,7 @@ public class PolicyHandler {
 		// Set up the default policy
 		if ( defaultPolicy == null ) {
 			defaultPolicy = new Policy(DEFAULT_POLICY_NAME);
-			defaultPolicy.addRule("fixedWorkers", 1);
+			defaultPolicy.setRule("fixedWorkers", 1);
 		}
 	}
 
@@ -63,13 +64,18 @@ public class PolicyHandler {
 			if ( !Pattern.matches("^[ 0-9a-zA-Z]+[=]{1}[ 0-9a-zA-Z]+$", rule) ) 
 				return new JsonObject().add("error", "Invalid rule "+rule+". It must have the form ruleName=ruleValue");
 			
-			policy.addRule( rule.split("=")[0].trim() , rule.split("=")[1].trim());
+			policy.setRule( rule.split("=")[0].trim() , rule.split("=")[1].trim());
 			thereAreRules = true;
 		}
 		
 		// Check that at least one rule was added
 		if ( !thereAreRules )
 			return new JsonObject().add("error", "No rules declared. They must be in the form of ruleName=ruleValue");
+		
+		// Set default max wait time if no max wait time was given and it is scalable
+		if ( policy.getRule("fixedWorkers") == null && policy.getRule("maxWait") == null ) {
+			policy.setRule( "maxWait", DEFAULT_MAX_WAIT );
+		}
 		
 		// Insert policy in the database
 		PolicyDAO pdao = new PolicyDAO();
