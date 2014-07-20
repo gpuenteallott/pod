@@ -238,18 +238,16 @@ public class PolicyHandler {
 	 */
 	public JsonObject viewActivePolicy () {
 		
+		return new JsonObject().add("policy", getActivePolicy().toJsonObject());
+	}
+	
+	public Policy getActivePolicy () {
+		
 		// Retrieve the previous active policy
 		PolicyDAO pdao = new PolicyDAO();
 		Policy policy = pdao.getActive();
 		
-		if ( policy == null ) {
-			defaultPolicy.setActive(true);
-			return new JsonObject().add("policy",defaultPolicy.toJsonObject());
-		}
-		else {
-			defaultPolicy.setActive(false);
-			return new JsonObject().add("policy",policy.toJsonObject());
-		}
+		return policy != null ? policy : defaultPolicy;
 	}
 
 	/**

@@ -13,6 +13,7 @@ import com.pod.interaction.Action;
 import com.pod.interaction.HttpSender;
 import com.pod.model.Activity;
 import com.pod.model.Execution;
+import com.pod.model.Policy;
 import com.pod.model.Worker;
 
 public class ExecutionHandler {
@@ -157,8 +158,19 @@ public class ExecutionHandler {
 			
 			// Add the execution object, including a field of predictedTime in case the required samples for this activity were registered
 			ActivityHandler ah = new ActivityHandler();
-			if ( ah.areSamplesTaken(execution.getActivityId()) )
-				jsonResponse.add("execution", execution.toJsonObject().add("predictedTime", calculateTimeToFinish(execution.getActivityId())) );
+			if ( ah.areSamplesTaken(execution.getActivityId()) ) {
+				int predictedTime = calculateTimeToFinish(execution.getActivityId());
+				jsonResponse.add("execution", execution.toJsonObject().add("predictedTime", predictedTime) );
+				
+				Policy activePolicy = new PolicyHandler().getActivePolicy();
+				
+				if ( activePolicy.getRule("maxWait") != null ) {
+					int maxWait = Integer.parseInt( activePolicy.getRule("maxWait") );
+					if ( predictedTime > maxWait )
+						jsonResponse.add("event", "launchingWorker");
+				}
+				
+			}
 			else
 				jsonResponse.add("execution", execution.toJsonObject() );
 		}
