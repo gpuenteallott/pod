@@ -113,8 +113,18 @@ public class ServerProperties implements ServletContextListener {
 				worker.setManager(true);
 				worker.setStatus("ready");
 				
+				// Verify if there is a manager already in the database
 				WorkerDAO wdao = new WorkerDAO();
-				workerId = wdao.insert(worker);
+				Worker [] workers = wdao.list();
+				boolean thisIsARedeploy = false;
+				for ( Worker w : workers )
+					if ( w.isManager() ) {
+						thisIsARedeploy = true;
+						break;
+					}
+				
+				if ( !thisIsARedeploy )
+					workerId = wdao.insert(worker);
 				
 				managerLocalIp = localIp;
 				
