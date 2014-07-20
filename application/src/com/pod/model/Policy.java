@@ -86,6 +86,20 @@ public class Policy implements java.io.Serializable {
 	public String getRule ( String ruleName ) {
 		return rules.get(ruleName) != null ? rules.get(ruleName).asString() : null;
 	}
+	
+	/**
+	 * Shortcut function
+	 * @return
+	 */
+	public int getMaxWorkers () {
+		
+		if ( rules.get("fixedWorkers") != null )
+			return rules.get("fixedWorkers").asInt();
+		else
+			return Integer.parseInt( rules.get("maxWorkers").asString() );
+		
+	}
+	
 	/**
 	 * Deletes and retrieves the rule indicated by its name, or null if it's not found
 	 * @param ruleName

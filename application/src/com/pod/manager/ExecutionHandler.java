@@ -162,14 +162,25 @@ public class ExecutionHandler {
 				int predictedTime = calculateTimeToFinish(execution.getActivityId());
 				jsonResponse.add("execution", execution.toJsonObject().add("predictedTime", predictedTime) );
 				
-				Policy activePolicy = new PolicyHandler().getActivePolicy();
+				PolicyHandler ph = new PolicyHandler();
+				Policy activePolicy = ph.getActivePolicy();
+				WorkerHandler wh = new WorkerHandler();
 				
-				if ( activePolicy.getRule("maxWait") != null ) {
+				// Only consider launching a new worker if we haven't reach the maximum and if there is a maxWait specified
+				if ( activePolicy.getMaxWorkers() < wh.getTotalWorkers() && activePolicy.getRule("maxWait") != null ) {
+					
 					int maxWait = Integer.parseInt( activePolicy.getRule("maxWait") );
+					
 					if ( predictedTime > maxWait ) {
 						jsonResponse.add("event", "launchingWorker");
-						WorkerHandler wh = new WorkerHandler();
-						wh.deployWorker();
+						
+						// Launch worker in new thread (otherwise, the response takes more time to be sent)
+						new Thread () {
+							public void run() {
+								WorkerHandler wh = new WorkerHandler();
+								wh.deployWorker();
+							}
+						}.start();
 					}
 				}
 				

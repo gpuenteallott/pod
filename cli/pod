@@ -25,7 +25,7 @@ if [[ -z $POD ]]; then
 	exit
 fi
 
-if [[ $1 == 'newExecution' ]]; then
+if [[ $1 == 'newExecution' ]] || [[ $1 == 'ne' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
 		curl "$POD/?action=newExecution&name=$2" | json_pp -json_opt canonical,indent
@@ -47,7 +47,7 @@ if [[ $1 == 'newExecution' ]]; then
 fi
 
 
-if [[ $1 == 'getExecutionStatus' ]]; then
+if [[ $1 == 'getExecution' ]] || [[ $1 == 'ge' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
 		curl "$POD/?action=getExecutionStatus&executionId=$2" | json_pp -json_opt canonical,indent
@@ -55,16 +55,16 @@ if [[ $1 == 'getExecutionStatus' ]]; then
 	fi
 	
 	if [[ $2 == '--help' ]]; then
-		./print "getExecutionStatus --help"
+		./print "getExecution --help"
 		exit
 	else 
 		echo "Usage: pod getExecutionStatus name"
-		echo "Type pod getExecutionStatus --help for more information"
+		echo "Type pod getExecution --help for more information"
 		exit
 	fi
 fi
 
-if [[ $1 == 'newActivity' ]]; then
+if [[ $1 == 'newActivity' ]] || [[ $1 == 'na' ]]; then
 
 	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]]; then
 		curl "$POD/?action=newActivity&installationScriptLocation=$3&name=$2" | json_pp -json_opt canonical,indent
@@ -82,7 +82,7 @@ if [[ $1 == 'newActivity' ]]; then
 fi
 
 
-if [[ $1 == 'getActivityStatus' ]]; then
+if [[ $1 == 'getActivity' ]] || [[ $1 == 'ga' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
 		curl "$POD/?action=getActivityStatus&name=$2" | json_pp -json_opt canonical,indent
@@ -90,16 +90,16 @@ if [[ $1 == 'getActivityStatus' ]]; then
 	fi
 	
 	if [[ $2 == '--help' ]]; then
-		./print "getActivityStatus --help"
+		./print "getActivity --help"
 		exit
 	else 
 		echo "Usage: pod getActivityStatus name"
-		echo "Type pod getActivityStatus --help for more information"
+		echo "Type pod getActivity --help for more information"
 		exit
 	fi
 fi
 
-if [[ $1 == 'deleteActivity' ]]; then
+if [[ $1 == 'deleteActivity' ]] || [[ $1 == 'da' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
 		curl "$POD/?action=deleteActivity&name=$2" | json_pp -json_opt canonical,indent
@@ -117,7 +117,7 @@ if [[ $1 == 'deleteActivity' ]]; then
 fi
 
 
-if [[ $1 == 'terminateExecution' ]]; then
+if [[ $1 == 'terminateExecution' ]] || [[ $1 == 'te' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
 		curl "$POD/?action=terminateExecution&executionId=$2" | json_pp -json_opt canonical,indent
@@ -134,7 +134,7 @@ if [[ $1 == 'terminateExecution' ]]; then
 	fi
 fi
 
-if [[ $1 == 'newPolicy' ]]; then
+if [[ $1 == 'newPolicy' ]] || [[ $1 == 'np' ]]; then
 
 	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]]; then
 		curl "$POD/?action=newPolicy&name=$2&rules=$3" | json_pp -json_opt canonical,indent
@@ -152,7 +152,7 @@ if [[ $1 == 'newPolicy' ]]; then
 	fi
 fi
 
-if [[ $1 == 'applyPolicy' ]]; then
+if [[ $1 == 'applyPolicy' ]] || [[ $1 == 'ap' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
 		curl "$POD/?action=applyPolicy&name=$2" | json_pp -json_opt canonical,indent
@@ -170,7 +170,7 @@ if [[ $1 == 'applyPolicy' ]]; then
 fi
 
 
-if [[ $1 == 'deletePolicy' ]]; then
+if [[ $1 == 'deletePolicy' ]] || [[ $1 == 'dp' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
 		curl "$POD/?action=deletePolicy&name=$2" | json_pp -json_opt canonical,indent
@@ -188,7 +188,7 @@ if [[ $1 == 'deletePolicy' ]]; then
 fi
 
 
-if [[ $1 == 'viewActivePolicy' ]]; then
+if [[ $1 == 'viewActivePolicy' ]] || [[ $1 == 'vp' ]]; then
 
 	if [[ $# == 1 ]] ; then
 		curl "$POD/?action=viewActivePolicy" | json_pp -json_opt canonical,indent
@@ -206,7 +206,7 @@ if [[ $1 == 'viewActivePolicy' ]]; then
 fi
 
 
-if [[ $1 == 'resetPolicies' ]]; then
+if [[ $1 == 'resetPolicies' ]] || [[ $1 == 'rp' ]]; then
 
 	if [[ $# == 1 ]] ; then
 		curl "$POD/?action=resetPolicies" | json_pp -json_opt canonical,indent
@@ -225,7 +225,7 @@ fi
 
 
 
-if [[ $1 == 'getPolicies' ]]; then
+if [[ $1 == 'getPolicies' ]] || [[ $1 == 'gp' ]]; then
 
 	if [[ $# == 1 ]] ; then
 		curl "$POD/?action=getPolicies" | json_pp -json_opt canonical,indent
@@ -242,7 +242,7 @@ if [[ $1 == 'getPolicies' ]]; then
 	fi
 fi
 
-if [[ $1 == 'getWorkers' ]]; then
+if [[ $1 == 'getWorkers' ]] || [[ $1 == 'gw' ]]; then
 
 	if [[ $# == 1 ]] ; then
 		curl "$POD/?action=getWorkers" | json_pp -json_opt canonical,indent
@@ -318,6 +318,21 @@ if [[ $1 == 'deploy' ]]; then
 	else 
 		echo "Usage: pod deploy [security group] [key pair name]"
 		echo "Type pod deploy --help for more information"
+		exit
+	fi
+fi
+
+
+if [[ $1 == 'push' ]]; then
+
+	if [[ $# == 2 ]] ; then
+		cd ..
+		git add .
+		git commit -m "$2"
+		git push origin master
+		exit
+	else
+		echo "Sepcify a commit message"
 		exit
 	fi
 fi
