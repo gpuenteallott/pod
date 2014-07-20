@@ -125,6 +125,15 @@ public class ServerProperties implements ServletContextListener {
 				
 				if ( !thisIsARedeploy )
 					workerId = wdao.insert(worker);
+				// We should as the workers what is their state, but for now we're going to set them to ready
+				else {
+					for ( Worker w : workers ) {
+						if ( !w.getStatus().equals("ready") ) {
+							w.setStatus("ready");
+							wdao.update(w);
+						}
+					}
+				}
 				
 				managerLocalIp = localIp;
 				
