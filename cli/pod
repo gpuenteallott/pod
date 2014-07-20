@@ -28,7 +28,7 @@ fi
 if [[ $1 == 'newExecution' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD/?action=newExecution&name=$2"
+		curl "$POD/?action=newExecution&name=$2" | json_pp -json_opt canonical,indent
 		exit
 	fi
 	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]] ; then
@@ -267,7 +267,7 @@ if [[ $1 == 'log' ]]; then
 	fi
 	
 	if [[ $2 == '--help' ]]; then
-		./print "log type --help"
+		./print "log --help"
 		exit
 	else 
 		echo "Usage: pod logs type"
@@ -276,6 +276,51 @@ if [[ $1 == 'log' ]]; then
 	fi
 fi
 
+
+if [[ $1 == 'redeploy' ]]; then
+
+	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
+		ssh ubuntu@$POD "bash -s" < POD_manager_reinstall.sh $2
+		exit
+	fi
+
+	if [[ $# == 1 ]] ; then
+		ssh ubuntu@$POD "bash -s" < POD_manager_reinstall.sh
+		exit
+	fi
+	
+	if [[ $2 == '--help' ]]; then
+		./print "redeploy --help"
+		exit
+	else 
+		echo "Usage: pod redeploy [db]"
+		echo "Type pod redeploy --help for more information"
+		exit
+	fi
+fi
+
+
+if [[ $1 == 'deploy' ]]; then
+
+	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
+		./deployPODinAWS.sh $2 $3
+		exit
+	fi
+
+	if [[ $# == 1 ]] ; then
+		./deployPODinAWS.sh POD-grp POD-key
+		exit
+	fi
+	
+	if [[ $2 == '--help' ]]; then
+		./print "deploy --help"
+		exit
+	else 
+		echo "Usage: pod deploy [security group] [key pair name]"
+		echo "Type pod deploy --help for more information"
+		exit
+	fi
+fi
 
 
 echo "Unknown command. Use --help to get indications"

@@ -21,7 +21,7 @@ import com.pod.model.Installation;
 public class ActivityHandler {
 	
 	// Number of time samples used to calculate the mean execution time for an activity
-	private static int NUMBER_OF_TIME_SAMPLES = 5;
+	private static int NUMBER_OF_TIME_SAMPLES = 2;
 	
 	// A map containing the execution times. It's not implicitly synchronized
 	// Time is saved as int in milliseconds

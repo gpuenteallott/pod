@@ -225,7 +225,7 @@ Example:
 "
 fi
 
-if [[ $1 == "logs --help" ]]; then
+if [[ $1 == "log --help" ]]; then
 
   echo "
 POD log type
@@ -235,6 +235,35 @@ Returns the last lines of any of the specified system logs
 
 Example:
     ./pod log policy01
+
+"
+fi
+
+if [[ $1 == "redeploy --help" ]]; then
+
+  echo "
+POD redeploy [db]
+
+Redeploys the POD manager using the most updated code from the repository
+   - db, if present, the manager's database will be deleted and updated to the last version in the repository
+
+Example:
+    ./pod 'db'
+
+"
+fi
+
+if [[ $1 == "deploy --help" ]]; then
+
+  echo "
+POD deploy [security group] [key pair name]
+
+Deploys a new POD manager in AWS. The credentials and region used must be found in ~/.aws/config, which is the default location for them with AWS CLI tools
+   - security group, indicates the security group that the manager will use. By default, the group POD-grp will be used
+   - key pair name, indicates the key pair used for the manager and all its workers. By default, it will try to use one called POD-key
+
+Example:
+    ./pod POD-grp POD-key
 
 "
 fi
