@@ -70,11 +70,6 @@ public class ServerProperties implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent arg0) {
 		
 		logger.info("Initializing Context");
-
-
-		// Reset the app directory
-		File appDirectory = new File ("/home/pod/app");
-		deleteContents(appDirectory);
 		
 		// Load properties
 		try {
