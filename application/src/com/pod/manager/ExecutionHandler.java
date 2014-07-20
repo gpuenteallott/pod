@@ -227,7 +227,7 @@ public class ExecutionHandler {
 		}
 		
 		// In case the execution is done, we pull it (remove it)
-		if ( "finished".equals(execution.getStatus()) || "error".equals(execution.getStatus()) ) {
+		if ( "finished".equals(execution.getStatus()) || "error".equals(execution.getStatus()) || "terminated".equals(execution.getStatus()) ) {
 			return new JsonObject().add("execution", map.pull(executionId).toJsonObject());
 		}
 		
