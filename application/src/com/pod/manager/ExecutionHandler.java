@@ -468,7 +468,7 @@ public class ExecutionHandler {
 		ExecutionMap map = new ExecutionMap();
 		
 		for ( Execution e : map.getAllExecutions() ) {
-			response.add( e.getId() ,"activity="+ e.getActivityName()+ ", status="+e.getStatus() );
+			response.add( ""+e.getId() ,"activity="+ e.getActivityName()+ ", status="+e.getStatus() );
 		}
 		
 		return response;

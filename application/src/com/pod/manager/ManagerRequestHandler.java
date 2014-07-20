@@ -144,7 +144,7 @@ public class ManagerRequestHandler {
 		// A message from client requesting all executions in a summary
 		else if ( action == Action.GET_LOGS ) {
 			ExecutionHandler h = new ExecutionHandler();
-			return h.getAllExecutions(json);
+			return h.getAllExecutions();
 		}
 	
 		return jsonResponse.add("error", "this manager doesn't recognize that request");

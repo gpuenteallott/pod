@@ -9,6 +9,12 @@
 #
 #####################################################
 
+LOG="log.txt"
+
+echo "" >> $LOG
+echo "---------------------------------------------------------------------" >> $LOG
+echo " $1 $2 $3 $4" >> $LOG
+
 if [[ $# == 0 ]]; then
 	./print --help
     exit
@@ -262,7 +268,9 @@ fi
 if [[ $1 == 'log' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		curl "$POD/?action=logs&type=$2" | json_pp -json_opt canonical,indent
+		RES=`curl "$POD/?action=logs&type=$2"`
+		echo $RES >> $LOG
+		#echo $RES | json_pp -json_opt canonical,indent
 		exit
 	fi
 	
