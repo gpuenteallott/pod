@@ -21,7 +21,7 @@ public class StatusCheckerTask extends TimerTask {
 	public void run () {
 		
 		// If we have been free more time than the time to disconnect, we send a request to the manager to terminate this worker
-		if ( !ExecutionPerformer.isExecutionInProcess() && new Date().getTime() - lastTimeWorking.getTime() > ServerProperties.getTimeToTerminate() ) {
+		if ( !ExecutionPerformer.isExecutionInProcess() && new Date().getTime() - lastTimeWorking.getTime() > ServerProperties.getTerminationTime() ) {
 			
 			JsonObject message = new JsonObject();
 			message.add( "action", Action.SELF_TERMINATION_REQUEST.getId() );

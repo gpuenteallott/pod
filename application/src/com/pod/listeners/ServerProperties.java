@@ -63,7 +63,7 @@ public class ServerProperties implements ServletContextListener {
 	private static String localIp;
 	private static String publicIp;
 	private static String instanceId;
-	private static int timeToTerminate;
+	private static int terminationTime;
 	
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
@@ -159,7 +159,7 @@ public class ServerProperties implements ServletContextListener {
 				
 				managerLocalIp = properties.getProperty("managerLocalIp");
 				workerId = Integer.parseInt( properties.getProperty("workerId") );
-				timeToTerminate = Integer.parseInt( properties.getProperty("timeToTerminate") );
+				terminationTime = Integer.parseInt( properties.getProperty("terminationTime") );
 				
 				// Set up the timer for periodic tasks
 				Timer time = new Timer();
@@ -265,11 +265,11 @@ public class ServerProperties implements ServletContextListener {
 	public static String getInstanceId(){
 		return instanceId;
 	}
-	public static int getTimeToTerminate() {
-		return timeToTerminate;
+	public static int getTerminationTime() {
+		return terminationTime;
 	}
-	public static void setTimeToTerminate( int newTimeToDisconnect ) {
-		timeToTerminate = newTimeToDisconnect;
+	public static void setTerminationTime( int newterminationTime ) {
+		terminationTime = newterminationTime;
 	}
 	
 

@@ -228,10 +228,10 @@ public class WorkerHandler {
 		
 		PolicyHandler ph = new PolicyHandler();
 		Policy activePolicy = ph.getActivePolicy();
-		if ( activePolicy.getRule("timeToTerminate") == null )
-			userData = userData.replace("TIME_TO_TERMINATE=", "TIME_TO_TERMINATE="+ServerProperties.DEFAULT_TIME_TO_TERMINATE);
+		if ( activePolicy.getRule("terminationTime") == null )
+			userData = userData.replace("TERMINATION_TIME=", "TERMINATION_TIME="+ServerProperties.DEFAULT_TIME_TO_TERMINATE);
 		else
-			userData = userData.replace("TIME_TO_TERMINATE=", "TIME_TO_TERMINATE="+activePolicy.getRule("timeToTerminate"));
+			userData = userData.replace("TERMINATION_TIME=", "TERMINATION_TIME="+activePolicy.getRule("terminationTime"));
 		
 		
 		// Run instance
