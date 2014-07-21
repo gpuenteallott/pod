@@ -19,6 +19,8 @@ WORKER_ID=
 #The identifier of the POD cloud
 NAME=
 
+TERMINATION_TIME=
+
 # The repository URL
 REPO_URL=
 REPO_NAME=`echo $REPO_URL | cut -d'/' -f 5`
@@ -43,6 +45,7 @@ echo "instanceId=$EC2_INSTANCE_ID" >> $HOME/server.properties
 echo "localIp=$LOCAL_IP" >> $HOME/server.properties
 echo "publicIp=$PUBLIC_IP" >> $HOME/server.properties
 echo "repoURL=$REPO_URL" >> $HOME/server.properties
+echo "terminationTime=$TERMINATION_TIME" >> $HOME/server.properties
 
 ##########################################################
 
