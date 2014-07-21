@@ -35,13 +35,13 @@ fi
 if [[ $1 == 'newExecution' ]] || [[ $1 == 'ne' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		RES=`curl "$POD/?action=newExecution&name=$2"`
+		RES=`curl -s "$POD/?action=newExecution&name=$2"`
 		echo $RES >> $LOG
 		echo $RES | json_pp -json_opt canonical,indent
 		exit
 	fi
 	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]] ; then
-		RES=`curl "$POD/?action=newExecution&name=$2&input=$3"`
+		RES=`curl -s "$POD/?action=newExecution&name=$2&input=$3"`
 		echo $RES >> $LOG
 		echo $RES | json_pp -json_opt canonical,indent
 		exit
@@ -61,7 +61,7 @@ fi
 if [[ $1 == 'getExecution' ]] || [[ $1 == 'ge' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		RES=`curl "$POD/?action=getExecutionStatus&executionId=$2"`
+		RES=`curl -s "$POD/?action=getExecutionStatus&executionId=$2"`
 		echo $RES >> $LOG
 		echo $RES | json_pp -json_opt canonical,indent
 		exit
@@ -80,7 +80,7 @@ fi
 if [[ $1 == 'newActivity' ]] || [[ $1 == 'na' ]]; then
 
 	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]]; then
-		RES=`curl "$POD/?action=newActivity&installationScriptLocation=$3&name=$2"`
+		RES=`curl -s "$POD/?action=newActivity&installationScriptLocation=$3&name=$2"`
 		echo $RES >> $LOG
 		echo $RES | json_pp -json_opt canonical,indent
 		exit
@@ -100,7 +100,7 @@ fi
 if [[ $1 == 'getActivity' ]] || [[ $1 == 'ga' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		RES=`curl "$POD/?action=getActivityStatus&name=$2"`
+		RES=`curl -s "$POD/?action=getActivityStatus&name=$2"`
 		echo $RES >> $LOG
 		echo $RES | json_pp -json_opt canonical,indent
 		exit
@@ -119,7 +119,7 @@ fi
 if [[ $1 == 'deleteActivity' ]] || [[ $1 == 'da' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		RES=`curl "$POD/?action=deleteActivity&name=$2"`
+		RES=`curl -s "$POD/?action=deleteActivity&name=$2"`
 		echo $RES >> $LOG
 		echo $RES | json_pp -json_opt canonical,indent
 		exit
@@ -139,7 +139,7 @@ fi
 if [[ $1 == 'terminateExecution' ]] || [[ $1 == 'te' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		RES=`curl "$POD/?action=terminateExecution&executionId=$2"`
+		RES=`curl -s "$POD/?action=terminateExecution&executionId=$2"`
 		echo $RES >> $LOG
 		echo $RES | json_pp -json_opt canonical,indent
 		exit
@@ -158,7 +158,7 @@ fi
 if [[ $1 == 'newPolicy' ]] || [[ $1 == 'np' ]]; then
 
 	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ -n $3 ]]; then
-		RES=`curl "$POD/?action=newPolicy&name=$2&rules=$3"`
+		RES=`curl -s "$POD/?action=newPolicy&name=$2&rules=$3"`
 		echo $RES >> $LOG
 		echo $RES | json_pp -json_opt canonical,indent
 		exit
@@ -178,7 +178,7 @@ fi
 if [[ $1 == 'applyPolicy' ]] || [[ $1 == 'ap' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		RES=`curl "$POD/?action=applyPolicy&name=$2"`
+		RES=`curl -s "$POD/?action=applyPolicy&name=$2"`
 		echo $RES >> $LOG
 		echo $RES | json_pp -json_opt canonical,indent
 		exit
@@ -198,7 +198,7 @@ fi
 if [[ $1 == 'deletePolicy' ]] || [[ $1 == 'dp' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		RES=`curl "$POD/?action=deletePolicy&name=$2"`
+		RES=`curl -s "$POD/?action=deletePolicy&name=$2"`
 		echo $RES >> $LOG
 		echo $RES | json_pp -json_opt canonical,indent
 		exit
@@ -218,7 +218,7 @@ fi
 if [[ $1 == 'viewActivePolicy' ]] || [[ $1 == 'vp' ]]; then
 
 	if [[ $# == 1 ]] ; then
-		RES=`curl "$POD/?action=viewActivePolicy"`
+		RES=`curl -s "$POD/?action=viewActivePolicy"`
 		echo $RES >> $LOG
 		echo $RES | json_pp -json_opt canonical,indent
 		exit
@@ -238,7 +238,7 @@ fi
 if [[ $1 == 'resetPolicies' ]] || [[ $1 == 'rp' ]]; then
 
 	if [[ $# == 1 ]] ; then
-		RES=`curl "$POD/?action=resetPolicies"`
+		RES=`curl -s "$POD/?action=resetPolicies"`
 		echo $RES >> $LOG
 		echo $RES | json_pp -json_opt canonical,indent
 		exit
@@ -259,7 +259,7 @@ fi
 if [[ $1 == 'getPolicies' ]] || [[ $1 == 'gp' ]]; then
 
 	if [[ $# == 1 ]] ; then
-		RES=`curl "$POD/?action=getPolicies"`
+		RES=`curl -s "$POD/?action=getPolicies"`
 		echo $RES >> $LOG
 		echo $RES | json_pp -json_opt canonical,indent
 		exit
@@ -278,7 +278,7 @@ fi
 if [[ $1 == 'getWorkers' ]] || [[ $1 == 'gw' ]]; then
 
 	if [[ $# == 1 ]] ; then
-		RES=`curl "$POD/?action=getWorkers"`
+		RES=`curl -s "$POD/?action=getWorkers"`
 		echo $RES >> $LOG
 		echo $RES | json_pp -json_opt canonical,indent
 		exit
@@ -297,7 +297,7 @@ fi
 if [[ $1 == 'getAllExecutions' ]] || [[ $1 == 'gae' ]]; then
 
 	if [[ $# == 1 ]] ; then
-		RES=`curl "$POD/?action=getAllExecutions"`
+		RES=`curl -s "$POD/?action=getAllExecutions"`
 		echo $RES >> $LOG
 		echo $RES | json_pp -json_opt canonical,indent
 		exit
@@ -316,7 +316,7 @@ fi
 if [[ $1 == 'log' ]]; then
 
 	if [[ $# == 2 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		RES=`curl "$POD/?action=logs&type=$2"`
+		RES=`curl -s "$POD/?action=logs&type=$2"`
 		echo $RES >> $LOG
 		echo $RES | json_pp -json_opt canonical,indent
 		exit

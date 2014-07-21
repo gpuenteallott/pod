@@ -280,19 +280,19 @@ public class ExecutionHandler {
 			ah.newTimeRegister( execution.getActivityId() , (int)(execution.getFinishTime() - execution.getStartTime()) );
 		}
 		
-		// Put the execution object in the bag, so the client can retrieve it later
+		// Put the execution object in the map, so the client can retrieve it later
 		ExecutionMap map = new ExecutionMap();
 		map.put(execution);
 		
 		// In case there was an error in the worker with the execution
 		if ( "error".equals(execution.getStatus()) )
-			return new JsonObject().add("action", Action.ACK.getId());
+			return new JsonObject().add("action", Action.ACK.getId()).add("error","error with the execution at the worker");
 		
 		
 		// If the message contains executionChaining=false, we don't try to find another execution to send
 		// because the worker is busy installing something
 		if ( json.get("executionChaining") != null && !json.get("executionChaining").asBoolean() )
-			return new JsonObject().add("action", Action.ACK.getId());
+			return new JsonObject().add("action", Action.ACK.getId()).add("error","chaning is deactivated");
 		
 		// Look for pending executions in the queue, and return a PERFORM_EXECUTION if there are
 		// If there aren't, the json message will be a simple ACK
@@ -324,7 +324,7 @@ public class ExecutionHandler {
 			WorkerDAO wdao = new WorkerDAO();
 			wdao.updateStatus( workerId , "ready");
 
-			jsonResponse.add("action", Action.ACK.getId());
+			jsonResponse.add("action", Action.ACK.getId()).add("error","worker "+workerId+"set to ready");
 		}
 		
 		// If there is a pending execution we don't change the status of the worker (keep it "working")

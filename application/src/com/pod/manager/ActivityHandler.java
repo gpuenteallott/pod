@@ -63,10 +63,14 @@ public class ActivityHandler {
 	 */
 	public void newTimeRegister ( int activityId, int time ) {
 		
+		if ( executionTimes.get(activityId) == null ) {
+			newActivityTimeRegister(activityId);
+		}
+		
 		// Update value in the mean time
 		CircularFifoQueue<Integer> queue = executionTimes.get(activityId);
 		queue.add(time);
-		executionTimes.put( activityId, queue);
+		executionTimes.put( activityId, queue); // unnecessary?
 		
 		// Update the number of samples if necessary
 		Integer samples = executionTimeSamples.get(activityId);
@@ -74,7 +78,6 @@ public class ActivityHandler {
 				executionTimeSamples.put(activityId, samples+1);
 		}
 		
-		//System.out.println("Activity "+activityId+" has a mean time of "+getMeanTime(activityId)+ ". Valid="+areSamplesTaken(activityId)+"   "+ executionTimeSamples.get(activityId));
 	}
 	
 	
