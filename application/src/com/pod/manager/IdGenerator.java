@@ -22,8 +22,8 @@ public class IdGenerator {
 		
 		// If the id is 0 (init) or less than 0 (minimum value) then we generate another id.
 		// The max value of the new id is 1,000,000, which is 3 magnitude orders less than the MAX_INTEGER value
-		if ( id <= 0 ) id = new Random().nextInt(MAX_INIT_VALUE);
-		
+		//if ( id <= 0 ) id = new Random().nextInt(MAX_INIT_VALUE);
+		if ( id <= 0 ) id = 1;
 		return id++;
 	}
 	
