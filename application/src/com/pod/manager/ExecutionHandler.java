@@ -292,7 +292,7 @@ public class ExecutionHandler {
 		// If the message contains executionChaining=false, we don't try to find another execution to send
 		// because the worker is busy installing something
 		if ( json.get("executionChaining") != null && !json.get("executionChaining").asBoolean() )
-			return new JsonObject().add("action", Action.ACK.getId()).add("error","chaning is deactivated");
+			return new JsonObject().add("action", Action.ACK.getId());
 		
 		// Look for pending executions in the queue, and return a PERFORM_EXECUTION if there are
 		// If there aren't, the json message will be a simple ACK
@@ -324,7 +324,7 @@ public class ExecutionHandler {
 			WorkerDAO wdao = new WorkerDAO();
 			wdao.updateStatus( workerId , "ready");
 
-			jsonResponse.add("action", Action.ACK.getId()).add("error","worker "+workerId+"set to ready");
+			jsonResponse.add("action", Action.ACK.getId());
 		}
 		
 		// If there is a pending execution we don't change the status of the worker (keep it "working")

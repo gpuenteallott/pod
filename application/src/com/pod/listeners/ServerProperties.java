@@ -122,6 +122,7 @@ public class ServerProperties implements ServletContextListener {
 				for ( Worker w : workers )
 					if ( w.isManager() ) {
 						thisIsARedeploy = true;
+						workerId = w.getId();
 						break;
 					}
 				
