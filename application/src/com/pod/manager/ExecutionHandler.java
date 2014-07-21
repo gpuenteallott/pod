@@ -167,8 +167,9 @@ public class ExecutionHandler {
 				WorkerHandler wh = new WorkerHandler();
 				
 				// Only consider launching a new worker if we haven't reach the maximum and if there is a maxWait specified
-
-				System.out.println("MAX WORKERS RETRIEVED "+  activePolicy.getMaxWorkers());
+				System.out.println( "MAX WAIT IS " + activePolicy.getRule("maxWait"));
+				System.out.println( "activePolicy.getMaxWorkers() " + activePolicy.getMaxWorkers());
+				System.out.println( "wh.getTotalWorkers() " + wh.getTotalWorkers());
 				
 				if ( activePolicy.getMaxWorkers() < wh.getTotalWorkers() && activePolicy.getRule("maxWait") != null ) {
 					

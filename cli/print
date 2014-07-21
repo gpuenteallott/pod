@@ -7,20 +7,24 @@ Welcome to POD - Processing On Demand
 This is the list of commands. To get more information about each command, type \"pod command --help\"
 
 Usage: pod <command> [parameters]
-
-    - newActivity 
-    - getActivityStatus
-    - deleteActivity
-    - newExecution
-    - getExecutionStatus
-    - terminateExecution
-    - newPolicy
-    - applyPolicy
-    - deletePolicy
-    - viewActivePolicy
-    - getPolicies
-    - resetPolicies
+                                       abbreviated:
+    - newActivity                      na
+    - getActivity                      ga
+    - deleteActivity                   da
+    - newExecution                     ne
+    - getExecution                     ge
+    - getAllExecutions                 gae
+    - terminateExecution               te
+    - newPolicy                        np
+    - applyPolicy                      ap
+    - deletePolicy                     dp
+    - viewActivePolicy                 vp
+    - getPolicies                      gp
+    - resetPolicies                    rp
     - log
+    - redeploy
+    - deploy
+    - push
 
 To use, export the URL of the POD Manager using 
 export POD=
