@@ -1,5 +1,7 @@
 package com.pod.model;
 
+import java.util.Date;
+
 import com.eclipsesource.json.JsonObject;
 
 /**
@@ -14,6 +16,7 @@ public class Worker implements java.io.Serializable {
 	private String publicIp;
 	private String instanceId;
 	private boolean isManager;
+	private Date lastTimeWorked;
 	
 	public int getId() {
 		return id;
@@ -41,6 +44,7 @@ public class Worker implements java.io.Serializable {
 		if ( localIp != null ) json.add("localIp", localIp);
 		if ( publicIp != null ) json.add("publicIp", publicIp);
 		if ( instanceId != null ) json.add("instanceId", instanceId);
+		if ( lastTimeWorked != null ) json.add("lastTimeWorked", lastTimeWorked.getTime());
 		json.add("isManager", isManager);
 		return json;
 	}
@@ -61,5 +65,11 @@ public class Worker implements java.io.Serializable {
 	}
 	public void setManager(boolean isManager) {
 		this.isManager = isManager;
+	}
+	public Date getLastTimeWorked() {
+		return lastTimeWorked;
+	}
+	public void setLastTimeWorked(Date lastTimeWorked) {
+		this.lastTimeWorked = lastTimeWorked;
 	}
 }

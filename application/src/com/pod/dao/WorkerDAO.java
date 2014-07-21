@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.pod.model.Worker;
@@ -45,7 +46,7 @@ public class WorkerDAO {
 		try {
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "INSERT INTO workers ( status , local_ip, public_ip, instance_id, is_manager ) VALUES ( ?,?,?,?,? )";
+			String searchQuery = "INSERT INTO workers ( status , local_ip, public_ip, instance_id, is_manager, last_time_worked ) VALUES ( ?,?,?,?,?,? )";
 			
 			statement = con.prepareStatement(searchQuery, Statement.RETURN_GENERATED_KEYS);
 			statement.setString(1, worker.getStatus() );
@@ -53,6 +54,7 @@ public class WorkerDAO {
 			statement.setString(3, worker.getPublicIp() );
 			statement.setString(4, worker.getInstanceId() );
 			statement.setBoolean(5, worker.isManager() );
+			statement.setDate(6, new java.sql.Date( new Date().getTime() ) );
 			
 			statement.executeUpdate();
 			
@@ -227,7 +229,7 @@ public class WorkerDAO {
 				worker.setPublicIp( rs.getString("public_ip") );
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
-				break;
+				worker.setLastTimeWorked( rs.getDate("lastTimeWorked"));
 				
 			}
 			
@@ -294,6 +296,7 @@ public class WorkerDAO {
 				worker.setPublicIp( rs.getString("public_ip") );
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
+				worker.setLastTimeWorked( rs.getDate("lastTimeWorked"));
 				break;
 				
 			}
@@ -360,6 +363,7 @@ public class WorkerDAO {
 				worker.setPublicIp( rs.getString("public_ip") );
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
+				worker.setLastTimeWorked( rs.getDate("lastTimeWorked"));
 				workers.add(worker);
 			}
 			
@@ -484,6 +488,7 @@ public class WorkerDAO {
 				worker.setPublicIp( rs.getString("public_ip") );
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
+				worker.setLastTimeWorked( rs.getDate("lastTimeWorked"));
 				workers.add(worker);
 			}
 			
@@ -551,6 +556,7 @@ public class WorkerDAO {
 				worker.setPublicIp( rs.getString("public_ip") );
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
+				worker.setLastTimeWorked( rs.getDate("lastTimeWorked"));
 				workers.add(worker);
 			}
 			
@@ -616,6 +622,7 @@ public class WorkerDAO {
 				worker.setPublicIp( rs.getString("public_ip") );
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
+				worker.setLastTimeWorked( rs.getDate("lastTimeWorked"));
 				workers.add(worker);
 			}
 			
@@ -687,6 +694,7 @@ public class WorkerDAO {
 				worker.setPublicIp( rs.getString("public_ip") );
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
+				worker.setLastTimeWorked( rs.getDate("lastTimeWorked"));
 			}
 			
 		} catch (SQLException e) {
@@ -775,4 +783,56 @@ public class WorkerDAO {
 		     }
 		}
 	}
+	
+	
+	/**
+	 * Updates the last time worked field for the given worker by its id
+	 * @param worker worker with a valid id
+	 * @return true if updated, false otherwise
+	 */
+	public boolean update ( int workerId ) {
+		
+		Connection con = null;
+		PreparedStatement statement = null;
+		boolean updated = false;
+		
+		try {
+			
+			con = ConnectionManager.getConnection();
+			
+			String searchQuery = "UPDATE workers SET last_time_worked=? WHERE id = ?";
+			
+			statement = con.prepareStatement(searchQuery);
+			statement.setDate(1, new java.sql.Date( new Date().getTime() ) );
+			statement.setInt(2, workerId );
+
+			int rows = statement.executeUpdate();
+			
+			updated = rows > 0 ? true : false;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			error = e.toString();
+		}
+		
+		finally {
+		     
+		     if (statement != null) {
+		        try {
+		        	statement.close();
+		        } catch (Exception e) { System.err.println(e); }
+		        	statement = null;
+		        }
+		
+		     if (con != null) {
+		        try {
+		        	con.close();
+		        } catch (Exception e) { System.err.println(e); }
+		
+		        con = null;
+		     }
+		}
+		return updated;
+	}
+	
 }

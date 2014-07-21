@@ -99,6 +99,17 @@ public class Policy implements java.io.Serializable {
 	}
 	
 	/**
+	 * Shortcut function
+	 * @return
+	 */
+	public int getMinWorkers () {
+		if ( rules.get("fixedWorkers") != null )
+			return rules.get("fixedWorkers").asInt();
+		else
+			return Integer.parseInt( rules.get("minWorkers").asString() );
+	}
+	
+	/**
 	 * Deletes and retrieves the rule indicated by its name, or null if it's not found
 	 * @param ruleName
 	 * @return

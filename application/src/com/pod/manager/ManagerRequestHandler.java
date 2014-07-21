@@ -119,9 +119,9 @@ public class ManagerRequestHandler {
 		}
 		
 		// Request from client to view the info of the active policy
-		else if ( action == Action.VIEW_ACTIVE_POLICY ) {
+		else if ( action == Action.GET_ACTIVE_POLICY ) {
 			PolicyHandler h = new PolicyHandler();
-			return h.viewActivePolicy();
+			return h.getActivePolicy();
 		}
 		
 		// Request from client to list all workers
@@ -145,12 +145,6 @@ public class ManagerRequestHandler {
 		else if ( action == Action.GET_ALL_EXECUTIONS ) {
 			ExecutionHandler h = new ExecutionHandler();
 			return h.getAllExecutions();
-		}
-		
-		// A message from worker requesting termination
-		else if ( action == Action.SELF_TERMINATION_REQUEST ) {
-			WorkerHandler h = new WorkerHandler();
-			return h.handleTerminationRequest(json);
 		}
 	
 		return jsonResponse.add("error", "this manager doesn't recognize that request");

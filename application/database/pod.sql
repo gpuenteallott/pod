@@ -30,6 +30,7 @@ CREATE  TABLE IF NOT EXISTS `pod`.`workers` (
   `local_ip` VARCHAR(45) NULL DEFAULT NULL ,
   `instance_id` VARCHAR(45) NULL DEFAULT NULL ,
   `is_manager` INT(1) NOT NULL DEFAULT 0 ,
+  `last_time_worked` TIMESTAMP NULL DEFAULT NULL ,
   PRIMARY KEY (`id`) )
 ENGINE = InnoDB
 AUTO_INCREMENT = 433

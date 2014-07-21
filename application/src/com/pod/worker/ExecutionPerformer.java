@@ -48,7 +48,6 @@ public class ExecutionPerformer implements Runnable {
 	public void run () {
 		
 		executionInProcess = true;
-		StatusCheckerTask.setLastTimeWorking( new Date());
 		
 		// Logging
 			System.out.println("Worker: starting execution "+execution.getId()+" of activity '"+execution.getActivityName() +"'");
@@ -130,8 +129,6 @@ public class ExecutionPerformer implements Runnable {
 		else {
 			executionInProcess = false;
 		}
-		
-		StatusCheckerTask.setLastTimeWorking( new Date());
 	}
 	
 	private JsonObject execute () {

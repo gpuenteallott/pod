@@ -30,16 +30,14 @@ public enum Action {
 	DELETE_POLICY(31),
 	APPLY_POLICY(32),
 	RESET_POLICIES(33),
-	VIEW_ACTIVE_POLICY(34),
+	GET_ACTIVE_POLICY(34),
 	GET_POLICIES(35),
 	
 	WORKER_DEPLOYED(40), // sent from new deployed worker to manager
 	
 	GET_WORKERS(50),
 	
-	GET_LOGS(60),
-	
-	SELF_TERMINATION_REQUEST(70);
+	GET_LOGS(60);
 	
 	
 	private int id;

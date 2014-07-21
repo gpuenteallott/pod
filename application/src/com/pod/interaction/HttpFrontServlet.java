@@ -33,11 +33,6 @@ public class HttpFrontServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		// Verify that we have the info of the public DNS
-		if ( ServerProperties.getDns() == null ) {
-			ServerProperties.setDns( request.getServerName() );
-		}
-		
 		// Do request processing as manager receiving request from outside the cloud
 		doManagerFromOutside(request,response);
 	}
@@ -253,11 +248,11 @@ public class HttpFrontServlet extends HttpServlet {
 		}
 
 		// Requesting information from the active policy
-		else if ( action.equals("viewActivePolicy") ) {
+		else if ( action.equals("getActivePolicy") ) {
 			
 			// Prepare json object to pass to the request handler
 			json = new JsonObject();
-			json.add("action", Action.VIEW_ACTIVE_POLICY.getId());
+			json.add("action", Action.GET_ACTIVE_POLICY.getId());
 			
 			// Logging
 				System.out.println("Message log. From outside. action:"+action); System.out.println();

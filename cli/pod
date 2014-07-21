@@ -215,21 +215,21 @@ if [[ $1 == 'deletePolicy' ]] || [[ $1 == 'dp' ]]; then
 fi
 
 
-if [[ $1 == 'viewActivePolicy' ]] || [[ $1 == 'vp' ]]; then
+if [[ $1 == 'getActivePolicy' ]] || [[ $1 == 'gap' ]]; then
 
 	if [[ $# == 1 ]] ; then
-		RES=`curl -s "$POD/?action=viewActivePolicy"`
+		RES=`curl -s "$POD/?action=getActivePolicy"`
 		echo $RES >> $LOG
 		echo $RES | json_pp -json_opt canonical,indent
 		exit
 	fi
 	
 	if [[ $# == 2 ]] && [[ $2 == '--help' ]]; then
-		./print "viewActivePolicy --help"
+		./print "getActivePolicy --help"
 		exit
 	else 
-		echo "Usage: pod viewActivePolicy"
-		echo "Type pod viewActivePolicy --help for more information"
+		echo "Usage: pod getActivePolicy"
+		echo "Type pod getActivePolicy --help for more information"
 		exit
 	fi
 fi

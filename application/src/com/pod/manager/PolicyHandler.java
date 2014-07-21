@@ -10,20 +10,12 @@ import com.pod.model.Policy;
 
 public class PolicyHandler {
 	
-	private static Policy defaultPolicy;
-	private static final String DEFAULT_POLICY_NAME = "default";
 	private static final int DEFAULT_MAX_WAIT = 60*1000;
 	
 	/**
 	 * Constructor that initializes the default policy internal object
 	 */
 	public PolicyHandler() {
-		
-		// Set up the default policy
-		if ( defaultPolicy == null ) {
-			defaultPolicy = new Policy(DEFAULT_POLICY_NAME);
-			defaultPolicy.setRule("fixedWorkers", "1");
-		}
 	}
 
 	/**
@@ -44,10 +36,6 @@ public class PolicyHandler {
 		if ( nameValue == null ) return new JsonObject().add("error", "Parameter name is null");
 		if ( !nameValue.isString() ) return new JsonObject().add("error", "Parameter name isn't a string");
 		String name = nameValue.asString();
-		
-		// We don't allow a policy with the default name
-		if ( name.equals(DEFAULT_POLICY_NAME) )
-			return new JsonObject().add("error", "The policy name "+name+" already exists");
 		
 		JsonValue rulesValue = policyJson.get("rules");
 		if ( rulesValue == null ) return new JsonObject().add("error", "Parameter rules is null");
@@ -112,10 +100,6 @@ public class PolicyHandler {
 		if ( !nameValue.isString() ) return new JsonObject().add("error", "Parameter name isn't a string");
 		String name = nameValue.asString();
 		
-		// We don't allow a policy with the default name
-		if ( name.equals(DEFAULT_POLICY_NAME) )
-			return new JsonObject().add("error", "The default policy can't be deleted");
-		
 		// Delete policy from database
 		PolicyDAO pdao = new PolicyDAO();
 		boolean deleted = pdao.delete(name);
@@ -148,9 +132,6 @@ public class PolicyHandler {
 			jsonPolicies.add(policy.toJsonObject());
 		}
 		
-		defaultPolicy.setActive(defaultActive);
-		jsonPolicies.add( defaultPolicy.toJsonObject() );
-		
 		return new JsonObject().add("policies", jsonPolicies);
 	}
 	
@@ -177,15 +158,7 @@ public class PolicyHandler {
 		PolicyDAO pdao = new PolicyDAO();
 		Policy previousPolicy = pdao.getActive();
 		
-		// Set it as active
-		boolean updated = false;
-		if ( name.equals("default") ) {
-			updated = true;
-		}
-		else {
-			updated = pdao.setActive(name);
-		}
-		
+		boolean updated = pdao.setActive(name);
 		
 		if ( !updated )
 			if ( pdao.getError() == null || pdao.getError().equals("") ) 
@@ -194,7 +167,7 @@ public class PolicyHandler {
 				return new JsonObject().add("error", pdao.getError());
 		
 		// Deactivate the previous policy
-		if ( previousPolicy != null ) {
+		if ( previousPolicy != null && !previousPolicy.getName().equals(name) ) {
 			updated = pdao.setInactive( previousPolicy );
 			if ( !updated )
 				return new JsonObject().add("error", pdao.getError());
@@ -204,8 +177,8 @@ public class PolicyHandler {
 		new Thread( new Runnable() {
 			public void run() {
 				
-				PolicyHandler h = new PolicyHandler();
-				Policy policy = h.getActivePolicy();
+				PolicyDAO pdao = new PolicyDAO();
+				Policy policy = pdao.getActive();
 				WorkerHandler wh = new WorkerHandler();
 				
 				int minWorkers = 1;
@@ -235,25 +208,17 @@ public class PolicyHandler {
 		}).start();
 		
 		// Return the information of the new active policy
-		return viewActivePolicy();
+		return getActivePolicy();
 	}
 	
-	/**
-	 * Retrieves the information for the active policy
-	 * @return
-	 */
-	public JsonObject viewActivePolicy () {
-		
-		return new JsonObject().add("policy", getActivePolicy().toJsonObject());
-	}
+
 	
-	public Policy getActivePolicy () {
+	public JsonObject getActivePolicy() {
 		
 		// Retrieve the previous active policy
 		PolicyDAO pdao = new PolicyDAO();
-		Policy policy = pdao.getActive();
 		
-		return policy != null ? policy : defaultPolicy;
+		return pdao.getActive().toJsonObject();
 	}
 
 	/**

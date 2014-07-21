@@ -8,6 +8,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.pod.dao.ActivityDAO;
 import com.pod.dao.InstallationDAO;
+import com.pod.dao.PolicyDAO;
 import com.pod.dao.WorkerDAO;
 import com.pod.interaction.Action;
 import com.pod.interaction.HttpSender;
@@ -86,6 +87,7 @@ public class ExecutionHandler {
 			if ( worker != null ) {
 				
 				worker.setStatus("working");
+				worker.setLastTimeWorked( new Date() );
 				wdao.update(worker);
 			}
 		}
@@ -162,8 +164,8 @@ public class ExecutionHandler {
 				int predictedTime = calculateTimeToFinish(execution.getActivityId());
 				jsonResponse.add("execution", execution.toJsonObject().add("predictedTime", predictedTime) );
 				
-				PolicyHandler ph = new PolicyHandler();
-				Policy activePolicy = ph.getActivePolicy();
+				PolicyDAO pdao = new PolicyDAO();
+				Policy activePolicy = pdao.getActive();
 				WorkerHandler wh = new WorkerHandler();
 				
 				// Only consider launching a new worker if we haven't reach the maximum and if there is a maxWait specified
@@ -266,6 +268,11 @@ public class ExecutionHandler {
 	 */
 	public JsonObject handleExecutionReport ( JsonObject json ) {
 		
+		WorkerDAO wdao = new WorkerDAO();
+		Worker worker = wdao.select( json.get("workerId").asInt() );
+		worker.setLastTimeWorked( new Date() );
+		wdao.update(worker);
+		
 		Execution execution = new Execution (json.get("execution").asObject());
 		
 		// If the execution finished without error, we update its finish time
@@ -293,7 +300,7 @@ public class ExecutionHandler {
 		
 		// Look for pending executions in the queue, and return a PERFORM_EXECUTION if there are
 		// If there aren't, the json message will be a simple ACK
-		return lookForPendingExecution ( json.get("workerId").asInt() );
+		return lookForPendingExecution ( worker );
 	}
 	
 	
@@ -303,14 +310,14 @@ public class ExecutionHandler {
 	 * @param workerId
 	 * @return
 	 */
-	public JsonObject lookForPendingExecution ( int workerId ) {
+	public JsonObject lookForPendingExecution ( Worker worker ) {
 		
 		// Prepare response object
 		JsonObject jsonResponse = new JsonObject();
 		
 		// Check if there is a pending execution in the queue that this worker could handle
 		InstallationDAO idao = new InstallationDAO();
-		int[] activityIds = idao.selectInstalledActivityIdsByWorker( workerId );
+		int[] activityIds = idao.selectInstalledActivityIdsByWorker( worker.getId() );
 		
 		ExecutionWaitingQueue queue = new ExecutionWaitingQueue();
 		Execution newExecution = queue.pull(activityIds);
@@ -319,7 +326,7 @@ public class ExecutionHandler {
 		// we set the worker status to "ready" because it's available
 		if ( newExecution == null ) {
 			WorkerDAO wdao = new WorkerDAO();
-			wdao.updateStatus( workerId , "ready");
+			wdao.updateStatus( worker.getId() , "ready");
 
 			jsonResponse.add("action", Action.ACK.getId());
 		}
@@ -331,8 +338,6 @@ public class ExecutionHandler {
 			
 			// We need to get its IP address to put it in the execution map
 			// This is necessary in order to allow clients to terminate executions
-			WorkerDAO wdao = new WorkerDAO();
-			Worker worker = wdao.select( workerId );
 			map.setWorkerIP(newExecution.getId(), worker.getLocalIp());
 			
 			// Update execution info

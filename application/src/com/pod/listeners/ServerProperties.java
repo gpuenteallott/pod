@@ -21,6 +21,7 @@ import com.pod.dao.PolicyDAO;
 import com.pod.dao.WorkerDAO;
 import com.pod.interaction.Action;
 import com.pod.interaction.HttpSender;
+import com.pod.model.Policy;
 import com.pod.model.Worker;
 import com.pod.worker.StatusCheckerTask;
 
@@ -52,7 +53,6 @@ public class ServerProperties implements ServletContextListener {
 	
 	private static String role;
 	private static String name;
-	private static String dns;
 	private static String securityGroup;
 	private static String keypair;
 	private static int workerId;
@@ -63,7 +63,6 @@ public class ServerProperties implements ServletContextListener {
 	private static String localIp;
 	private static String publicIp;
 	private static String instanceId;
-	private static int terminationTime;
 	
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
@@ -126,8 +125,18 @@ public class ServerProperties implements ServletContextListener {
 						break;
 					}
 				
-				if ( !thisIsARedeploy )
+				if ( !thisIsARedeploy ) {
+
 					workerId = wdao.insert(worker);
+					
+					Policy defaultPolicy = new Policy("default");
+					defaultPolicy.setRule("fixedWorkers", "1");
+					defaultPolicy.setActive(true);
+					
+					PolicyDAO pdao = new PolicyDAO();
+					pdao.insert(defaultPolicy);
+					
+				}
 				// We should as the workers what is their state, but for now we're going to set them to ready
 				else {
 					for ( Worker w : workers ) {
@@ -140,17 +149,12 @@ public class ServerProperties implements ServletContextListener {
 				
 				managerLocalIp = localIp;
 				
-				// Obtain our own public IP address
-			    String s;
-			    URL u = new URL("http://bot.whatismyipaddress.com/");
-		    	BufferedReader in = new BufferedReader( new InputStreamReader(u.openStream()) );
-		    	while ((s = in.readLine()) != null) {
-		            dns = s;
-		        }
-		    	in.close();
-			    
-			    logger.info("DNS "+dns);
 				
+				// Set up the timer for periodic tasks
+				Timer time = new Timer();
+				StatusCheckerTask sct = new StatusCheckerTask();
+				time.schedule(sct, PERIODIC_CHECKS_INTERVAL, PERIODIC_CHECKS_INTERVAL);
+
 				
 			}
 			// If this is a worker, read the property from the properties file
@@ -160,13 +164,6 @@ public class ServerProperties implements ServletContextListener {
 				
 				managerLocalIp = properties.getProperty("managerLocalIp");
 				workerId = Integer.parseInt( properties.getProperty("workerId") );
-				terminationTime = Integer.parseInt( properties.getProperty("terminationTime") );
-				
-				// Set up the timer for periodic tasks
-				Timer time = new Timer();
-				StatusCheckerTask sct = new StatusCheckerTask();
-				sct.setLastTimeWorking( new Date());
-				time.schedule(sct, PERIODIC_CHECKS_INTERVAL, PERIODIC_CHECKS_INTERVAL);
 			
 				// We must contact the master here, so they know we've launched
 				HttpSender sender = new HttpSender();
@@ -216,13 +213,6 @@ public class ServerProperties implements ServletContextListener {
 		ServerProperties.name = name;
 	}
 
-	public static String getDns() {
-		return dns;
-	}
-
-	public static void setDns(String dns) {
-		ServerProperties.dns = dns;
-	}
 
 	public static int getWorkerId() {
 		return workerId;
@@ -266,13 +256,6 @@ public class ServerProperties implements ServletContextListener {
 	public static String getInstanceId(){
 		return instanceId;
 	}
-	public static int getTerminationTime() {
-		return terminationTime;
-	}
-	public static void setTerminationTime( int newterminationTime ) {
-		terminationTime = newterminationTime;
-	}
-	
 
 	private boolean delete(File f) {
 	  if (f.isDirectory()) {

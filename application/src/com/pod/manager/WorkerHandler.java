@@ -16,6 +16,7 @@ import com.amazonaws.services.ec2.model.*;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.pod.dao.ActivityDAO;
+import com.pod.dao.PolicyDAO;
 import com.pod.dao.WorkerDAO;
 import com.pod.interaction.Action;
 import com.pod.listeners.ServerProperties;
@@ -183,7 +184,7 @@ public class WorkerHandler {
 	}
 	
 	
-	private void terminateWorkerAction ( List<String> instanceIds ) {
+	public void terminateWorkerAction ( List<String> instanceIds ) {
 		
 		// Try to create the client
 		AWSCredentialsProvider credentialsProvider = new ClasspathPropertiesFileCredentialsProvider("/main/resources/AwsCredentials.properties");
@@ -224,14 +225,6 @@ public class WorkerHandler {
 		                   .replace("REPO_URL=", "REPO_URL="+ServerProperties.getRepoURL())
 		                   .replace("KEYPAIR=", "KEYPAIR="+ServerProperties.getKeypair())
 		                   .replace("SECURITY_GROUP=", "SECURITY_GROUP="+ServerProperties.getSecutiryGroup());
-		
-		
-		PolicyHandler ph = new PolicyHandler();
-		Policy activePolicy = ph.getActivePolicy();
-		if ( activePolicy.getRule("terminationTime") == null )
-			userData = userData.replace("TERMINATION_TIME=", "TERMINATION_TIME="+ServerProperties.DEFAULT_TIME_TO_TERMINATE);
-		else
-			userData = userData.replace("TERMINATION_TIME=", "TERMINATION_TIME="+activePolicy.getRule("terminationTime"));
 		
 		
 		// Run instance

@@ -1,48 +1,53 @@
 package com.pod.worker;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TimerTask;
 
-import com.eclipsesource.json.JsonObject;
-import com.pod.interaction.Action;
-import com.pod.interaction.HttpSender;
-import com.pod.listeners.ServerProperties;
+import com.pod.dao.PolicyDAO;
+import com.pod.dao.WorkerDAO;
+import com.pod.manager.WorkerHandler;
+import com.pod.model.Policy;
+import com.pod.model.Worker;
 
 /**
- * This class contains the logic to be performed in a periodic basis, such us the self termination procedure
+ * This class contains the logic to be performed in a periodic basis, such us the termination procedure
+ * 
+ * This approach to terminate workers isn't very good, although it works for now
+ * The problem consists in that a task could be assigned to a worker while we are deciding if we should terminate it or not
  * @author will
  *
  */
 public class StatusCheckerTask extends TimerTask {
 	
-	private static Date lastTimeWorking;
+	public static int DEFAULT_TERMINATION_TIME = 45*60*1000; // 45 mins
 	
 	public void run () {
 		
-		// If we have been free more time than the time to disconnect, we send a request to the manager to terminate this worker
-		if ( !ExecutionPerformer.isExecutionInProcess() && new Date().getTime() - lastTimeWorking.getTime() > ServerProperties.getTerminationTime() ) {
+		WorkerHandler wh = new WorkerHandler();
+		PolicyDAO pdao = new PolicyDAO();
+		Policy policy = pdao.getActive();
+		
+		// Before we even check if we can terminate a worker, we make sure we have room to terminate
+		if ( wh.getTotalWorkers() > policy.getMinWorkers() ) {
 			
-			JsonObject message = new JsonObject();
-			message.add( "action", Action.SELF_TERMINATION_REQUEST.getId() );
+			WorkerDAO wdao = new WorkerDAO();
+			Worker[] workers = wdao.list();
 			
-			HttpSender sender = new HttpSender();
-			sender.setDestinationIP( ServerProperties.getManagerLocalIp() );
-			sender.setDestinationRole("manager");
-			sender.setMessage(message);
+			Date now = new Date();
+			int terminationTime = policy.getRule("terminationTime") == null ? DEFAULT_TERMINATION_TIME : Integer.parseInt( policy.getRule("terminationTime") );
 			
-			String response = null;
-			try {
-				response = sender.send();
-			} catch (IOException e) {
-				e.printStackTrace();
-				return;
+			List<String> instanceIds = new ArrayList<String>();
+			
+			for ( Worker worker : workers ) {
+				
+				if ( worker.getLastTimeWorked().getTime() < now.getTime() - terminationTime ) {
+					instanceIds.add(worker.getInstanceId());
+				}
 			}
+			
+			wh.terminateWorkerAction(instanceIds);
 		}
 	}
-	
-	public static void setLastTimeWorking ( Date d ) {
-		lastTimeWorking = d;
-	}
-
 }

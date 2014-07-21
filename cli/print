@@ -18,7 +18,7 @@ Usage: pod <command> [parameters]
     - newPolicy                        np
     - applyPolicy                      ap
     - deletePolicy                     dp
-    - viewActivePolicy                 vp
+    - getActivePolicy                  gap
     - getPolicies                      gp
     - resetPolicies                    rp
     - log
@@ -173,15 +173,15 @@ Example:
 fi
 
 
-if [[ $1 == "viewActivePolicy --help" ]]; then
+if [[ $1 == "getActivePolicy --help" ]]; then
 
   echo "
-POD viewActivePolicy
+POD getActivePolicy
 
 Returns the information of the currently active policy. This policy has the rules that define the behaviour of the POD cloud
 
 Example:
-    ./pod viewActivePolicy
+    ./pod getActivePolicy
 
 "
 fi
