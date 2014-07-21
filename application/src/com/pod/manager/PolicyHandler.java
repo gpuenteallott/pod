@@ -22,7 +22,7 @@ public class PolicyHandler {
 		// Set up the default policy
 		if ( defaultPolicy == null ) {
 			defaultPolicy = new Policy(DEFAULT_POLICY_NAME);
-			defaultPolicy.setRule("fixedWorkers", 1);
+			defaultPolicy.setRule("fixedWorkers", "1");
 		}
 	}
 
@@ -204,8 +204,8 @@ public class PolicyHandler {
 		new Thread( new Runnable() {
 			public void run() {
 				
-				PolicyDAO pdao = new PolicyDAO();
-				Policy policy = pdao.getActive();
+				PolicyHandler h = new PolicyHandler();
+				Policy policy = h.getActivePolicy();
 				WorkerHandler wh = new WorkerHandler();
 				
 				int minWorkers = 1;
