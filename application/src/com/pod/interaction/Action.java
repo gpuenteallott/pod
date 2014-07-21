@@ -37,7 +37,9 @@ public enum Action {
 	
 	GET_WORKERS(50),
 	
-	GET_LOGS(60);
+	GET_LOGS(60),
+	
+	SELF_TERMINATION_REQUEST(70);
 	
 	
 	private int id;

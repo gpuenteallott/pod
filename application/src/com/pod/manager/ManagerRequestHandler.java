@@ -146,6 +146,12 @@ public class ManagerRequestHandler {
 			ExecutionHandler h = new ExecutionHandler();
 			return h.getAllExecutions();
 		}
+		
+		// A message from worker requesting termination
+		else if ( action == Action.SELF_TERMINATION_REQUEST ) {
+			WorkerHandler h = new WorkerHandler();
+			return h.handleTerminationRequest(json);
+		}
 	
 		return jsonResponse.add("error", "this manager doesn't recognize that request");
 	}

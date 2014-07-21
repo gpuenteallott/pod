@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Date;
 import java.util.Properties;
+import java.util.Timer;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletContextEvent;
@@ -20,6 +22,7 @@ import com.pod.dao.WorkerDAO;
 import com.pod.interaction.Action;
 import com.pod.interaction.HttpSender;
 import com.pod.model.Worker;
+import com.pod.worker.StatusCheckerTask;
 
 
 /**
@@ -44,6 +47,9 @@ public class ServerProperties implements ServletContextListener {
 			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
 			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 	
+	private static final int PERIODIC_CHECKS_INTERVAL = 60 * 1000;
+	public static int DEFAULT_TIME_TO_TERMINATE = 45*60*1000; // 45 mins
+	
 	private static String role;
 	private static String name;
 	private static String dns;
@@ -57,6 +63,7 @@ public class ServerProperties implements ServletContextListener {
 	private static String localIp;
 	private static String publicIp;
 	private static String instanceId;
+	private static int timeToTerminate;
 	
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
@@ -152,10 +159,15 @@ public class ServerProperties implements ServletContextListener {
 				
 				managerLocalIp = properties.getProperty("managerLocalIp");
 				workerId = Integer.parseInt( properties.getProperty("workerId") );
+				timeToTerminate = Integer.parseInt( properties.getProperty("timeToTerminate") );
+				
+				// Set up the timer for periodic tasks
+				Timer time = new Timer();
+				StatusCheckerTask sct = new StatusCheckerTask();
+				sct.setLastTimeWorking( new Date());
+				time.schedule(sct, PERIODIC_CHECKS_INTERVAL, PERIODIC_CHECKS_INTERVAL);
 			
 				// We must contact the master here, so they know we've launched
-				// Send message to manager when done
-				
 				HttpSender sender = new HttpSender();
 				
 				// The workerId is automatically added to the message
@@ -252,6 +264,12 @@ public class ServerProperties implements ServletContextListener {
 	}
 	public static String getInstanceId(){
 		return instanceId;
+	}
+	public static int getTimeToTerminate() {
+		return timeToTerminate;
+	}
+	public static void setTimeToTerminate( int newTimeToDisconnect ) {
+		timeToTerminate = newTimeToDisconnect;
 	}
 	
 

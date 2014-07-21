@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Date;
 
 import com.eclipsesource.json.JsonObject;
 import com.pod.interaction.Action;
@@ -47,6 +48,7 @@ public class ExecutionPerformer implements Runnable {
 	public void run () {
 		
 		executionInProcess = true;
+		StatusCheckerTask.setLastTimeWorking( new Date());
 		
 		// Logging
 			System.out.println("Worker: starting execution "+execution.getId()+" of activity '"+execution.getActivityName() +"'");
@@ -128,6 +130,8 @@ public class ExecutionPerformer implements Runnable {
 		else {
 			executionInProcess = false;
 		}
+		
+		StatusCheckerTask.setLastTimeWorking( new Date());
 	}
 	
 	private JsonObject execute () {

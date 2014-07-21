@@ -20,6 +20,7 @@ import com.pod.dao.WorkerDAO;
 import com.pod.interaction.Action;
 import com.pod.listeners.ServerProperties;
 import com.pod.model.Activity;
+import com.pod.model.Policy;
 import com.pod.model.Worker;
 
 /**
@@ -122,6 +123,33 @@ public class WorkerHandler {
 	
 	public void stopWorker(int id){}
 	
+	public JsonObject handleTerminationRequest ( JsonObject json ) {
+		
+		if ( json.get("workerId") == null )
+			return new JsonObject().add("error", "no worker id specified");
+		
+		int workerId = json.get("workerId").asInt();
+		
+		WorkerDAO wdao = new WorkerDAO();
+		Worker worker = wdao.select(workerId);
+		
+		if ( worker == null )
+			return new JsonObject().add("error", "no worker found with that id");
+		
+		if ( worker.isManager() )
+			return new JsonObject().add("error", "can't terminate manager");
+		
+		worker.setStatus("terminated");
+		wdao.update(worker);
+		
+		List<String> instanceIds = new ArrayList<String>();
+		instanceIds.add( worker.getInstanceId() );
+		
+		terminateWorkerAction ( instanceIds );
+		
+		return new JsonObject().add("action", Action.ACK.getId());
+	}
+	
 	/**
 	 * At the moment, this method terminates the workers, interrupting whatever they were doing
 	 * For a future iteration, the correct process would be to try to notify the worker first, so the worker does it
@@ -197,6 +225,13 @@ public class WorkerHandler {
 		                   .replace("KEYPAIR=", "KEYPAIR="+ServerProperties.getKeypair())
 		                   .replace("SECURITY_GROUP=", "SECURITY_GROUP="+ServerProperties.getSecutiryGroup());
 		
+		
+		PolicyHandler ph = new PolicyHandler();
+		Policy activePolicy = ph.getActivePolicy();
+		if ( activePolicy.getRule("timeToTerminate") == null )
+			userData = userData.replace("TIME_TO_TERMINATE=", "TIME_TO_TERMINATE="+ServerProperties.DEFAULT_TIME_TO_TERMINATE);
+		else
+			userData = userData.replace("TIME_TO_TERMINATE=", "TIME_TO_TERMINATE="+activePolicy.getRule("timeToTerminate"));
 		
 		
 		// Run instance

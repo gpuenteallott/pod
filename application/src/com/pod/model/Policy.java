@@ -92,12 +92,10 @@ public class Policy implements java.io.Serializable {
 	 * @return
 	 */
 	public int getMaxWorkers () {
-		
 		if ( rules.get("fixedWorkers") != null )
 			return rules.get("fixedWorkers").asInt();
 		else
 			return Integer.parseInt( rules.get("maxWorkers").asString() );
-		
 	}
 	
 	/**
