@@ -71,7 +71,8 @@ public class SystemSchedulerTask extends TimerTask {
 				toTerminate++;
 			}
 		}
-		wh.terminateWorkerAction(instanceIds);
+		if (instanceIds.size() > 0)
+			wh.terminateWorkerAction(instanceIds);
 		System.out.println("SystemSchedulerTask: found "+toTerminate+" workers that are going to be terminated due to errors");
 		
 		// Check if there are workers not giving signs of being active

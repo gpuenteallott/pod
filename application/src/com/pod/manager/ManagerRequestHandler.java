@@ -172,7 +172,7 @@ public class ManagerRequestHandler {
 			filename = "/home/pod/server.properties";
 		else if ( "server".equals(type) ) {
 			filename = "/var/lib/tomcat7/logs/catalina.out";
-			linesToShow = 100;
+			linesToShow = 150;
 		}
 		
 		response.add("filename", filename);
