@@ -37,6 +37,9 @@ public enum Action {
 	
 	GET_WORKERS(50),
 	
+	STILL_ALIVE(55), // sent from worker to manager to inform that it is still listening for activities
+	                 // it is also a way for the worker to see if the manager is alive
+	
 	GET_LOGS(60);
 	
 	

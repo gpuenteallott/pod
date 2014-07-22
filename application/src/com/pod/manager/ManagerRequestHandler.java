@@ -146,6 +146,12 @@ public class ManagerRequestHandler {
 			ExecutionHandler h = new ExecutionHandler();
 			return h.getAllExecutions();
 		}
+		
+		// A message sent from the worker to inform that it is alive
+		else if ( action == Action.STILL_ALIVE ) {
+			WorkerHandler h = new WorkerHandler();
+			return h.stillAlive( json );
+		}
 	
 		return jsonResponse.add("error", "this manager doesn't recognize that request");
 	}

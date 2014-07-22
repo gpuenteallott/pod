@@ -38,7 +38,7 @@ public class WorkerHandler {
 	}
 	
 	public int getTotalWorkers() {
-		return new WorkerDAO().list().length; // the list method already retrieves only non terminated workers
+		return new WorkerDAO().list().length - getErrorWorkers(); // the list method already retrieves only non terminated workers
 	}
 	public int getReadyWorkers() {
 		return new WorkerDAO().selectByStatus( new String[] {"ready"} ).length;
@@ -57,6 +57,9 @@ public class WorkerHandler {
 	}
 	public int getTerminatedWorkers() {
 		return new WorkerDAO().selectByStatus( new String[] {"terminated"} ).length;
+	}
+	public int getErrorWorkers() {
+		return new WorkerDAO().selectByStatus( new String[] {"error"} ).length;
 	}
 
 	
@@ -124,6 +127,17 @@ public class WorkerHandler {
 	
 	public void stopWorker(int id){}
 
+	
+	public JsonObject stillAlive ( JsonObject json ) {
+		
+		int workerId = json.get("workerId").asInt();
+		
+		WorkerDAO wdao = new WorkerDAO();
+		wdao.updateLastTimeAlive(workerId);
+		
+		return new JsonObject().add("action", Action.ACK.getId());
+		
+	}
 	
 	/**
 	 * At the moment, this method terminates the workers, interrupting whatever they were doing
@@ -249,8 +263,8 @@ public class WorkerHandler {
 		worker.setInstanceId( json.get("instanceId").asString() );
 		
 		WorkerDAO wdao = new WorkerDAO();
-		wdao.update( worker );
 		wdao.updateLastTimeWorked( worker.getId() );
+		wdao.update( worker );
 		
 		// Now that the manager knows that the worker exists, we must notify the installations to the worker
 		// Right now, we send one message per activity to the worker

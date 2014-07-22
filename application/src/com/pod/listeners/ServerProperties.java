@@ -21,9 +21,10 @@ import com.pod.dao.PolicyDAO;
 import com.pod.dao.WorkerDAO;
 import com.pod.interaction.Action;
 import com.pod.interaction.HttpSender;
+import com.pod.manager.SystemSchedulerTask;
 import com.pod.model.Policy;
 import com.pod.model.Worker;
-import com.pod.worker.StatusCheckerTask;
+import com.pod.worker.WorkerUpdaterTask;
 
 
 /**
@@ -48,7 +49,8 @@ public class ServerProperties implements ServletContextListener {
 			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
 			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 	
-	private static final int PERIODIC_CHECKS_INTERVAL = 5 * 1000; // every 5 secs
+	private static final int PERIODIC_CHECKS_INTERVAL = 30 * 1000; // every 30 sec
+	private static final int WORKER_PERIODIC_UPDATES_INTERVAL = 60*60*1000; // every 2 mins
 	public static int DEFAULT_TIME_TO_TERMINATE = 45*60*1000; // 45 mins
 	
 	private static String role;
@@ -151,7 +153,7 @@ public class ServerProperties implements ServletContextListener {
 				
 				// Set up the timer for periodic tasks
 				Timer time = new Timer();
-				StatusCheckerTask sct = new StatusCheckerTask();
+				SystemSchedulerTask sct = new SystemSchedulerTask();
 				time.schedule(sct, PERIODIC_CHECKS_INTERVAL, PERIODIC_CHECKS_INTERVAL);
 
 				
@@ -186,6 +188,11 @@ public class ServerProperties implements ServletContextListener {
 				}
 				
 				JsonObject jsonResponse = JsonObject.readFrom(response);
+				
+				// Set up the timer for periodic tasks
+				Timer time = new Timer();
+				WorkerUpdaterTask sct = new WorkerUpdaterTask();
+				time.schedule(sct, WORKER_PERIODIC_UPDATES_INTERVAL, WORKER_PERIODIC_UPDATES_INTERVAL);
 				
 			}
 		} catch (IOException e) {

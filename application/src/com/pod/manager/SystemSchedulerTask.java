@@ -1,4 +1,4 @@
-package com.pod.worker;
+package com.pod.manager;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,7 +7,6 @@ import java.util.TimerTask;
 
 import com.pod.dao.PolicyDAO;
 import com.pod.dao.WorkerDAO;
-import com.pod.manager.WorkerHandler;
 import com.pod.model.Policy;
 import com.pod.model.Worker;
 
@@ -19,9 +18,10 @@ import com.pod.model.Worker;
  * @author will
  *
  */
-public class StatusCheckerTask extends TimerTask {
+public class SystemSchedulerTask extends TimerTask {
 	
 	public static int DEFAULT_TERMINATION_TIME = 45*60*1000; // 45 mins
+	public static int DEFAULT_ERROR_TIMEOUT = 60*1000; // 5 mins
 	
 	public void run () {
 		
@@ -56,5 +56,35 @@ public class StatusCheckerTask extends TimerTask {
 			
 			System.out.println("Workers terminated="+instanceIds.size()+", terminationTime="+terminationTime+" ms");
 		}
+		
+		WorkerDAO wdao = new WorkerDAO();
+		Worker[] workers = wdao.list();
+		
+		// Terminate workers that are in error status
+		int toTerminate = 0;
+		List<String> instanceIds = new ArrayList<String>();
+		for ( Worker worker : workers ) {
+			if ( !worker.isManager() && worker.getStatus().equals("error") ) {
+				instanceIds.add(worker.getInstanceId());
+				worker.setStatus("terminated");
+				wdao.update(worker);
+				toTerminate++;
+			}
+		}
+		wh.terminateWorkerAction(instanceIds);
+		System.out.println("SystemSchedulerTask: found "+toTerminate+" workers that are going to be terminated due to errors");
+		
+		// Check if there are workers not giving signs of being active
+		int errorStatusWorkers = 0;
+		for ( Worker worker : workers ) {
+			if ( !worker.isManager() && worker.getStatus().equals("ready") || worker.getStatus().equals("working") ) {
+				if ( worker.getLastTimeAlive().getTime() + DEFAULT_ERROR_TIMEOUT < new Date().getTime() ) {
+					worker.setStatus("error");
+					wdao.update(worker);
+					errorStatusWorkers++;
+				}
+			}
+		}
+		System.out.println("SystemSchedulerTask: found "+errorStatusWorkers+" workers with errors");
 	}
 }

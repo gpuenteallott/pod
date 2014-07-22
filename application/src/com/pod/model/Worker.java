@@ -17,6 +17,7 @@ public class Worker implements java.io.Serializable {
 	private String instanceId;
 	private boolean isManager;
 	private Date lastTimeWorked;
+	private Date lastTimeAlive;
 	
 	public int getId() {
 		return id;
@@ -45,6 +46,7 @@ public class Worker implements java.io.Serializable {
 		if ( publicIp != null ) json.add("publicIp", publicIp);
 		if ( instanceId != null ) json.add("instanceId", instanceId);
 		if ( lastTimeWorked != null ) json.add("lastTimeWorked", lastTimeWorked.getTime());
+		if ( lastTimeAlive != null ) json.add("lastTimeAlive", lastTimeAlive.getTime());
 		json.add("isManager", isManager);
 		return json;
 	}
@@ -71,5 +73,11 @@ public class Worker implements java.io.Serializable {
 	}
 	public void setLastTimeWorked(Date lastTimeWorked) {
 		this.lastTimeWorked = lastTimeWorked;
+	}
+	public Date getLastTimeAlive() {
+		return lastTimeAlive;
+	}
+	public void setLastTimeAlive(Date lastTimeAlive) {
+		this.lastTimeAlive = lastTimeAlive;
 	}
 }

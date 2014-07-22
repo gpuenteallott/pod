@@ -231,6 +231,7 @@ public class WorkerDAO {
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
 				worker.setLastTimeWorked( rs.getTimestamp("last_time_worked"));
+				worker.setLastTimeAlive( rs.getTimestamp("last_time_alive"));
 				
 			}
 			
@@ -298,6 +299,7 @@ public class WorkerDAO {
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
 				worker.setLastTimeWorked( rs.getTimestamp("last_time_worked"));
+				worker.setLastTimeAlive( rs.getTimestamp("last_time_alive"));
 				break;
 				
 			}
@@ -365,6 +367,7 @@ public class WorkerDAO {
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
 				worker.setLastTimeWorked( rs.getTimestamp("last_time_worked"));
+				worker.setLastTimeAlive( rs.getTimestamp("last_time_alive"));
 				workers.add(worker);
 			}
 			
@@ -473,7 +476,7 @@ public class WorkerDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "SELECT workers.id, workers.status, workers.local_ip, workers.public_ip, workers.instance_id, workers.is_manager, workers.last_time_worked FROM workers, installations WHERE workers.id = installations.workerId AND installations.activityId = ?";
+			String searchQuery = "SELECT workers.id, workers.status, workers.local_ip, workers.public_ip, workers.instance_id, workers.is_manager, workers.last_time_worked, workers.last_time_alive FROM workers, installations WHERE workers.id = installations.workerId AND installations.activityId = ?";
 			
 			statement = con.prepareStatement(searchQuery);
 			statement.setInt(1, activityId );
@@ -490,6 +493,7 @@ public class WorkerDAO {
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
 				worker.setLastTimeWorked( rs.getTimestamp("last_time_worked"));
+				worker.setLastTimeAlive( rs.getTimestamp("last_time_alive"));
 				workers.add(worker);
 			}
 			
@@ -541,7 +545,7 @@ public class WorkerDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "SELECT workers.id, workers.status, workers.local_ip, workers.public_ip, workers.instance_id, workers.is_manager, workers.last_time_worked FROM workers, installations, activities WHERE workers.id = installations.workerId AND installations.activityId = activities.id AND activities.name = ?";
+			String searchQuery = "SELECT workers.id, workers.status, workers.local_ip, workers.public_ip, workers.instance_id, workers.is_manager, workers.last_time_worked, workers.last_time_alive FROM workers, installations, activities WHERE workers.id = installations.workerId AND installations.activityId = activities.id AND activities.name = ?";
 			
 			statement = con.prepareStatement(searchQuery);
 			statement.setString(1, activityName );
@@ -558,6 +562,7 @@ public class WorkerDAO {
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
 				worker.setLastTimeWorked( rs.getTimestamp("last_time_worked"));
+				worker.setLastTimeAlive( rs.getTimestamp("last_time_alive"));
 				workers.add(worker);
 			}
 			
@@ -624,6 +629,7 @@ public class WorkerDAO {
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
 				worker.setLastTimeWorked( rs.getTimestamp("last_time_worked"));
+				worker.setLastTimeAlive( rs.getTimestamp("last_time_alive"));
 				workers.add(worker);
 			}
 			
@@ -675,7 +681,7 @@ public class WorkerDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "SELECT workers.id, workers.status, workers.local_ip, workers.public_ip, workers.instance_id, workers.is_manager, workers.last_time_worked FROM workers, installations "
+			String searchQuery = "SELECT workers.id, workers.status, workers.local_ip, workers.public_ip, workers.instance_id, workers.is_manager, workers.last_time_worked, workers.last_time_alive FROM workers, installations "
 					+ "WHERE workers.id = installations.workerId AND installations.activityId = ? "
 					+ "AND installations.status = 'installed'"
 					+ "AND workers.status = ?";
@@ -696,6 +702,7 @@ public class WorkerDAO {
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
 				worker.setLastTimeWorked( rs.getTimestamp("last_time_worked"));
+				worker.setLastTimeAlive( rs.getTimestamp("last_time_alive"));
 			}
 			
 		} catch (SQLException e) {
@@ -801,7 +808,60 @@ public class WorkerDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "UPDATE workers SET last_time_worked=? WHERE id = ?";
+			String searchQuery = "UPDATE workers SET last_time_worked=?, last_time_alive=? WHERE id = ?";
+			
+			statement = con.prepareStatement(searchQuery);
+			
+			statement.setTimestamp(1, new java.sql.Timestamp( new Date().getTime() ) );
+			statement.setTimestamp(2, new java.sql.Timestamp( new Date().getTime() ) );
+			statement.setInt(3, workerId );
+
+			int rows = statement.executeUpdate();
+			
+			updated = rows > 0 ? true : false;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			error = e.toString();
+		}
+		
+		finally {
+		     
+		     if (statement != null) {
+		        try {
+		        	statement.close();
+		        } catch (Exception e) { System.err.println(e); }
+		        	statement = null;
+		        }
+		
+		     if (con != null) {
+		        try {
+		        	con.close();
+		        } catch (Exception e) { System.err.println(e); }
+		
+		        con = null;
+		     }
+		}
+		return updated;
+	}
+	
+	
+	/**
+	 * Updates the last time that the worker was alive
+	 * @param worker worker with a valid id
+	 * @return true if updated, false otherwise
+	 */
+	public boolean updateLastTimeAlive ( int workerId ) {
+		
+		Connection con = null;
+		PreparedStatement statement = null;
+		boolean updated = false;
+		
+		try {
+			
+			con = ConnectionManager.getConnection();
+			
+			String searchQuery = "UPDATE workers SET last_time_alive=? WHERE id = ?";
 			
 			statement = con.prepareStatement(searchQuery);
 			
