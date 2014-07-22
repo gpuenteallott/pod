@@ -472,7 +472,7 @@ public class WorkerDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "SELECT workers.id, workers.status, workers.local_ip, workers.public_ip, workers.instance_id, workers.is_manager FROM workers, installations WHERE workers.id = installations.workerId AND installations.activityId = ?";
+			String searchQuery = "SELECT workers.id, workers.status, workers.local_ip, workers.public_ip, workers.instance_id, workers.is_manager, workers.last_time_worked FROM workers, installations WHERE workers.id = installations.workerId AND installations.activityId = ?";
 			
 			statement = con.prepareStatement(searchQuery);
 			statement.setInt(1, activityId );
@@ -540,7 +540,7 @@ public class WorkerDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "SELECT workers.id, workers.status, workers.local_ip, workers.public_ip, workers.instance_id, workers.is_manager FROM workers, installations, activities WHERE workers.id = installations.workerId AND installations.activityId = activities.id AND activities.name = ?";
+			String searchQuery = "SELECT workers.id, workers.status, workers.local_ip, workers.public_ip, workers.instance_id, workers.is_manager, workers.last_time_worked FROM workers, installations, activities WHERE workers.id = installations.workerId AND installations.activityId = activities.id AND activities.name = ?";
 			
 			statement = con.prepareStatement(searchQuery);
 			statement.setString(1, activityName );
@@ -674,7 +674,7 @@ public class WorkerDAO {
 			
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "SELECT workers.id, workers.status, workers.local_ip, workers.public_ip, workers.instance_id, workers.is_manager FROM workers, installations "
+			String searchQuery = "SELECT workers.id, workers.status, workers.local_ip, workers.public_ip, workers.instance_id, workers.is_manager, workers.last_time_worked FROM workers, installations "
 					+ "WHERE workers.id = installations.workerId AND installations.activityId = ? "
 					+ "AND installations.status = 'installed'"
 					+ "AND workers.status = ?";
