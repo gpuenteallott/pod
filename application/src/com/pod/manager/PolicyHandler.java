@@ -192,6 +192,7 @@ public class PolicyHandler {
 					if ( policy.getRules().get("maxWorkers") != null ) maxWorkers = Integer.parseInt( policy.getRules().get("maxWorkers").asString() );
 				}
 				
+				System.out.println("Policy - minWorkers="+minWorkers+" maxWorkers="+maxWorkers+" total="+wh.getTotalWorkers());
 				
 				// If the current nº of workers is less than the minimum specified, deploy more
 				if ( wh.getTotalWorkers() < minWorkers ) {
