@@ -1,15 +1,5 @@
 #!/bin/bash
 
-
-
-
-# REGION REGION REGION
-
-
-
-
-
-
 #####################################################################
 # POD - Processing On Demand open source platform
 #
@@ -93,8 +83,7 @@ do
 done < instance_ids.tmp
 
 # Remove aws credentials file
-#rm instance_ids.tmp
-#rm $INSTANCE_SETUP.tmp
+rm $INSTANCE_SETUP.tmp
 rm instance_ids.tmp
 
 echo "Done launching. Waiting for Manager DNS..."
@@ -119,6 +108,6 @@ done
 echo ""
 
 echo "Manager DNS obtained successfully"
-echo "For CLI,"
-echo "\$ export POD=\"$MANAGER_DNS\""
+echo "For CLI:"
+echo "export POD=\"$MANAGER_DNS\""
 echo ""

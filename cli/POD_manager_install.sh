@@ -50,6 +50,7 @@ AMI=
 echo `date` " - Updating dependencies" >> $LOG >> $LOG
 
 sudo apt-get -y update
+sudo apt-get -y install language-pack-en
 
 echo `date` " - Installing Java" >> $LOG
 

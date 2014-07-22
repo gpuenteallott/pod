@@ -10,6 +10,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.pod.dao.ActivityDAO;
 import com.pod.dao.InstallationDAO;
+import com.pod.dao.WorkerDAO;
 import com.pod.interaction.Action;
 import com.pod.model.Activity;
 import com.pod.model.Execution;
@@ -338,6 +339,6 @@ public class ActivityHandler {
 		
 		// Look for pending executions in the queue, and return a PERFORM_EXECUTION if there are
 		// If there aren't, the json message will be a simple ACK
-		return eh.lookForPendingExecution ( json.get("workerId").asInt() );
+		return eh.lookForPendingExecution ( new WorkerDAO().select( json.get("workerId").asInt() ) );
 	}
 }
