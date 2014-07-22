@@ -45,16 +45,16 @@ if [ -e ~/pod.sql ]; then
 	rm ~/pod.sql
 fi
 
-echo `date` " - Getting the project" >> $LOG
-echo `date` " - Getting the project"
+echo `date` "- Getting the project" >> $LOG
+echo `date` "- Getting the project"
 
 # Get the project
 cd ~
 wget https://github.com/gpuenteallott/pod/archive/master.zip > /dev/null 2>&1
 unzip master.zip  > /dev/null
 
-echo `date` " - Building project" >> $LOG
-echo `date` " - Building project"
+echo `date` "- Building project" >> $LOG
+echo `date` "- Building project"
 
 # Build the project
 cd pod-master/application
@@ -69,8 +69,8 @@ mv pod-master/application/database/*.sql pod.sql
 
 if [ $# == 1 ]; then
 	if [ $1 == 'db' ]; then
-		echo `date` " - Importing database" >> $LOG
-		echo `date` " - Importing database"
+		echo `date` "- Importing database" >> $LOG
+		echo `date` "- Importing database"
 		mysql -u root --password=kaerus_123 -h localhost < pod.sql
 		rm -R ~/app
 	fi
@@ -83,8 +83,8 @@ if [ ! -d ~/app ]; then
 	sudo chgrp tomcat7 ~/app
 fi
 
-echo `date` " - Waiting for deployment" >> $LOG
-echo `date` " - Waiting for deployment"
+echo `date` "- Waiting for deployment" >> $LOG
+echo `date` "- Waiting for deployment"
 
 # Give time to Tomcat to deploy the app in a folder
 while [ ! -d "/var/lib/tomcat7/webapps/ROOT/WEB-INF" ]
@@ -92,8 +92,8 @@ do
 	sleep 1
 done
 
-echo `date` " - Restoring credentials and properties file" >> $LOG
-echo `date` " - Restoring credentials and properties file"
+echo `date` "- Restoring credentials and properties file" >> $LOG
+echo `date` "- Restoring credentials and properties file"
 
 
 # Restore credentials and name file
@@ -107,8 +107,8 @@ rm ~/master.zip
 rm -R ~/pod-master
 rm ~/pod.sql
 
-echo `date` " - Server redeployed" >> $LOG
-echo `date` " - Server redeployed"
+echo `date` "- Server redeployed" >> $LOG
+echo `date` "- Server redeployed"
 
 # Exit the ssh
 exit

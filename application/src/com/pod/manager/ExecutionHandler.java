@@ -87,8 +87,8 @@ public class ExecutionHandler {
 			if ( worker != null ) {
 				
 				worker.setStatus("working");
-				worker.setLastTimeWorked( new Date() );
 				wdao.update(worker);
+				wdao.updateLastTimeWorked( worker.getId() );
 			}
 		}
 		
@@ -348,6 +348,9 @@ public class ExecutionHandler {
 			jsonResponse.add("action", Action.PERFORM_EXECUTION.getId());
 			jsonResponse.add("execution", newExecution.toJsonObject() );
 		}
+		
+		WorkerDAO wdao = new WorkerDAO();
+		wdao.updateLastTimeWorked( worker.getId() );
 		
 		return jsonResponse;
 	}

@@ -790,7 +790,7 @@ public class WorkerDAO {
 	 * @param worker worker with a valid id
 	 * @return true if updated, false otherwise
 	 */
-	public boolean update ( int workerId ) {
+	public boolean updateLastTimeWorked ( int workerId ) {
 		
 		Connection con = null;
 		PreparedStatement statement = null;

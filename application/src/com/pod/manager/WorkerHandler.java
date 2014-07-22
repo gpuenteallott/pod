@@ -123,33 +123,7 @@ public class WorkerHandler {
 	public void startWorker(int id){}
 	
 	public void stopWorker(int id){}
-	
-	public JsonObject handleTerminationRequest ( JsonObject json ) {
-		
-		if ( json.get("workerId") == null )
-			return new JsonObject().add("error", "no worker id specified");
-		
-		int workerId = json.get("workerId").asInt();
-		
-		WorkerDAO wdao = new WorkerDAO();
-		Worker worker = wdao.select(workerId);
-		
-		if ( worker == null )
-			return new JsonObject().add("error", "no worker found with that id");
-		
-		if ( worker.isManager() )
-			return new JsonObject().add("error", "can't terminate manager");
-		
-		worker.setStatus("terminated");
-		wdao.update(worker);
-		
-		List<String> instanceIds = new ArrayList<String>();
-		instanceIds.add( worker.getInstanceId() );
-		
-		terminateWorkerAction ( instanceIds );
-		
-		return new JsonObject().add("action", Action.ACK.getId());
-	}
+
 	
 	/**
 	 * At the moment, this method terminates the workers, interrupting whatever they were doing
@@ -276,6 +250,7 @@ public class WorkerHandler {
 		
 		WorkerDAO wdao = new WorkerDAO();
 		wdao.update( worker );
+		wdao.updateLastTimeWorked( worker.getId() );
 		
 		// Now that the manager knows that the worker exists, we must notify the installations to the worker
 		// Right now, we send one message per activity to the worker
