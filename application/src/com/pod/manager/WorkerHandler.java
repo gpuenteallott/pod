@@ -158,6 +158,8 @@ public class WorkerHandler {
 	 */
 	public void terminateWorkers ( int workersToTerminate ){
 		
+		System.out.println("Proceeding to terminate "+workersToTerminate+" workers");
+		
 		List<String> instanceIds = new ArrayList<String>();
 
 		WorkerDAO wdao = new WorkerDAO();
@@ -178,6 +180,8 @@ public class WorkerHandler {
 			}
 			
 		}
+		
+		System.out.println(workersToTerminate+" have been successfully flagged");
 
 		if ( !instanceIds.isEmpty() )
 			terminateWorkerAction( instanceIds );
