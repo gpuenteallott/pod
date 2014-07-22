@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -803,7 +804,10 @@ public class WorkerDAO {
 			String searchQuery = "UPDATE workers SET last_time_worked=? WHERE id = ?";
 			
 			statement = con.prepareStatement(searchQuery);
-			statement.setDate(1, new java.sql.Date( new Date().getTime() ) );
+			
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			
+			statement.setString(1, sdf.format( new Date() ) );
 			statement.setInt(2, workerId );
 
 			int rows = statement.executeUpdate();

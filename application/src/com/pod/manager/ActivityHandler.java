@@ -333,6 +333,9 @@ public class ActivityHandler {
 			}
 		}
 		
+		WorkerDAO wdao = new WorkerDAO();
+		wdao.updateLastTimeWorked( workerId );
+		
 		// Now that the installation is completed (successfully or not), we check if there are new executions that this worker could handle
 		
 		ExecutionHandler eh = new ExecutionHandler();

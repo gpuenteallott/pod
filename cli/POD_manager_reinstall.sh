@@ -20,17 +20,17 @@
 LOG="/home/pod/setup.log"
 
 echo "" >> $LOG
-echo `date` " - Server redeploy" >> $LOG
-echo `date` " - Server redeploy"
-echo `date` " - Saving properties" >> $LOG
-echo `date` " - Saving properties"
+echo `date` "- Server redeploy" >> $LOG
+echo `date` "- Server redeploy"
+echo `date` "- Saving properties" >> $LOG
+echo `date` "- Saving properties"
 
 # Remove the default Tomcat Webapp
 sudo service tomcat7 stop > /dev/null
 sudo mv /var/lib/tomcat7/webapps/ROOT/WEB-INF/classes/main/resources/AwsCredentials.properties ~/AwsCredentials.properties.tmp # Save credentials file
 
-echo `date` " - Removing previous version" >> $LOG
-echo `date` " - Removing previous version"
+echo `date` "- Removing previous version" >> $LOG
+echo `date` "- Removing previous version"
 sudo rm -R /var/lib/tomcat7/webapps/ROOT.war
 sudo rm -R /var/lib/tomcat7/webapps/ROOT
 sudo service tomcat7 start > /dev/null
