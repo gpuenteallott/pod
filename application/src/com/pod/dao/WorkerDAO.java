@@ -229,7 +229,7 @@ public class WorkerDAO {
 				worker.setPublicIp( rs.getString("public_ip") );
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
-				worker.setLastTimeWorked( rs.getDate("lastTimeWorked"));
+				worker.setLastTimeWorked( rs.getDate("last_time_worked"));
 				
 			}
 			
@@ -296,7 +296,7 @@ public class WorkerDAO {
 				worker.setPublicIp( rs.getString("public_ip") );
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
-				worker.setLastTimeWorked( rs.getDate("lastTimeWorked"));
+				worker.setLastTimeWorked( rs.getDate("last_time_worked"));
 				break;
 				
 			}
@@ -363,7 +363,7 @@ public class WorkerDAO {
 				worker.setPublicIp( rs.getString("public_ip") );
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
-				worker.setLastTimeWorked( rs.getDate("lastTimeWorked"));
+				worker.setLastTimeWorked( rs.getDate("last_time_worked"));
 				workers.add(worker);
 			}
 			
@@ -488,7 +488,7 @@ public class WorkerDAO {
 				worker.setPublicIp( rs.getString("public_ip") );
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
-				worker.setLastTimeWorked( rs.getDate("lastTimeWorked"));
+				worker.setLastTimeWorked( rs.getDate("last_time_worked"));
 				workers.add(worker);
 			}
 			
@@ -556,7 +556,7 @@ public class WorkerDAO {
 				worker.setPublicIp( rs.getString("public_ip") );
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
-				worker.setLastTimeWorked( rs.getDate("lastTimeWorked"));
+				worker.setLastTimeWorked( rs.getDate("last_time_worked"));
 				workers.add(worker);
 			}
 			
@@ -622,7 +622,7 @@ public class WorkerDAO {
 				worker.setPublicIp( rs.getString("public_ip") );
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
-				worker.setLastTimeWorked( rs.getDate("lastTimeWorked"));
+				worker.setLastTimeWorked( rs.getDate("last_time_worked"));
 				workers.add(worker);
 			}
 			
@@ -694,7 +694,7 @@ public class WorkerDAO {
 				worker.setPublicIp( rs.getString("public_ip") );
 				worker.setInstanceId( rs.getString("instance_id") );
 				worker.setManager( rs.getBoolean("is_manager") );
-				worker.setLastTimeWorked( rs.getDate("lastTimeWorked"));
+				worker.setLastTimeWorked( rs.getDate("last_time_worked"));
 			}
 			
 		} catch (SQLException e) {
