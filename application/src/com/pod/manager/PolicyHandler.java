@@ -199,11 +199,10 @@ public class PolicyHandler {
 					for ( int i = 0; i < workersToDeploy; i++ )
 						wh.deployWorker();
 				}
-				if ( wh.getTotalWorkers() > maxWorkers ) {
+				else if ( wh.getTotalWorkers() > maxWorkers ) {
 					int workersToTerminate = wh.getTotalWorkers()-maxWorkers;
 					wh.terminateWorkers(workersToTerminate);
 				}
-				
 			}
 		}).start();
 		

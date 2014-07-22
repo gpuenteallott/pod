@@ -93,7 +93,7 @@ public class Policy implements java.io.Serializable {
 	 */
 	public int getMaxWorkers () {
 		if ( rules.get("fixedWorkers") != null )
-			return rules.get("fixedWorkers").asInt();
+			return Integer.parseInt( rules.get("fixedWorkers").asString() );
 		else
 			return Integer.parseInt( rules.get("maxWorkers").asString() );
 	}
@@ -104,7 +104,7 @@ public class Policy implements java.io.Serializable {
 	 */
 	public int getMinWorkers () {
 		if ( rules.get("fixedWorkers") != null )
-			return rules.get("fixedWorkers").asInt();
+			return Integer.parseInt( rules.get("fixedWorkers").asString() );
 		else
 			return Integer.parseInt( rules.get("minWorkers").asString() );
 	}

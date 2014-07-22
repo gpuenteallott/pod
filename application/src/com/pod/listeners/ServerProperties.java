@@ -149,7 +149,6 @@ public class ServerProperties implements ServletContextListener {
 				
 				managerLocalIp = localIp;
 				
-				
 				// Set up the timer for periodic tasks
 				Timer time = new Timer();
 				StatusCheckerTask sct = new StatusCheckerTask();
