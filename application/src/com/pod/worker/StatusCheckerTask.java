@@ -42,7 +42,7 @@ public class StatusCheckerTask extends TimerTask {
 			
 			for ( Worker worker : workers ) {
 				
-				if ( worker.getLastTimeWorked().getTime() < now.getTime() - terminationTime ) {
+				if ( !worker.isManager() && worker.getLastTimeWorked().getTime() < now.getTime() - terminationTime ) {
 					instanceIds.add(worker.getInstanceId());
 				}
 			}
