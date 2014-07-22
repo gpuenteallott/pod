@@ -38,7 +38,7 @@ public class WorkerHandler {
 	}
 	
 	public int getTotalWorkers() {
-		return new WorkerDAO().list().length - getTerminatedWorkers();
+		return new WorkerDAO().list().length; // the list method already retrieves only non terminated workers
 	}
 	public int getReadyWorkers() {
 		return new WorkerDAO().selectByStatus( new String[] {"ready"} ).length;
