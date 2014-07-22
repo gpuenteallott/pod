@@ -47,6 +47,8 @@ public class StatusCheckerTask extends TimerTask {
 				if ( !worker.isManager() && worker.getStatus().equals("ready") 
 						&& worker.getLastTimeWorked().getTime() < now.getTime() - terminationTime ) {
 					instanceIds.add(worker.getInstanceId());
+					worker.setStatus("terminated");
+					wdao.update(worker);
 				}
 			}
 			
