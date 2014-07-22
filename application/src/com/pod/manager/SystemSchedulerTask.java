@@ -21,7 +21,7 @@ import com.pod.model.Worker;
 public class SystemSchedulerTask extends TimerTask {
 	
 	public static int DEFAULT_TERMINATION_TIME = 45*60*1000; // 45 mins
-	public static int DEFAULT_ERROR_TIMEOUT = 60*1000; // 5 mins
+	public static int DEFAULT_ERROR_TIMEOUT = 5*60*1000; // 5 mins
 	
 	public void run () {
 		
@@ -71,8 +71,7 @@ public class SystemSchedulerTask extends TimerTask {
 				toTerminate++;
 			}
 		}
-		if (instanceIds.size() > 0)
-			wh.terminateWorkerAction(instanceIds);
+		wh.terminateWorkerAction(instanceIds);
 		System.out.println("SystemSchedulerTask: found "+toTerminate+" workers that are going to be terminated due to errors");
 		
 		// Check if there are workers not giving signs of being active

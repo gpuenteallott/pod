@@ -178,6 +178,9 @@ public class WorkerHandler {
 	
 	public void terminateWorkerAction ( List<String> instanceIds ) {
 		
+		if ( instanceIds == null ||  instanceIds.size() == 0 )
+			return;
+		
 		// Try to create the client
 		AWSCredentialsProvider credentialsProvider = new ClasspathPropertiesFileCredentialsProvider("/main/resources/AwsCredentials.properties");
 		AmazonEC2 amazonEC2Client = new AmazonEC2Client(credentialsProvider);
