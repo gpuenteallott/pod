@@ -48,7 +48,7 @@ public class ServerProperties implements ServletContextListener {
 			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
 			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 	
-	private static final int PERIODIC_CHECKS_INTERVAL = 60 * 1000;
+	private static final int PERIODIC_CHECKS_INTERVAL = 5 * 1000; // every 5 secs
 	public static int DEFAULT_TIME_TO_TERMINATE = 45*60*1000; // 45 mins
 	
 	private static String role;

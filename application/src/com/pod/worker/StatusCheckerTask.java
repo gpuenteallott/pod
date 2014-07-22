@@ -25,6 +25,8 @@ public class StatusCheckerTask extends TimerTask {
 	
 	public void run () {
 		
+		System.out.println("StatusCheckerTask routine");
+		
 		WorkerHandler wh = new WorkerHandler();
 		PolicyDAO pdao = new PolicyDAO();
 		Policy policy = pdao.getActive();
@@ -42,12 +44,15 @@ public class StatusCheckerTask extends TimerTask {
 			
 			for ( Worker worker : workers ) {
 				
-				if ( !worker.isManager() && worker.getLastTimeWorked().getTime() < now.getTime() - terminationTime ) {
+				if ( !worker.isManager() && worker.getStatus().equals("ready") 
+						&& worker.getLastTimeWorked().getTime() < now.getTime() - terminationTime ) {
 					instanceIds.add(worker.getInstanceId());
 				}
 			}
 			
 			wh.terminateWorkerAction(instanceIds);
+			
+			System.out.println("Workers terminated="+instanceIds.size()+", terminationTime="+terminationTime+" ms");
 		}
 	}
 }
