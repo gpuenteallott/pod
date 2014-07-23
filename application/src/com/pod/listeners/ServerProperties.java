@@ -50,7 +50,7 @@ public class ServerProperties implements ServletContextListener {
 			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 	
 	private static final int PERIODIC_CHECKS_INTERVAL = 2*60 * 1000; // every 2 min
-	private static final int WORKER_PERIODIC_UPDATES_INTERVAL = 2*60*60*1000; // every 2 mins
+	private static final int WORKER_PERIODIC_UPDATES_INTERVAL = 2*60*1000; // every 2 mins
 	public static int DEFAULT_TIME_TO_TERMINATE = 45*60*1000; // 45 mins
 	public static int DEFAULT_TERMINATION_TIME = 45*60*1000; // 45 mins
 	public static int DEFAULT_ERROR_TIMEOUT = 5*60*1000; // 5 mins
@@ -140,6 +140,10 @@ public class ServerProperties implements ServletContextListener {
 					PolicyDAO pdao = new PolicyDAO();
 					pdao.insert(defaultPolicy);
 					pdao.setActive(defaultPolicy);
+					
+					// delete contents that might have been left there (this is not a redeploy preserrving database)
+					if ( new File("/home/pod/app").exists() )
+						deleteContents(new File("/home/pod/app"));
 					
 				}
 				// We should as the workers what is their state, but for now we're going to set them to ready

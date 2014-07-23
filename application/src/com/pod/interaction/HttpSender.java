@@ -9,6 +9,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Logger;
 
+import main.resources.PodLogger;
+
 import com.eclipsesource.json.JsonObject;
 import com.pod.listeners.ServerProperties;
 import com.pod.manager.ManagerRequestHandler;
@@ -20,7 +22,7 @@ import com.pod.worker.WorkerRequestHandler;
  */
 public class HttpSender {
 
-	Logger logger = Logger.getLogger(HttpSender.class.getName());
+	public static PodLogger log = new PodLogger("HttpSender");
 	
 	private String destinationIP;
 	private String destinationRole; // can be "worker" or "manager"
@@ -42,8 +44,8 @@ public class HttpSender {
 		
 		// Logging
 			int i = (int)(Math.random() * 1000);
-			logger.info("Message log. Id "+i+". To "+destinationRole+" ("+destinationIP+"/"+destinationRole+")");
-			logger.info("Req ("+i+"): "+message);
+			log.i("Message log. To "+destinationRole+" ("+destinationIP+"/"+destinationRole+")");
+			log.i("Req ("+i+"): "+message);
 		// End logging
 		
 		String response = null;
@@ -57,8 +59,7 @@ public class HttpSender {
 			response = sendToRemote();
 		
 		// Logging
-			logger.info("Res ("+i+"): "+response);
-			logger.info("");
+			log.i("Res ("+i+"): "+response);
 		// End logging
 			
 		return response;
