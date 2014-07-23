@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import main.resources.PodLogger;
+
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.pod.interaction.Action;
@@ -18,6 +20,8 @@ import com.pod.interaction.Action;
  */
 
 public class ManagerRequestHandler {
+	
+	public static PodLogger log = new PodLogger("PolicyHandler");
 	
 	
 	/**
@@ -198,7 +202,7 @@ public class ManagerRequestHandler {
 			  //Close the input stream
 			  in.close();
 		}catch (Exception e){//Catch exception if any
-			  System.err.println("Error: " + e.getMessage());
+			  log.e("Error: " + e.getMessage());
 		}
 		 
 		 return response.add("contents", logJson);

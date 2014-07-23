@@ -5,8 +5,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimerTask;
 
+import main.resources.PodLogger;
+
 import com.pod.dao.PolicyDAO;
 import com.pod.dao.WorkerDAO;
+import com.pod.listeners.ServerProperties;
 import com.pod.model.Policy;
 import com.pod.model.Worker;
 
@@ -20,19 +23,18 @@ import com.pod.model.Worker;
  */
 public class SystemSchedulerTask extends TimerTask {
 	
-	public static int DEFAULT_TERMINATION_TIME = 45*60*1000; // 45 mins
-	public static int DEFAULT_ERROR_TIMEOUT = 5*60*1000; // 5 mins
+	public static PodLogger log = new PodLogger("SystemSchedulerTask");
 	
 	public void run () {
 		
-		System.out.println("StatusCheckerTask routine");
+		log.i("Routine");
 		
 		WorkerHandler wh = new WorkerHandler();
 		PolicyDAO pdao = new PolicyDAO();
 		Policy policy = pdao.getActive();
 		
 		if ( policy == null )
-			System.out.println("StatusCheckerTask: Active policy retrieved is null");
+			log.e("StatusCheckerTask: Active policy retrieved is null");
 		// Before we even check if we can terminate a worker, we make sure we have room to terminate
 		else if ( wh.getTotalWorkers() > policy.getMinWorkers() ) {
 			
@@ -40,7 +42,7 @@ public class SystemSchedulerTask extends TimerTask {
 			Worker[] workers = wdao.list();
 			
 			Date now = new Date();
-			int terminationTime = policy.getRule("terminationTime") == null ? DEFAULT_TERMINATION_TIME : Integer.parseInt( policy.getRule("terminationTime") );
+			int terminationTime = policy.getRule("terminationTime") == null ? ServerProperties.DEFAULT_TERMINATION_TIME : Integer.parseInt( policy.getRule("terminationTime") );
 			
 			List<String> instanceIds = new ArrayList<String>();
 			
@@ -56,7 +58,7 @@ public class SystemSchedulerTask extends TimerTask {
 			
 			wh.terminateWorkerAction(instanceIds);
 			
-			System.out.println("Workers terminated="+instanceIds.size()+", terminationTime="+terminationTime+" ms");
+			log.i("Workers terminated="+instanceIds.size()+", terminationTime="+terminationTime+" ms");
 		}
 		
 		WorkerDAO wdao = new WorkerDAO();
@@ -74,19 +76,19 @@ public class SystemSchedulerTask extends TimerTask {
 			}
 		}
 		wh.terminateWorkerAction(instanceIds);
-		System.out.println("SystemSchedulerTask: found "+toTerminate+" workers that are going to be terminated due to errors");
+		log.i("found "+toTerminate+" workers that are going to be terminated due to errors");
 		
 		// Check if there are workers not giving signs of being active
 		int errorStatusWorkers = 0;
 		for ( Worker worker : workers ) {
 			if ( !worker.isManager() && worker.getStatus().equals("ready") || worker.getStatus().equals("working") ) {
-				if ( worker.getLastTimeAlive().getTime() + DEFAULT_ERROR_TIMEOUT < new Date().getTime() ) {
+				if ( worker.getLastTimeAlive().getTime() + ServerProperties.DEFAULT_ERROR_TIMEOUT < new Date().getTime() ) {
 					worker.setStatus("error");
 					wdao.update(worker);
 					errorStatusWorkers++;
 				}
 			}
 		}
-		System.out.println("SystemSchedulerTask: found "+errorStatusWorkers+" workers with errors");
+		log.i("SystemSchedulerTask: found "+errorStatusWorkers+" workers with errors");
 	}
 }

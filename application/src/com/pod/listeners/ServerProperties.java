@@ -10,13 +10,13 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Timer;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import main.resources.PodLogger;
+
 import com.eclipsesource.json.JsonObject;
-import com.pod.dao.ActivityDAO;
 import com.pod.dao.PolicyDAO;
 import com.pod.dao.WorkerDAO;
 import com.pod.interaction.Action;
@@ -37,8 +37,8 @@ import com.pod.worker.WorkerUpdaterTask;
  * The reason is that otherwise the context was initialized twice.
  */
 public class ServerProperties implements ServletContextListener {
-	
-	Logger logger = Logger.getLogger(ServerProperties.class.getName());
+
+	public static PodLogger log = new PodLogger("ServerProperties");
 	
 	// This is the default location for the server properties, except in the case of the manager
 	private static final String PROPERTIES_FILE_PATH = "/home/pod/server.properties";
@@ -52,6 +52,8 @@ public class ServerProperties implements ServletContextListener {
 	private static final int PERIODIC_CHECKS_INTERVAL = 2*30 * 1000; // every 2 min
 	private static final int WORKER_PERIODIC_UPDATES_INTERVAL = 2*60*60*1000; // every 2 mins
 	public static int DEFAULT_TIME_TO_TERMINATE = 45*60*1000; // 45 mins
+	public static int DEFAULT_TERMINATION_TIME = 45*60*1000; // 45 mins
+	public static int DEFAULT_ERROR_TIMEOUT = 5*60*1000; // 5 mins
 	
 	private static String role;
 	private static String name;
@@ -68,7 +70,7 @@ public class ServerProperties implements ServletContextListener {
 	
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
-		logger.info("Context destroyed");
+		log.i("Context destroyed");
 	}
 
 	/**
@@ -77,7 +79,7 @@ public class ServerProperties implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
 		
-		logger.info("Initializing Context");
+		log.i("Initializing Context");
 		
 		// Load properties
 		try {
@@ -101,7 +103,7 @@ public class ServerProperties implements ServletContextListener {
 			
 			if ( role.equals("manager") ) {
 				
-				logger.info("Performing Manager setup");
+				log.i("Performing Manager setup");
 				
 				// Reset the database
 				//new WorkerDAO().deleteAll();
@@ -162,7 +164,7 @@ public class ServerProperties implements ServletContextListener {
 			// If this is a worker, read the property from the properties file
 			else {
 				
-				logger.info("Performing Worker setup");
+				log.i("Performing Worker setup");
 				
 				managerLocalIp = properties.getProperty("managerLocalIp");
 				workerId = Integer.parseInt( properties.getProperty("workerId") );
@@ -200,7 +202,7 @@ public class ServerProperties implements ServletContextListener {
 			e.printStackTrace();
 		}
 
-		logger.info("Context initialized. Name="+name +" Role="+role);
+		log.i("Context initialized. Name="+name +" Role="+role);
 		
 	}
 

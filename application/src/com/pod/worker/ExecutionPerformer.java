@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
 
+import main.resources.PodLogger;
+
 import com.eclipsesource.json.JsonObject;
 import com.pod.interaction.Action;
 import com.pod.interaction.HttpSender;
@@ -21,6 +23,8 @@ import com.pod.model.Execution;
  * When the execution is done, the worker will send a message to the manager with both standard output and standard error
  */
 public class ExecutionPerformer implements Runnable {
+	
+	public static PodLogger log = new PodLogger("ExecutionPerformer");
 	
 	// This variable has the process object, useful to be able to destroy it from another thread
 	private static Process process;
@@ -50,7 +54,7 @@ public class ExecutionPerformer implements Runnable {
 		executionInProcess = true;
 		
 		// Logging
-			System.out.println("Worker: starting execution "+execution.getId()+" of activity '"+execution.getActivityName() +"'");
+			log.i("Worker: starting execution "+execution.getId()+" of activity '"+execution.getActivityName() +"'");
 		// End logging
 		
 		// Prepare message in case of error
@@ -80,7 +84,7 @@ public class ExecutionPerformer implements Runnable {
 		
 		
 		// Logging
-			System.out.println("Worker: finished execution "+execution.getId()+" of activity '"+execution.getActivityName() +"'");
+			log.i("Worker: finished execution "+execution.getId()+" of activity '"+execution.getActivityName() +"'");
 		// End logging
 				
 		// Set message action
@@ -166,7 +170,7 @@ public class ExecutionPerformer implements Runnable {
 		try {
 			while ((line = br.readLine()) != null) {
 				// Every line of standard output
-				System.out.println(line);
+				log.i(line);
 				stdout += line + "\n";
 			}
 		} catch (IOException e) {
@@ -182,7 +186,7 @@ public class ExecutionPerformer implements Runnable {
 		try {
 			while ((line = br.readLine()) != null) {
 				// Every line of standard error
-				System.err.println(line);
+				log.i(line);
 				stderr += line + "\n";
 			}
 		} catch (IOException e) {

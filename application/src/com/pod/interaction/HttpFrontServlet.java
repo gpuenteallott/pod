@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import main.resources.PodLogger;
+
 import com.eclipsesource.json.JsonObject;
 import com.pod.listeners.ServerProperties;
 import com.pod.manager.ManagerRequestHandler;
@@ -19,6 +21,8 @@ import com.pod.manager.ManagerRequestHandler;
  */
 @WebServlet("/HttpFrontServlet")
 public class HttpFrontServlet extends HttpServlet {
+
+	public static PodLogger log = new PodLogger("HttpFrontServlet");
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -91,7 +95,7 @@ public class HttpFrontServlet extends HttpServlet {
 			json.add("execution", executionJson);
 			
 			// Logging
-				System.out.println("Message log. From outside. action:"+action+", name:"+request.getParameter("name")+", input:"+request.getParameter("input")); System.out.println();
+			log.i("Message log. From outside. action:"+action+", name:"+request.getParameter("name")+", input:"+request.getParameter("input"));
 			// End logging
 		}
 		
@@ -121,7 +125,7 @@ public class HttpFrontServlet extends HttpServlet {
 			json.add("execution", executionJson);
 			
 			// Logging
-				System.out.println("Message log. From outside. action:"+action+", executionId:"+executionId); System.out.println();
+			log.i("Message log. From outside. action:"+action+", executionId:"+executionId);
 			// End logging
 		}
 		
@@ -137,7 +141,7 @@ public class HttpFrontServlet extends HttpServlet {
 			json.add("activity", activityJson);
 			
 			// Logging
-				System.out.println("Message log. From outside. action:"+action+", name:"+request.getParameter("name")+", installationScriptLocation:"+request.getParameter("installationScriptLocation")); System.out.println();
+			log.i("Message log. From outside. action:"+action+", name:"+request.getParameter("name")+", installationScriptLocation:"+request.getParameter("installationScriptLocation"));
 			// End logging
 		}
 		
@@ -152,7 +156,7 @@ public class HttpFrontServlet extends HttpServlet {
 			json.add("activity", activityJson);
 			
 			// Logging
-				System.out.println("Message log. From outside. action:"+action+", name:"+request.getParameter("name")); System.out.println();
+			log.i("Message log. From outside. action:"+action+", name:"+request.getParameter("name"));
 			// End logging
 		}
 		
@@ -166,7 +170,7 @@ public class HttpFrontServlet extends HttpServlet {
 			json.add("activity", activityJson);
 						
 			// Logging
-				System.out.println("Message log. From outside. action:"+action+", name:"+request.getParameter("name")); System.out.println();
+			log.i("Message log. From outside. action:"+action+", name:"+request.getParameter("name"));
 			// End logging
 		}
 		
@@ -196,7 +200,7 @@ public class HttpFrontServlet extends HttpServlet {
 			json.add("execution", executionJson);
 			
 			// Logging
-				System.out.println("Message log. From outside. action:"+action+", executionId:"+executionId); System.out.println();
+			log.i("Message log. From outside. action:"+action+", executionId:"+executionId);
 			// End logging
 		}
 		
@@ -212,7 +216,7 @@ public class HttpFrontServlet extends HttpServlet {
 			json.add("policy", policyJson);
 			
 			// Logging
-				System.out.println("Message log. From outside. action:"+action+", name:"+request.getParameter("name")+", rules:"+request.getParameter("rules")); System.out.println();
+			log.i("Message log. From outside. action:"+action+", name:"+request.getParameter("name")+", rules:"+request.getParameter("rules"));
 			// End logging
 		}
 
@@ -227,7 +231,7 @@ public class HttpFrontServlet extends HttpServlet {
 			json.add("policy", policyJson);
 			
 			// Logging
-				System.out.println("Message log. From outside. action:"+action+", name:"+request.getParameter("name")); System.out.println();
+			log.i("Message log. From outside. action:"+action+", name:"+request.getParameter("name"));
 			// End logging
 		}
 		
@@ -243,7 +247,7 @@ public class HttpFrontServlet extends HttpServlet {
 			json.add("policy", policyJson);
 			
 			// Logging
-				System.out.println("Message log. From outside. action:"+action+", name:"+request.getParameter("name")); System.out.println();
+			log.i("Message log. From outside. action:"+action+", name:"+request.getParameter("name"));
 			// End logging
 		}
 
@@ -255,7 +259,7 @@ public class HttpFrontServlet extends HttpServlet {
 			json.add("action", Action.GET_ACTIVE_POLICY.getId());
 			
 			// Logging
-				System.out.println("Message log. From outside. action:"+action); System.out.println();
+			log.i("Message log. From outside. action:"+action);
 			// End logging
 		}
 		
@@ -267,7 +271,7 @@ public class HttpFrontServlet extends HttpServlet {
 			json.add("action", Action.GET_POLICIES.getId());
 			
 			// Logging
-				System.out.println("Message log. From outside. action:"+action); System.out.println();
+			log.i("Message log. From outside. action:"+action);
 			// End logging
 		}
 		
@@ -279,7 +283,7 @@ public class HttpFrontServlet extends HttpServlet {
 			json.add("action", Action.RESET_POLICIES.getId());
 			
 			// Logging
-				System.out.println("Message log. From outside. action:"+action); System.out.println();
+			log.i("Message log. From outside. action:"+action);
 			// End logging
 		}
 		
@@ -291,7 +295,7 @@ public class HttpFrontServlet extends HttpServlet {
 			json.add("action", Action.GET_WORKERS.getId());
 			
 			// Logging
-				System.out.println("Message log. From outside. action:"+action); System.out.println();
+			log.i("Message log. From outside. action:"+action);
 			// End logging
 		}
 		
@@ -304,7 +308,7 @@ public class HttpFrontServlet extends HttpServlet {
 			json.add("type", request.getParameter("type"));
 			
 			// Logging
-				System.out.println("Message log. From outside. action:"+action); System.out.println();
+			log.i("Message log. From outside. action:"+action);
 			// End logging
 		}
 		
@@ -316,7 +320,7 @@ public class HttpFrontServlet extends HttpServlet {
 			json.add("action", Action.GET_ALL_EXECUTIONS.getId());
 			
 			// Logging
-				System.out.println("Message log. From outside. action:"+action); System.out.println();
+			log.i("Message log. From outside. action:"+action);
 			// End logging
 		}
 		

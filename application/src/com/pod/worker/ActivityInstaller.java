@@ -10,6 +10,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
+import main.resources.PodLogger;
+
 import com.eclipsesource.json.JsonObject;
 import com.pod.interaction.Action;
 import com.pod.interaction.HttpSender;
@@ -25,6 +27,8 @@ import com.pod.model.Execution;
  * After the (un)installation, a message will be sent to the manager of this worker informing about the result
  */
 public class ActivityInstaller implements Runnable {
+	
+	public static PodLogger log = new PodLogger("ActivityInstaller");
 	
 	private Activity activity;
 	private boolean uninstall;
@@ -51,8 +55,8 @@ public class ActivityInstaller implements Runnable {
 		ExecutionPerformer.setExecutionInProcess(true);
 		
 		// Logging
-			if ( ! uninstall ) System.out.println("Worker: installing activity "+activity.getName());
-			else System.out.println("Worker: (un)installing activity "+activity.getName());
+			if ( ! uninstall ) log.i("Worker: installing activity "+activity.getName());
+			else log.i("Worker: (un)installing activity "+activity.getName());
 		// End logging
 		
 		// Install or uninstall activity
@@ -69,8 +73,8 @@ public class ActivityInstaller implements Runnable {
 		}
 		
 		// Logging
-			if ( ! uninstall ) System.out.println("Worker: done installing activity "+activity.getName());
-			else System.out.println("Worker: done uninstalling activity "+activity.getName());
+			if ( ! uninstall ) log.i("Worker: done installing activity "+activity.getName());
+			else log.i("Worker: done uninstalling activity "+activity.getName());
 		// End logging
 		
 		// Send message to manager when done
@@ -169,7 +173,7 @@ public class ActivityInstaller implements Runnable {
 		File appDirectory = new File ("/home/pod/app/"+activity.getName());
 		
 		if ( !appDirectory.mkdirs() ) {
-			System.err.println("Directory for app couldn't be created: " + appDirectory.getPath());
+			log.e("Directory for app couldn't be created: " + appDirectory.getPath());
 			errorDescription = "Unable to install, coudln't create space for the app in the file system";
 			return false;
 		}

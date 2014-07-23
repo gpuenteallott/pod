@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
+import main.resources.PodLogger;
+
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.pod.dao.ActivityDAO;
@@ -18,6 +20,8 @@ import com.pod.model.Policy;
 import com.pod.model.Worker;
 
 public class ExecutionHandler {
+
+	public static PodLogger log = new PodLogger("ExecutionHandler");
 
 	/**
 	 * Handles the event of a new execution
@@ -442,7 +446,7 @@ public class ExecutionHandler {
 		for ( Execution e : pendingExecutions )
 			time += ah.getMeanTime(e.getActivityId());
 		
-		System.out.println("pending executions "+pendingExecutions.size());
+		log.i("pending executions "+pendingExecutions.size());
 		
 		// Calculate mean between workers
 		if ( executionsInProgress.length == 0 )

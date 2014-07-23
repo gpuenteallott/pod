@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import main.resources.PodLogger;
+
 import org.apache.commons.codec.binary.Base64;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
@@ -28,6 +30,8 @@ import com.pod.model.Worker;
  * This class is in charge of handling workers (deploying, starting, stopping, etc)
  */
 public class WorkerHandler {
+	
+	public static PodLogger log = new PodLogger("WorkerHandler");
 	
 	private static boolean securityGroupCreated;
 	
@@ -127,7 +131,11 @@ public class WorkerHandler {
 	
 	public void stopWorker(int id){}
 
-	
+	/**
+	 * Attends the status update from the worker
+	 * @param json
+	 * @return
+	 */
 	public JsonObject stillAlive ( JsonObject json ) {
 		
 		int workerId = json.get("workerId").asInt();
@@ -146,7 +154,7 @@ public class WorkerHandler {
 	 */
 	public void terminateWorkers ( int workersToTerminate ){
 		
-		System.out.println("Proceeding to terminate "+workersToTerminate+" workers");
+		log.i("Proceeding to terminate "+workersToTerminate+" workers");
 		
 		List<String> instanceIds = new ArrayList<String>();
 
@@ -169,7 +177,7 @@ public class WorkerHandler {
 			
 		}
 		
-		System.out.println(workersToTerminate+" have been successfully flagged");
+		log.i(workersToTerminate+" have been successfully flagged");
 
 		if ( !instanceIds.isEmpty() )
 			terminateWorkerAction( instanceIds );

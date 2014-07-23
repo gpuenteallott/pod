@@ -3,6 +3,8 @@ package com.pod.manager;
 import java.util.ArrayList;
 import java.util.List;
 
+import main.resources.PodLogger;
+
 import com.pod.model.Execution;
 
 /**
@@ -13,6 +15,8 @@ import com.pod.model.Execution;
  */
 public class ExecutionWaitingQueue {
 
+	public static PodLogger log = new PodLogger("ExecutionWaitingQueue");
+	
 	private static boolean initialized;
 	private static List<Execution> queue;
 	
@@ -59,7 +63,7 @@ public class ExecutionWaitingQueue {
 		
 		} catch (IndexOutOfBoundsException e){
 			// Used to avoid problems with concurrent threads removing elements
-			 System.err.println(e);
+			log.e(e.toString());
 		}
 		return null;
 	}
@@ -89,7 +93,7 @@ public class ExecutionWaitingQueue {
 		
 		} catch (IndexOutOfBoundsException e){
 			// Used to avoid problems with concurrent threads removing elements
-			System.err.println(e);
+			log.e(e.toString());
 		}
 		return executions.toArray( new Execution [executions.size()] );
 	}

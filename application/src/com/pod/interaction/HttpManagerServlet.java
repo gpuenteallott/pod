@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import main.resources.PodLogger;
+
 import com.eclipsesource.json.JsonObject;
 import com.pod.manager.ManagerRequestHandler;
 
@@ -19,6 +21,8 @@ import com.pod.manager.ManagerRequestHandler;
  */
 @WebServlet("/ManagerServlet")
 public class HttpManagerServlet extends HttpServlet {
+
+	public static PodLogger log = new PodLogger("HttpManagerServlet");
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -58,7 +62,7 @@ public class HttpManagerServlet extends HttpServlet {
 		}
 		
 		// Logging
-		System.out.println("Message log. For Manager. "+jsonRaw); System.out.println();
+		log.i("Message log. For Manager. "+jsonRaw); System.out.println();
 		// End logging
 		
 		// Create worker instance and attend request internally
@@ -66,7 +70,7 @@ public class HttpManagerServlet extends HttpServlet {
 		JsonObject jsonResponse = worker.doManagerRequest(JsonObject.readFrom( jsonRaw ));
 		
 		// Logging
-		System.out.println("Message log. Response from Manager. "+jsonResponse); System.out.println();
+		log.i("Message log. Response from Manager. "+jsonResponse); System.out.println();
 		// End logging
 		
 		// Send response

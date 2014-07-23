@@ -2,6 +2,8 @@ package com.pod.manager;
 
 import java.util.regex.Pattern;
 
+import main.resources.PodLogger;
+
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
@@ -9,6 +11,8 @@ import com.pod.dao.PolicyDAO;
 import com.pod.model.Policy;
 
 public class PolicyHandler {
+	
+	public static PodLogger log = new PodLogger("PolicyHandler");
 	
 	private static final int DEFAULT_MAX_WAIT = 60*1000;
 	
@@ -192,7 +196,7 @@ public class PolicyHandler {
 					if ( policy.getRules().get("maxWorkers") != null ) maxWorkers = Integer.parseInt( policy.getRules().get("maxWorkers").asString() );
 				}
 				
-				System.out.println("Policy - minWorkers="+minWorkers+" maxWorkers="+maxWorkers+" total="+wh.getTotalWorkers());
+				log.i("Policy - minWorkers="+minWorkers+" maxWorkers="+maxWorkers+" total="+wh.getTotalWorkers());
 				
 				// If the current nº of workers is less than the minimum specified, deploy more
 				if ( wh.getTotalWorkers() < minWorkers ) {
