@@ -137,6 +137,7 @@ public class ServerProperties implements ServletContextListener {
 					
 					PolicyDAO pdao = new PolicyDAO();
 					pdao.insert(defaultPolicy);
+					pdao.setActive(defaultPolicy);
 					
 				}
 				// We should as the workers what is their state, but for now we're going to set them to ready

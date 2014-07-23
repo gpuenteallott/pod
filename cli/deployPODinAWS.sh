@@ -56,7 +56,7 @@ fi
 # We will pass the EC2 instance the modified script file which includes the files
 # We sent the secret slashes encoded with the char sequence ########
 # Otherwise, the sed command has problems because slashes are part of its syntax
-echo "EC2: Modifying install script on the fly to include AWS credentials"
+echo ""
 cp -f $INSTANCE_SETUP $INSTANCE_SETUP.tmp
 sed -i "s/ACCESS_KEY=/ACCESS_KEY=$ACCESS_KEY/g" $INSTANCE_SETUP.tmp
 SECRET_SCAPED=`echo $SECRET_KEY | sed -e 's/[\/&]/########/g'`
@@ -86,7 +86,9 @@ done < instance_ids.tmp
 rm $INSTANCE_SETUP.tmp
 rm instance_ids.tmp
 
-echo "Done launching. Waiting for Manager DNS..."
+echo "Done launching. Expect the server to be ready in 10 minutes"
+echo ""
+echo "Waiting for Manager DNS..."
 echo -n "*"
 sleep 5
 

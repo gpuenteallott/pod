@@ -52,7 +52,7 @@ public class PolicyDAO {
 		try {
 			con = ConnectionManager.getConnection();
 			
-			String searchQuery = "INSERT INTO policies ( name , rules ) VALUES ( ? , ? )";
+			String searchQuery = "INSERT INTO policies ( name, rules ) VALUES ( ? , ? )";
 			
 			statement = con.prepareStatement(searchQuery, Statement.RETURN_GENERATED_KEYS);
 			statement.setString(1, policy.getName() );

@@ -26,6 +26,49 @@ if [[ $1 == '--help' ]]; then
     exit
 fi
 
+
+
+
+if [[ $1 == 'deploy' ]]; then
+
+	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
+		./deployPODinAWS.sh $2 $3
+		exit
+	fi
+
+	if [[ $# == 1 ]] ; then
+		./deployPODinAWS.sh POD-grp POD-key
+		exit
+	fi
+	
+	if [[ $2 == '--help' ]]; then
+		./print "deploy --help"
+		exit
+	else 
+		echo "Usage: pod deploy [security group] [key pair name]"
+		echo "Type pod deploy --help for more information"
+		exit
+	fi
+fi
+
+
+if [[ $1 == 'push' ]]; then
+
+	if [[ $# == 2 ]] ; then
+		cd ..
+		git add .
+		git add -u
+		git commit -m "$2"
+		git push origin master
+		exit
+	else
+		echo "Sepcify a commit message"
+		exit
+	fi
+fi
+
+
+
 if [[ -z $POD ]]; then
 	echo "Environment variable POD has no value. Please set it up"
 	echo "It must contain the URL to the manager"
@@ -351,45 +394,6 @@ if [[ $1 == 'redeploy' ]]; then
 	else 
 		echo "Usage: pod redeploy [db]"
 		echo "Type pod redeploy --help for more information"
-		exit
-	fi
-fi
-
-
-if [[ $1 == 'deploy' ]]; then
-
-	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
-		./deployPODinAWS.sh $2 $3
-		exit
-	fi
-
-	if [[ $# == 1 ]] ; then
-		./deployPODinAWS.sh POD-grp POD-key
-		exit
-	fi
-	
-	if [[ $2 == '--help' ]]; then
-		./print "deploy --help"
-		exit
-	else 
-		echo "Usage: pod deploy [security group] [key pair name]"
-		echo "Type pod deploy --help for more information"
-		exit
-	fi
-fi
-
-
-if [[ $1 == 'push' ]]; then
-
-	if [[ $# == 2 ]] ; then
-		cd ..
-		git add .
-		git add -u
-		git commit -m "$2"
-		git push origin master
-		exit
-	else
-		echo "Sepcify a commit message"
 		exit
 	fi
 fi

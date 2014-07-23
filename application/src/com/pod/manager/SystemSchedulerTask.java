@@ -31,8 +31,10 @@ public class SystemSchedulerTask extends TimerTask {
 		PolicyDAO pdao = new PolicyDAO();
 		Policy policy = pdao.getActive();
 		
+		if ( policy == null )
+			System.out.println("StatusCheckerTask: Active policy retrieved is null");
 		// Before we even check if we can terminate a worker, we make sure we have room to terminate
-		if ( wh.getTotalWorkers() > policy.getMinWorkers() ) {
+		else if ( wh.getTotalWorkers() > policy.getMinWorkers() ) {
 			
 			WorkerDAO wdao = new WorkerDAO();
 			Worker[] workers = wdao.list();
