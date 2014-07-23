@@ -140,6 +140,8 @@ public class WorkerHandler {
 		
 		int workerId = json.get("workerId").asInt();
 		
+		log.i("Still Alive message received from worker "+workerId);
+		
 		WorkerDAO wdao = new WorkerDAO();
 		wdao.updateLastTimeAlive(workerId);
 		
