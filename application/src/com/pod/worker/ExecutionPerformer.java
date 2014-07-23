@@ -170,7 +170,7 @@ public class ExecutionPerformer implements Runnable {
 		try {
 			while ((line = br.readLine()) != null) {
 				// Every line of standard output
-				log.i(line);
+				//log.i(line);
 				stdout += line + "\n";
 			}
 		} catch (IOException e) {
@@ -186,7 +186,7 @@ public class ExecutionPerformer implements Runnable {
 		try {
 			while ((line = br.readLine()) != null) {
 				// Every line of standard error
-				log.i(line);
+				//log.i(line);
 				stderr += line + "\n";
 			}
 		} catch (IOException e) {
