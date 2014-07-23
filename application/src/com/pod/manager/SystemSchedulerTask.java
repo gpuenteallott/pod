@@ -27,14 +27,15 @@ public class SystemSchedulerTask extends TimerTask {
 	
 	public void run () {
 		
-		log.i("Routine");
-		
 		WorkerHandler wh = new WorkerHandler();
 		PolicyDAO pdao = new PolicyDAO();
 		Policy policy = pdao.getActive();
 		
+		int terminatedWorkers = 0;
+		int errorWorkers = 0;
+		
 		if ( policy == null )
-			log.e("StatusCheckerTask: Active policy retrieved is null");
+			log.e("Active policy retrieved is null");
 		// Before we even check if we can terminate a worker, we make sure we have room to terminate
 		else if ( wh.getTotalWorkers() > policy.getMinWorkers() ) {
 			
@@ -58,25 +59,24 @@ public class SystemSchedulerTask extends TimerTask {
 			
 			wh.terminateWorkerAction(instanceIds);
 			
-			log.i("Workers terminated="+instanceIds.size()+", terminationTime="+terminationTime+" ms");
+			terminatedWorkers = instanceIds.size();
+			
 		}
 		
 		WorkerDAO wdao = new WorkerDAO();
 		Worker[] workers = wdao.list();
 		
 		// Terminate workers that are in error status
-		int toTerminate = 0;
 		List<String> instanceIds = new ArrayList<String>();
 		for ( Worker worker : workers ) {
 			if ( !worker.isManager() && worker.getStatus().equals("error") ) {
 				instanceIds.add(worker.getInstanceId());
 				worker.setStatus("terminated");
 				wdao.update(worker);
-				toTerminate++;
+				errorWorkers++;
 			}
 		}
 		wh.terminateWorkerAction(instanceIds);
-		log.i("found "+toTerminate+" workers that are going to be terminated due to errors");
 		
 		// Check if there are workers not giving signs of being active
 		int errorStatusWorkers = 0;
@@ -89,6 +89,6 @@ public class SystemSchedulerTask extends TimerTask {
 				}
 			}
 		}
-		log.i("SystemSchedulerTask: found "+errorStatusWorkers+" workers with errors");
+		log.i("Routine: workers terminated by lack of activity = "+terminatedWorkers+", terminated by error = "+errorWorkers+", error marked = "+errorStatusWorkers);
 	}
 }

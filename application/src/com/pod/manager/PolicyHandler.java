@@ -196,18 +196,24 @@ public class PolicyHandler {
 					if ( policy.getRules().get("maxWorkers") != null ) maxWorkers = Integer.parseInt( policy.getRules().get("maxWorkers").asString() );
 				}
 				
-				log.i("Policy - minWorkers="+minWorkers+" maxWorkers="+maxWorkers+" total="+wh.getTotalWorkers());
+			
+				int total = wh.getTotalWorkers();
 				
 				// If the current nº of workers is less than the minimum specified, deploy more
-				if ( wh.getTotalWorkers() < minWorkers ) {
-					int workersToDeploy = minWorkers-wh.getTotalWorkers();
+				if ( total < minWorkers ) {
+					int workersToDeploy = minWorkers-total;
+					log.i("Policy - minWorkers="+minWorkers+" maxWorkers="+maxWorkers+" currentWorkers="+wh.getTotalWorkers()+" workersToDeploy="+workersToDeploy);
 					for ( int i = 0; i < workersToDeploy; i++ )
 						wh.deployWorker();
 				}
-				else if ( wh.getTotalWorkers() > maxWorkers ) {
-					int workersToTerminate = wh.getTotalWorkers()-maxWorkers;
+				else if ( total > maxWorkers ) {
+					int workersToTerminate = total-maxWorkers;
+					log.i("Policy - minWorkers="+minWorkers+" maxWorkers="+maxWorkers+" currentWorkers="+wh.getTotalWorkers()+" workersToTerminate="+workersToTerminate);
 					wh.terminateWorkers(workersToTerminate);
 				}
+				else
+					log.i("Policy - minWorkers="+minWorkers+" maxWorkers="+maxWorkers+" currentWorkers="+wh.getTotalWorkers()+" no changes required");
+					
 			}
 		}).start();
 		
