@@ -12,17 +12,20 @@
 LOG="log.txt"
 
 echo "" > $LOG
-echo "---------------------------------------------------------------------" >> $LOG
+echo "POD Command Line Interface" >> $LOG
+echo "" > $LOG
+echo "Last command executed:" > $LOG
+echo "" > $LOG
 echo "$1 $2 $3 $4 $5" >> $LOG
 echo "" > $LOG
 
 if [[ $# == 0 ]]; then
-	./print --help
+	./script/print --help
     exit
 fi
 
 if [[ $1 == '--help' ]]; then
-    ./print --help
+    ./script/print --help
     exit
 fi
 
@@ -32,17 +35,19 @@ fi
 if [[ $1 == 'deploy' ]]; then
 
 	if [[ $# == 3 ]] && [[ -n $2 ]] && [[ $2 != '--help' ]] ; then
+		cd script
 		./deployPODinAWS.sh $2 $3
 		exit
 	fi
 
 	if [[ $# == 1 ]] ; then
+		cd script
 		./deployPODinAWS.sh POD-grp POD-key
 		exit
 	fi
 	
 	if [[ $2 == '--help' ]]; then
-		./print "deploy --help"
+		./script/print "deploy --help"
 		exit
 	else 
 		echo "Usage: pod deploy [security group] [key pair name]"
@@ -71,7 +76,7 @@ fi
 
 if [[ -z $POD ]]; then
 	echo "Environment variable POD has no value. Please set it up"
-	echo "It must contain the URL to the manager"
+	echo "It must contain the public DNS of the manager"
 	exit
 fi
 
@@ -91,7 +96,7 @@ if [[ $1 == 'newExecution' ]] || [[ $1 == 'ne' ]]; then
 	fi
 	
 	if [[ $2 == '--help' ]]; then
-		./print "newExecution --help"
+		./script/print "newExecution --help"
 		exit
 	else 
 		echo "Usage: pod newExecution name"
@@ -111,7 +116,7 @@ if [[ $1 == 'getExecution' ]] || [[ $1 == 'ge' ]]; then
 	fi
 	
 	if [[ $2 == '--help' ]]; then
-		./print "getExecution --help"
+		./script/print "getExecution --help"
 		exit
 	else 
 		echo "Usage: pod getExecutionStatus name"
@@ -130,7 +135,7 @@ if [[ $1 == 'newActivity' ]] || [[ $1 == 'na' ]]; then
 	fi
 	
 	if [[ $2 == '--help' ]]; then
-		./print "newActivity --help"
+		./script/print "newActivity --help"
 		exit
 	else 
 		echo "Usage: pod newActivity name installationScriptLocation"
@@ -150,7 +155,7 @@ if [[ $1 == 'getActivity' ]] || [[ $1 == 'ga' ]]; then
 	fi
 	
 	if [[ $2 == '--help' ]]; then
-		./print "getActivity --help"
+		./script/print "getActivity --help"
 		exit
 	else 
 		echo "Usage: pod getActivityStatus name"
@@ -169,7 +174,7 @@ if [[ $1 == 'deleteActivity' ]] || [[ $1 == 'da' ]]; then
 	fi
 	
 	if [[ $2 == '--help' ]]; then
-		./print "deleteActivity --help"
+		./script/print "deleteActivity --help"
 		exit
 	else 
 		echo "Usage: pod deleteActivity name"
@@ -189,7 +194,7 @@ if [[ $1 == 'terminateExecution' ]] || [[ $1 == 'te' ]]; then
 	fi
 	
 	if [[ $2 == '--help' ]]; then
-		./print "terminateExecution --help"
+		./script/print "terminateExecution --help"
 		exit
 	else 
 		echo "Usage: pod terminateExecution name"
@@ -208,7 +213,7 @@ if [[ $1 == 'newPolicy' ]] || [[ $1 == 'np' ]]; then
 	fi
 	
 	if [[ $2 == '--help' ]]; then
-		./print "newPolicy --help"
+		./script/print "newPolicy --help"
 		exit
 	else 
 		echo "Usage: pod newPolicy name rules"
@@ -228,7 +233,7 @@ if [[ $1 == 'applyPolicy' ]] || [[ $1 == 'ap' ]]; then
 	fi
 	
 	if [[ $2 == '--help' ]]; then
-		./print "applyPolicy --help"
+		./script/print "applyPolicy --help"
 		exit
 	else 
 		echo "Usage: pod applyPolicy name"
@@ -248,7 +253,7 @@ if [[ $1 == 'deletePolicy' ]] || [[ $1 == 'dp' ]]; then
 	fi
 	
 	if [[ $2 == '--help' ]]; then
-		./print "deletePolicy --help"
+		./script/print "deletePolicy --help"
 		exit
 	else 
 		echo "Usage: pod deletePolicy name"
@@ -268,7 +273,7 @@ if [[ $1 == 'getActivePolicy' ]] || [[ $1 == 'gap' ]]; then
 	fi
 	
 	if [[ $# == 2 ]] && [[ $2 == '--help' ]]; then
-		./print "getActivePolicy --help"
+		./script/print "getActivePolicy --help"
 		exit
 	else 
 		echo "Usage: pod getActivePolicy"
@@ -288,7 +293,7 @@ if [[ $1 == 'resetPolicies' ]] || [[ $1 == 'rp' ]]; then
 	fi
 	
 	if [[ $# == 2 ]] && [[ $2 == '--help' ]]; then
-		./print "resetPolicies --help"
+		./script/print "resetPolicies --help"
 		exit
 	else 
 		echo "Usage: pod resetPolicies"
@@ -309,7 +314,7 @@ if [[ $1 == 'getPolicies' ]] || [[ $1 == 'gp' ]]; then
 	fi
 	
 	if [[ $# == 2 ]] && [[ $2 == '--help' ]]; then
-		./print "getPolicies --help"
+		./script/print "getPolicies --help"
 		exit
 	else 
 		echo "Usage: pod getPolicies"
@@ -328,7 +333,7 @@ if [[ $1 == 'getWorkers' ]] || [[ $1 == 'gw' ]]; then
 	fi
 	
 	if [[ $# == 2 ]] && [[ $2 == '--help' ]]; then
-		./print "getWorkers --help"
+		./script/print "getWorkers --help"
 		exit
 	else 
 		echo "Usage: pod getWorkers"
@@ -347,7 +352,7 @@ if [[ $1 == 'getAllExecutions' ]] || [[ $1 == 'gae' ]]; then
 	fi
 	
 	if [[ $# == 2 ]] && [[ $2 == '--help' ]]; then
-		./print "getWorkers --help"
+		./script/print "getWorkers --help"
 		exit
 	else 
 		echo "Usage: pod getWorkers"
@@ -366,7 +371,7 @@ if [[ $1 == 'log' ]]; then
 	fi
 	
 	if [[ $2 == '--help' ]]; then
-		./print "log --help"
+		./script/print "log --help"
 		exit
 	else 
 		echo "Usage: pod logs type"
@@ -389,7 +394,7 @@ if [[ $1 == 'redeploy' ]]; then
 	fi
 	
 	if [[ $2 == '--help' ]]; then
-		./print "redeploy --help"
+		./script/print "redeploy --help"
 		exit
 	else 
 		echo "Usage: pod redeploy [db]"

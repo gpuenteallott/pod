@@ -52,6 +52,23 @@ if [ -z $ACCESS_KEY ] || [ -z $SECRET_KEY ]; then
 	exit 1
 fi
 
+# Verify that keypair exists
+KEYPAIR_EXISTS=`aws ec2 describe-key-pairs --key-names $KEY_PAIR | grep "KeyPairs"`
+if [[ $KEYPAIR_EXISTS == '' ]]; then
+	echo "Key Pair called $KEY_PAIR doesn't exist"
+	echo "Please go to AWS console and create one or use the AWS CLI to do it:"
+	echo "$ aws ec2 create-key-pair --key-name MyKeyPair"
+fi
+
+# Verify that security group exists
+SECURITY_GROUP_EXISTS=`aws ec2 describe-security-groups --group-names $SECURITY_GROUP | grep "SecurityGroups"`
+if [[ $SECURITY_GROUP_EXISTS == '' ]]; then
+	echo "Security Group called $SECURITY_GROUP doesn't exist"
+	echo "Please go to AWS console and create one or use the AWS CLI to do it:"
+	echo "$ aws ec2 create-security-group --group-name MySecurityGroup --description 'My security group'"
+	echo "And don't forget to open the ports 22 for SSH and 80 for HTTP"
+fi
+
 # Modify the install.sh script to include the AWS security credentials for the servers
 # We will pass the EC2 instance the modified script file which includes the files
 # We sent the secret slashes encoded with the char sequence ########
@@ -86,7 +103,7 @@ done < instance_ids.tmp
 rm $INSTANCE_SETUP.tmp
 rm instance_ids.tmp
 
-echo "Done launching. Expect the server to be ready in 10 minutes"
+echo `date` "Done launching. Expect the server to be ready in 10 minutes"
 echo ""
 echo "Waiting for Manager DNS..."
 echo -n "*"

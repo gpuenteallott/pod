@@ -14,6 +14,7 @@ import com.pod.dao.PolicyDAO;
 import com.pod.dao.WorkerDAO;
 import com.pod.interaction.Action;
 import com.pod.interaction.HttpSender;
+import com.pod.listeners.ServerProperties;
 import com.pod.model.Activity;
 import com.pod.model.Execution;
 import com.pod.model.Policy;
@@ -172,11 +173,13 @@ public class ExecutionHandler {
 				Policy activePolicy = pdao.getActive();
 				WorkerHandler wh = new WorkerHandler();
 				
-				// Only consider launching a new worker if we haven't reach the maximum and if there is a maxWait specified
+				// Only consider launching a new worker if we haven't reach the maximum
 				
-				if ( activePolicy.getMaxWorkers() > wh.getTotalWorkers() && activePolicy.getRule("maxWait") != null ) {
+				if ( activePolicy.getMaxWorkers() > wh.getTotalWorkers() ) {
 					
-					int maxWait = Integer.parseInt( activePolicy.getRule("maxWait") );
+					int maxWait = ServerProperties.DEFAULT_MAX_WAIT;
+					if ( activePolicy.getRule("maxWait") != null )
+						maxWait = Integer.parseInt( activePolicy.getRule("maxWait") );
 					
 					if ( predictedTime > maxWait ) {
 						jsonResponse.add("event", "launchingWorker");

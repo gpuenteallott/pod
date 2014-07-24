@@ -54,6 +54,7 @@ public class ServerProperties implements ServletContextListener {
 	public static int DEFAULT_TIME_TO_TERMINATE = 45*60*1000; // 45 mins
 	public static int DEFAULT_TERMINATION_TIME = 45*60*1000; // 45 mins
 	public static int DEFAULT_ERROR_TIMEOUT = 5*60*1000; // 5 mins
+	public static int DEFAULT_MAX_WAIT = 3*60*1000; // 3 mins
 	
 	private static String role;
 	private static String name;

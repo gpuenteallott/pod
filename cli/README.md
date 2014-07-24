@@ -1,8 +1,12 @@
 POD - Processing On Demand platform
 ===
 
-Currently under development
+Command Line Interface
 
-Download and execute the file called pod
+It allows a user to have control over the manager and perform all operations from a console.
 
-Type ./pod --help to get indications
+The CLI is implemented directly with shell scripts. It is fully documented and all commands accept the –-help parameter, that will display a usage description.
+
+To execute, run:
+
+$ ./pod
