@@ -4,6 +4,7 @@
 *.jar
 .settings
 .classpath
+log.txt
 .project
 *.priv
 AwsCredentials.properties
