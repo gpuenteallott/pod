@@ -1,8 +1,6 @@
 POD - Processing On Demand platform
 ===
 
-Currently under development
-
 The purpose of POD is make deployment for application developers nice and easy.
 
 Imagine that you have developed some application that requires some kind of processing (language doesn't matter). The next step would be start planning how to upload your app, manage the servers, scalability constraints... WAIT! Don't do it!
